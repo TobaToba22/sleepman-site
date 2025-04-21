@@ -93,5 +93,88 @@
       document.getElementById("terminal").style.display = "block";
     }
   </script>
-</body>
+</body><!-- Секретная кнопка по лампе -->
+<div id="lamp-secret" onclick="revealTerminal()"></div>
+
+<!-- Терминал -->
+<div id="terminal">
+  <div class="terminal-box">
+    <p class="terminal-text">access code required:</p>
+    <input id="codeInput" type="text" placeholder="Enter code..." />
+    <button onclick="checkCode()">Unlock</button>
+    <p id="terminalMessage"></p>
+  </div>
+</div>
+
+<style>
+  #lamp-secret {
+    position: absolute;
+    top: 40px;
+    right: 40px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    z-index: 10;
+  }
+
+  #terminal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.95);
+    color: #00ff91;
+    font-family: monospace;
+    padding: 40px;
+    z-index: 100;
+  }
+
+  .terminal-box {
+    max-width: 500px;
+    margin: auto;
+    margin-top: 100px;
+  }
+
+  .terminal-box input {
+    background: black;
+    border: 1px solid #00ff91;
+    color: #00ff91;
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .terminal-box button {
+    background: transparent;
+    border: 1px solid #00ff91;
+    color: #00ff91;
+    padding: 8px 20px;
+    margin-top: 10px;
+    cursor: pointer;
+  }
+
+  .terminal-box p {
+    margin-top: 15px;
+  }
+</style>
+
+<script>
+  function revealTerminal() {
+    document.getElementById('terminal').style.display = 'block';
+  }
+
+  function checkCode() {
+    const code = document.getElementById('codeInput').value.trim().toLowerCase();
+    const secret = 'sleepaccess';
+    const msg = document.getElementById('terminalMessage');
+
+    if (code === secret) {
+      msg.innerText = '✔ ACCESS GRANTED — you may proceed.';
+      msg.style.color = '#00ff91';
+    } else {
+      msg.innerText = '✖ access denied.';
+      msg.style.color = '#ff0055';
+    }
+  }
+</script>
+
 </html>

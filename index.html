@@ -13,12 +13,14 @@
       color: #00ffcc;
       overflow: hidden;
     }
+
     .background {
       position: fixed;
       width: 100%;
       height: 100%;
       z-index: -1;
     }
+
     .ui {
       position: absolute;
       top: 50%;
@@ -28,6 +30,7 @@
       flex-direction: column;
       gap: 20px;
     }
+
     .button {
       background: rgba(0, 0, 0, 0.7);
       border: 2px solid #00ffcc;
@@ -38,93 +41,73 @@
       width: 280px;
       text-transform: uppercase;
     }
+
     .button:hover {
       background: #00ffcc;
       color: black;
     }
-    #lamp-secret {
-      position: absolute;
-      top: 40px;
-      right: 30px;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      z-index: 10;
-    }
+
+    /* Терминал */
     #terminal {
       display: none;
       position: fixed;
-      inset: 0;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: black;
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    .frame {
-      position: relative;
-      background: url('terminal_frame.png') no-repeat center center;
-      background-size: contain;
-      width: 600px;
-      height: 600px;
-    }
-    .terminal-content {
-      position: absolute;
-      top: 21%;
-      left: 11%;
-      width: 78%;
-      height: 58%;
       color: #00ff00;
+      padding: 20px;
       font-size: 18px;
+      z-index: 999;
       white-space: pre-wrap;
     }
-    .blinker {
-      display: inline-block;
-      width: 10px;
-      height: 18px;
-      background-color: #00ff00;
-      animation: blink 1s infinite;
-    }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
+
+    /* Секретная кнопка по лампе */
+    #secretLampBtn {
+      position: absolute;
+      top: 8%;
+      right: 10%;
+      width: 60px;
+      height: 60px;
+      z-index: 50;
+      cursor: pointer;
+      background: transparent;
+      border: none;
     }
   </style>
 </head>
 <body>
+  <!-- Фон -->
   <img class="background" id="bg" src="sleepman_final_1_3s.gif" alt="Sleepman Background">
 
+  <!-- UI -->
   <div class="ui" id="mainUI">
     <div class="button">BUY $SLEEPMAN</div>
     <div class="button">CLAIM NFT</div>
     <div class="button">JOIN CULT</div>
   </div>
 
-  <div id="lamp-secret" onclick="activateTerminal()"></div>
+  <!-- Секретная кнопка -->
+  <div id="secretLampBtn" onclick="activateTerminal()"></div>
 
+  <!-- Терминал -->
   <div id="terminal">
-    <div class="frame">
-      <div class="terminal-content">
-WELCOME TO THE DREAM PROTOCOL // SLEEPMAN
-
-Loading sleep memory logs...
-
-[Access Level: Public]
-
->> In the beginning... he only wanted rest.
->> They called him lazy. Then... they called him dangerous.
->> Now they follow him. Because only in sleep... he dreams of the Moon.
-
-<span class="blinker"></span>
-      </div>
-    </div>
+    ██████████████████████████████████████████████████████████████<br>
+    ███████ WELCOME TO THE DREAM PROTOCOL // SLEEPMAN █████████████<br>
+    ██████████████████████████████████████████████████████████████<br><br>
+    Loading sleep memory logs...<br><br>
+    [Access Level: Public]<br>
+    >> In the beginning... he only wanted rest.<br>
+    >> They called him lazy. Then... they called him dangerous.<br>
+    >> Now they follow him. Because only in sleep... he dreams of the Moon.<br>
   </div>
 
   <script>
     function activateTerminal() {
       document.getElementById("bg").style.display = "none";
       document.getElementById("mainUI").style.display = "none";
-      document.getElementById("terminal").style.display = "flex";
+      document.getElementById("terminal").style.display = "block";
     }
   </script>
 </body>

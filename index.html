@@ -45,7 +45,7 @@
     #lamp-secret {
       position: absolute;
       top: 40px;
-      right: 32px;
+      right: 30px;
       width: 40px;
       height: 40px;
       cursor: pointer;
@@ -55,74 +55,76 @@
       display: none;
       position: fixed;
       inset: 0;
-      background-color: rgba(0, 0, 0, 0.95);
-      z-index: 100;
-    }
-    .terminal-container {
-      background: url('terminal_frame.png') no-repeat center;
-      background-size: contain;
-      width: 768px;
-      height: 768px;
-      margin: 60px auto;
+      background: black;
+      z-index: 1000;
       display: flex;
-      flex-direction: column;
-      justify-content: center;
       align-items: center;
-      color: #00ff91;
-      font-family: monospace;
-      padding: 80px;
-      box-sizing: border-box;
+      justify-content: center;
     }
-    .terminal-text {
+    .frame {
+      position: relative;
+      background: url('terminal_frame.png') no-repeat center center;
+      background-size: contain;
+      width: 600px;
+      height: 600px;
+    }
+    .terminal-content {
+      position: absolute;
+      top: 21%;
+      left: 11%;
+      width: 78%;
+      height: 58%;
+      color: #00ff00;
       font-size: 18px;
-      text-align: left;
-      max-width: 85%;
+      white-space: pre-wrap;
     }
     .blinker {
       display: inline-block;
       width: 10px;
-      height: 10px;
-      background: #00ff00;
-      border-radius: 50%;
-      margin-left: 8px;
-      animation: blink 0.8s infinite;
+      height: 18px;
+      background-color: #00ff00;
+      animation: blink 1s infinite;
     }
     @keyframes blink {
-      0%, 50%, 100% { opacity: 1; }
-      25%, 75% { opacity: 0; }
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
   </style>
 </head>
 <body>
   <img class="background" id="bg" src="sleepman_final_1_3s.gif" alt="Sleepman Background">
+
   <div class="ui" id="mainUI">
     <div class="button">BUY $SLEEPMAN</div>
     <div class="button">CLAIM NFT</div>
     <div class="button">JOIN CULT</div>
   </div>
-  <div id="lamp-secret" onclick="revealTerminal()"></div>
+
+  <div id="lamp-secret" onclick="activateTerminal()"></div>
 
   <div id="terminal">
-    <div class="terminal-container">
-      <div class="terminal-text">
-        ██████████████████████████████████████████████████████████████<br>
-        ███████ WELCOME TO THE DREAM PROTOCOL // SLEEPMAN █████████████<br>
-        ██████████████████████████████████████████████████████████████<br><br>
-        Loading sleep memory logs...<br><br>
-        [Access Level: Public]<br>
-        >> In the beginning... he only wanted rest.<br>
-        >> They called him lazy. Then... they called him dangerous.<br>
-        >> Now they follow him. Because only in sleep... he dreams of the Moon.<br>
-        <div style="margin-top: 20px;">Awaiting input<span class="blinker"></span></div>
+    <div class="frame">
+      <div class="terminal-content">
+WELCOME TO THE DREAM PROTOCOL // SLEEPMAN
+
+Loading sleep memory logs...
+
+[Access Level: Public]
+
+>> In the beginning... he only wanted rest.
+>> They called him lazy. Then... they called him dangerous.
+>> Now they follow him. Because only in sleep... he dreams of the Moon.
+
+<span class="blinker"></span>
       </div>
     </div>
   </div>
 
   <script>
-    function revealTerminal() {
+    function activateTerminal() {
       document.getElementById("bg").style.display = "none";
       document.getElementById("mainUI").style.display = "none";
-      document.getElementById("terminal").style.display = "block";
+      document.getElementById("terminal").style.display = "flex";
     }
   </script>
 </body>

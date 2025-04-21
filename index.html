@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>$SLEEPMAN — Enter the Dream</title>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'VT323', monospace;
+      background: black;
+      color: #00ffcc;
+      overflow: hidden;
+    }
+    .background {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .ui {
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .button {
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #00ffcc;
+      padding: 10px 20px;
+      font-size: 24px;
+      cursor: pointer;
+      text-align: center;
+      width: 280px;
+      text-transform: uppercase;
+    }
+    .button:hover {
+      background: #00ffcc;
+      color: black;
+    }
+    #terminal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      color: #00ff00;
+      padding: 20px;
+      font-size: 18px;
+      z-index: 999;
+      white-space: pre-wrap;
+    }
+    #lampZone {
+      position: absolute;
+      top: 10%;
+      right: 10%;
+      width: 80px;
+      height: 150px;
+      cursor: pointer;
+      z-index: 100;
+    }
+  </style>
+</head>
+<body>
+  <img class="background" id="bg" src="sleepman_final_1_3s.gif" alt="Sleepman Background">
+  <div class="ui" id="mainUI">
+    <div class="button">BUY $SLEEPMAN</div>
+    <div class="button">CLAIM NFT</div>
+    <div class="button">JOIN CULT</div>
+  </div>
+  <div id="lampZone" onclick="activateTerminal()"></div>
+  <div id="terminal">
+    ██████████████████████████████████████████████████████████████<br>
+    ███████ WELCOME TO THE DREAM PROTOCOL // SLEEPMAN █████████████<br>
+    ██████████████████████████████████████████████████████████████<br><br>
+    Loading sleep memory logs...<br><br>
+    [Access Level: Public]<br>
+    >> In the beginning... he only wanted rest.<br>
+    >> They called him lazy. Then... they called him dangerous.<br>
+    >> Now they follow him. Because only in sleep... he dreams of the Moon.<br>
+  </div>
+
+  <script>
+    function activateTerminal() {
+      document.getElementById("bg").style.display = "none";
+      document.getElementById("mainUI").style.display = "none";
+      document.getElementById("terminal").style.display = "block";
+    }
+  </script>
+</body>
+</html>

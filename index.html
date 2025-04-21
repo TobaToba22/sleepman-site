@@ -42,28 +42,54 @@
       background: #00ffcc;
       color: black;
     }
+    #lamp-secret {
+      position: absolute;
+      top: 40px;
+      right: 32px;
+      width: 40px;
+      height: 40px;
+      cursor: pointer;
+      z-index: 10;
+    }
     #terminal {
       display: none;
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: black;
-      color: #00ff00;
-      padding: 20px;
-      font-size: 18px;
-      z-index: 999;
-      white-space: pre-wrap;
-    }
-    #lampZone {
-      position: absolute;
-      top: 10%;
-      right: 10%;
-      width: 80px;
-      height: 150px;
-      cursor: pointer;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.95);
       z-index: 100;
+    }
+    .terminal-container {
+      background: url('terminal_frame.png') no-repeat center;
+      background-size: contain;
+      width: 768px;
+      height: 768px;
+      margin: 60px auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #00ff91;
+      font-family: monospace;
+      padding: 80px;
+      box-sizing: border-box;
+    }
+    .terminal-text {
+      font-size: 18px;
+      text-align: left;
+      max-width: 85%;
+    }
+    .blinker {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #00ff00;
+      border-radius: 50%;
+      margin-left: 8px;
+      animation: blink 0.8s infinite;
+    }
+    @keyframes blink {
+      0%, 50%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0; }
     }
   </style>
 </head>
@@ -74,109 +100,30 @@
     <div class="button">CLAIM NFT</div>
     <div class="button">JOIN CULT</div>
   </div>
-  <div id="lampZone" onclick="activateTerminal()"></div>
+  <div id="lamp-secret" onclick="revealTerminal()"></div>
+
   <div id="terminal">
-    ██████████████████████████████████████████████████████████████<br>
-    ███████ WELCOME TO THE DREAM PROTOCOL // SLEEPMAN █████████████<br>
-    ██████████████████████████████████████████████████████████████<br><br>
-    Loading sleep memory logs...<br><br>
-    [Access Level: Public]<br>
-    >> In the beginning... he only wanted rest.<br>
-    >> They called him lazy. Then... they called him dangerous.<br>
-    >> Now they follow him. Because only in sleep... he dreams of the Moon.<br>
+    <div class="terminal-container">
+      <div class="terminal-text">
+        ██████████████████████████████████████████████████████████████<br>
+        ███████ WELCOME TO THE DREAM PROTOCOL // SLEEPMAN █████████████<br>
+        ██████████████████████████████████████████████████████████████<br><br>
+        Loading sleep memory logs...<br><br>
+        [Access Level: Public]<br>
+        >> In the beginning... he only wanted rest.<br>
+        >> They called him lazy. Then... they called him dangerous.<br>
+        >> Now they follow him. Because only in sleep... he dreams of the Moon.<br>
+        <div style="margin-top: 20px;">Awaiting input<span class="blinker"></span></div>
+      </div>
+    </div>
   </div>
 
   <script>
-    function activateTerminal() {
+    function revealTerminal() {
       document.getElementById("bg").style.display = "none";
       document.getElementById("mainUI").style.display = "none";
       document.getElementById("terminal").style.display = "block";
     }
   </script>
-</body><!-- Секретная кнопка по лампе -->
-<div id="lamp-secret" onclick="revealTerminal()"></div>
-
-<!-- Терминал -->
-<div id="terminal">
-  <div class="terminal-box">
-    <p class="terminal-text">access code required:</p>
-    <input id="codeInput" type="text" placeholder="Enter code..." />
-    <button onclick="checkCode()">Unlock</button>
-    <p id="terminalMessage"></p>
-  </div>
-</div>
-
-<style>
-  #lamp-secret {
-  position: absolute;
-  top: 40px;
-  right: 32px; /* было 40px */
-  width: 40px;
-  height: 40px;
-  cursor: pointer;
-  z-index: 10;
-}
-
-  }
-
-  #terminal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.95);
-    color: #00ff91;
-    font-family: monospace;
-    padding: 40px;
-    z-index: 100;
-  }
-
-  .terminal-box {
-    max-width: 500px;
-    margin: auto;
-    margin-top: 100px;
-  }
-
-  .terminal-box input {
-    background: black;
-    border: 1px solid #00ff91;
-    color: #00ff91;
-    padding: 10px;
-    width: 100%;
-    margin-top: 10px;
-  }
-
-  .terminal-box button {
-    background: transparent;
-    border: 1px solid #00ff91;
-    color: #00ff91;
-    padding: 8px 20px;
-    margin-top: 10px;
-    cursor: pointer;
-  }
-
-  .terminal-box p {
-    margin-top: 15px;
-  }
-</style>
-
-<script>
-  function revealTerminal() {
-    document.getElementById('terminal').style.display = 'block';
-  }
-
-  function checkCode() {
-    const code = document.getElementById('codeInput').value.trim().toLowerCase();
-    const secret = 'sleepaccess';
-    const msg = document.getElementById('terminalMessage');
-
-    if (code === secret) {
-      msg.innerText = '✔ ACCESS GRANTED — you may proceed.';
-      msg.style.color = '#00ff91';
-    } else {
-      msg.innerText = '✖ access denied.';
-      msg.style.color = '#ff0055';
-    }
-  }
-</script>
-
+</body>
 </html>

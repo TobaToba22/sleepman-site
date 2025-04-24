@@ -1,0 +1,279 @@
+/* Base Styles */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'VT323', monospace;
+    background: black;
+    color: #00ffcc;
+    overflow: hidden;
+    height: 100%;
+}
+
+/* Screen Management */
+.screen {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.screen.active {
+    display: block;
+}
+
+/* Intro Screen */
+#intro-screen {
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.console-text {
+    text-align: center;
+    font-size: 24px;
+    line-height: 1.5;
+}
+
+.typing-text {
+    display: inline-block;
+    opacity: 0;
+    animation: typing 1s ease-in forwards;
+}
+
+@keyframes typing {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+/* Main UI */
+.background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.8;
+}
+
+.ui {
+    position: absolute;
+    top: 50%;
+    left: 10%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.button {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00ffcc;
+    padding: 10px 20px;
+    font-size: 24px;
+    cursor: pointer;
+    text-align: center;
+    width: 280px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.button:hover {
+    background: #00ffcc;
+    color: black;
+    box-shadow: 0 0 20px #00ffcc;
+}
+
+/* Terminal */
+.terminal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.terminal-frame {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.terminal-content {
+    position: absolute;
+    top: calc(50% - 49.5px);
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    max-width: 700px;
+    height: 70vh;
+    max-height: 600px;
+    color: #00ff00;
+    font-size: 18px;
+    white-space: pre-wrap;
+    word-break: break-word;
+    text-align: center;
+    overflow-y: auto;
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.terminal-content::-webkit-scrollbar {
+    width: 10px;
+}
+
+.terminal-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+}
+
+.terminal-content::-webkit-scrollbar-thumb {
+    background: #00ff00;
+    border-radius: 5px;
+}
+
+.matrix-text {
+    display: inline-block;
+    opacity: 0;
+    animation: matrixAppear 0.5s ease-in forwards;
+}
+
+@keyframes matrixAppear {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.terminal-text {
+    margin-bottom: 40px;
+    text-shadow: 0 0 5px #00ff00;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.terminal-button {
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    background: black;
+    color: #00ff91;
+    border: 1px solid #00ff91;
+    padding: 5px 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.terminal-button:hover {
+    background: #00ff91;
+    color: black;
+}
+
+.access-denied {
+    color: #ff0033;
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    margin-top: 10px;
+    display: none;
+    animation: glitch 0.3s infinite;
+}
+
+@keyframes glitch {
+    0% { transform: translate(0) }
+    20% { transform: translate(-2px, 2px) }
+    40% { transform: translate(-2px, -2px) }
+    60% { transform: translate(2px, 2px) }
+    80% { transform: translate(2px, -2px) }
+    100% { transform: translate(0) }
+}
+
+.terminal-hidden {
+    display: none !important;
+}
+
+.input-container {
+    display: flex;
+    gap: 10px;
+    margin: 10px 0;
+    justify-content: center;
+}
+
+.terminal-input {
+    font-family: 'VT323', monospace;
+    font-size: 18px;
+    background: black;
+    color: #00ff91;
+    border: 1px solid #00ff91;
+    padding: 5px 10px;
+    width: 200px;
+    outline: none;
+}
+
+.terminal-input:focus {
+    box-shadow: 0 0 5px #00ff91;
+}
+
+.button-glow {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0,255,0,0.5) 0%, transparent 70%);
+    animation: glowPulse 2s infinite;
+}
+
+@keyframes glowPulse {
+    0% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.2); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 0.5; }
+}
+
+/* Secret Zone */
+.secret-zone {
+    position: absolute;
+    top: 8%;
+    right: 10%;
+    width: 60px;
+    height: 60px;
+    z-index: 50;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    opacity: 0;
+}
+
+.glow-effect {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(0,255,204,0.2) 0%, transparent 70%);
+    animation: pulse 2s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.blink {
+    color: #00ff00;
+    animation: blink 1s infinite;
+    display: inline-block;
+    width: 10px;
+    height: 20px;
+    vertical-align: middle;
+    margin-left: 2px;
+} 

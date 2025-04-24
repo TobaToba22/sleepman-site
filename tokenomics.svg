@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text {
+      font-family: 'VT323', monospace;
+      fill: #00ffcc;
+      text-shadow: 0 0 5px #00ffcc;
+    }
+    .pie-segment {
+      stroke: #00ffcc;
+      stroke-width: 2;
+    }
+    .label {
+      font-size: 16px;
+    }
+    .title {
+      font-size: 24px;
+    }
+  </style>
+  
+  <!-- Pie Chart -->
+  <g transform="translate(200, 200)">
+    <!-- Cult Treasury 30% -->
+    <path class="pie-segment" d="M0,0 L0,-150 A150,150 0 0,1 129.9,-75 Z" fill="#1a1a1a"/>
+    <!-- Viral Airdrops 20% -->
+    <path class="pie-segment" d="M0,0 L129.9,-75 A150,150 0 0,1 150,0 Z" fill="#1a1a1a"/>
+    <!-- Sleepman Liquidity Pool 15% -->
+    <path class="pie-segment" d="M0,0 L150,0 A150,150 0 0,1 129.9,75 Z" fill="#1a1a1a"/>
+    <!-- Devs of the Dream 10% -->
+    <path class="pie-segment" d="M0,0 L129.9,75 A150,150 0 0,1 75,129.9 Z" fill="#1a1a1a"/>
+  </g>
+
+  <!-- Labels -->
+  <text x="200" y="50" class="title" text-anchor="middle">TOKENOMICS</text>
+  
+  <text x="100" y="180" class="label">CULT TREASURY</text>
+  <text x="120" y="200" class="label">30%</text>
+  
+  <text x="300" y="180" class="label">VIRAL AIRDROPS</text>
+  <text x="320" y="200" class="label">20%</text>
+  
+  <text x="300" y="280" class="label">SLEEPMAN LIQUIDITY POOL</text>
+  <text x="320" y="300" class="label">15%</text>
+  
+  <text x="100" y="280" class="label">DEVS OF THE DREAM</text>
+  <text x="120" y="300" class="label">10%</text>
+</svg> 

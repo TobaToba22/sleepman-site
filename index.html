@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <title>$SLEEPMAN — Enter the Dream</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
   <style>
     html, body {
       margin: 0;
@@ -12,6 +13,62 @@
       background: black;
       color: #00ffcc;
       overflow: hidden;
+    }
+
+    /* Intro Screen */
+    #introScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: black;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .intro-text {
+      color: #00ffcc;
+      font-size: 2rem;
+      opacity: 0;
+      transform: translateY(20px);
+      text-shadow: 0 0 10px #00ffcc;
+    }
+
+    .intro-text:nth-child(1) {
+      animation: fadeInUp 2s ease forwards;
+    }
+
+    .intro-text:nth-child(2) {
+      animation: fadeInUp 2s ease forwards 2.5s;
+    }
+
+    .intro-text:nth-child(3) {
+      animation: fadeInUp 2s ease forwards 5s;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Main Content */
+    #mainContent {
+      opacity: 0;
+      transition: opacity 1s ease;
+    }
+
+    #mainContent.visible {
+      opacity: 1;
     }
 
     .background {
@@ -31,6 +88,7 @@
       gap: 20px;
     }
 
+    /* Main Menu Button Styles */
     .button {
       background: rgba(0, 0, 0, 0.7);
       border: 2px solid #00ffcc;
@@ -40,27 +98,466 @@
       text-align: center;
       width: 280px;
       text-transform: uppercase;
+      color: #00ffcc;
+      box-shadow: 0 0 10px #00ffcc;
+      text-shadow: 0 0 5px #00ffcc;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .button::before {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      color: #00ffcc;
+      filter: blur(1px);
+      transform: scale(1.1);
+      pointer-events: none;
     }
 
     .button:hover {
-      background: #00ffcc;
-      color: black;
+      animation: buttonGlitch 0.2s infinite;
+      box-shadow: 
+        0 0 10px #00ffcc,
+        0 0 20px #00ffcc,
+        0 0 30px #00ffcc;
+      text-shadow: 
+        0 0 5px #00ffcc,
+        0 0 10px #00ffcc,
+        0 0 15px #00ffcc;
+      letter-spacing: 1px;
     }
 
-    /* Терминал */
-    #terminal {
+    .button:hover::before {
+      animation: textGlitch 0.3s infinite;
+      opacity: 0.8;
+    }
+
+    @keyframes buttonGlitch {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 0); }
+      40% { transform: translate(2px, 0); }
+      60% { transform: translate(-1px, 0); }
+      80% { transform: translate(1px, 0); }
+      100% { transform: translate(0); }
+    }
+
+    @keyframes textGlitch {
+      0% { 
+        clip-path: inset(0 0 0 0);
+        transform: translate(0);
+        opacity: 1;
+      }
+      2% { 
+        clip-path: inset(20% 0 0 0);
+        transform: translate(-2px);
+        opacity: 0.8;
+      }
+      4% { 
+        clip-path: inset(0 0 20% 0);
+        transform: translate(2px);
+        opacity: 0.9;
+      }
+      6% { 
+        clip-path: inset(0 0 0 0);
+        transform: translate(0);
+        opacity: 1;
+      }
+      100% { 
+        clip-path: inset(0 0 0 0);
+        transform: translate(0);
+        opacity: 1;
+      }
+    }
+
+    .terminal-line.repeat-message {
+      color: #00ff66;
+      animation: textGlitch 2s ease-out;
+    }
+
+    /* Sound effect hook for future use */
+    .button[data-sound] {
+      transition: all 0.2s ease;
+    }
+
+    .button[data-sound]:hover {
+      /* Hook for future sound implementation */
+    }
+
+    /* Modal Styles */
+    .modal {
       display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: black;
+      background: rgba(0, 0, 0, 0.98);
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal.active {
+      opacity: 1;
+    }
+
+    .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      padding: 2rem;
+      border-radius: 5px;
+      border: 2px solid #00ff00;
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+      animation: borderPulse 2s infinite;
+      box-shadow: 
+        0 0 20px rgba(0, 255, 0, 0.5),
+        inset 0 0 20px rgba(0, 255, 0, 0.5);
+      overflow: hidden;
+    }
+
+    @keyframes borderPulse {
+      0% { border-color: #00ff00; box-shadow: 0 0 20px rgba(0, 255, 0, 0.5), inset 0 0 20px rgba(0, 255, 0, 0.5); }
+      50% { border-color: #003300; box-shadow: 0 0 10px rgba(0, 255, 0, 0.2), inset 0 0 10px rgba(0, 255, 0, 0.2); }
+      100% { border-color: #00ff00; box-shadow: 0 0 20px rgba(0, 255, 0, 0.5), inset 0 0 20px rgba(0, 255, 0, 0.5); }
+    }
+
+    .modal-title {
       color: #00ff00;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      font-family: 'VT323', monospace;
+      letter-spacing: 2px;
+      animation: glitchText 0.4s infinite;
+      position: relative;
+      text-shadow: 
+        2px 2px #003300,
+        -2px -2px #00ff00;
+    }
+
+    @keyframes glitchText {
+      0% { transform: translate(0); }
+      20% { transform: translate(-2px, 2px); }
+      40% { transform: translate(-2px, -2px); }
+      60% { transform: translate(2px, 2px); }
+      80% { transform: translate(2px, -2px); }
+      100% { transform: translate(0); }
+    }
+
+    .modal-image-container {
+      border: 1px solid #00ff00;
+      padding: 1rem;
+      margin: 1.5rem 0;
+      background: rgba(0, 255, 0, 0.05);
+      position: relative;
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-image-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 0, 0.1),
+        rgba(0, 255, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      animation: scanline 10s linear infinite;
+    }
+
+    @keyframes scanline {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(100%); }
+    }
+
+    .tokenomics-content {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      color: #00ff00;
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+      width: 100%;
+    }
+
+    .tokenomics-item {
+      display: flex;
+      justify-content: space-between;
+      border: 1px solid #00ff00;
+      padding: 0.8rem 1rem;
+      background: rgba(0, 255, 0, 0.05);
+      opacity: 0;
+      animation: fadeInGlitch 0.5s forwards, glitchItem 2s infinite;
+    }
+
+    .tokenomics-item:nth-child(1) { animation-delay: 0.3s; }
+    .tokenomics-item:nth-child(2) { animation-delay: 0.6s; }
+    .tokenomics-item:nth-child(3) { animation-delay: 0.9s; }
+    .tokenomics-item:nth-child(4) { animation-delay: 1.2s; }
+    .tokenomics-item:nth-child(5) { animation-delay: 1.5s; }
+
+    @keyframes fadeInGlitch {
+      0% {
+        opacity: 0;
+        transform: translateX(-10px);
+      }
+      50% {
+        opacity: 0.5;
+        transform: translateX(5px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    @keyframes glitchItem {
+      0% { transform: translate(0); }
+      1% { transform: translate(-2px); filter: brightness(150%); }
+      2% { transform: translate(2px); filter: brightness(100%); }
+      3% { transform: translate(0); }
+      90% { transform: translate(0); }
+      91% { transform: translate(-1px); filter: brightness(150%); }
+      92% { transform: translate(1px); filter: brightness(100%); }
+      93% { transform: translate(0); }
+    }
+
+    .modal-button {
+      background: transparent;
+      border: 2px solid #00ff00;
+      padding: 12px 40px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #00ff00;
+      text-transform: uppercase;
+      margin-top: 2rem;
+      font-family: 'VT323', monospace;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    .modal-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 255, 0, 0.2),
+        transparent
+      );
+      animation: buttonGlow 3s infinite;
+    }
+
+    @keyframes buttonGlow {
+      0% { left: -100%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+
+    .modal-button:hover {
+      animation: buttonGlitch 0.3s infinite;
+      background: rgba(0, 255, 0, 0.1);
+      text-shadow: 0 0 8px #00ff00;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      color: #00ff00;
+      font-size: 28px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-shadow: 0 0 5px #00ff00;
+      padding: 5px 10px;
+      animation: glitchText 1s infinite;
+    }
+
+    .close-modal:hover {
+      animation: glitchText 0.2s infinite;
+    }
+
+    /* Scanline effect for the entire modal */
+    .modal::after {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.1),
+        rgba(0, 0, 0, 0.1) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      animation: scanline 10s linear infinite;
+      z-index: 2001;
+    }
+
+    /* CRT flicker effect */
+    .modal::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 255, 0, 0.03);
+      pointer-events: none;
+      animation: flicker 0.15s infinite;
+      z-index: 2001;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+
+    /* Info Button Styles */
+    #info-button {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      background: transparent;
+      border: 1px solid #00ffcc;
+      color: #00ffcc;
+      font-family: 'VT323', 'IBM Plex Mono', 'Source Code Pro', monospace;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 1000;
+    }
+
+    #info-button:hover {
+      box-shadow: 0 0 10px #00ffcc;
+      text-shadow: 0 0 5px #00ffcc;
+    }
+
+    /* Typewriter effect styles */
+    .typewriter-text {
+      display: inline-block;
+      overflow: hidden;
+      white-space: pre-line;
+      border-right: 2px solid #00ffcc;
+      animation: blink 0.75s step-end infinite;
+    }
+
+    @keyframes blink {
+      from, to { border-color: transparent }
+      50% { border-color: #00ffcc; }
+    }
+
+    /* Info Modal Styles */
+    #info-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.98);
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #info-modal.active {
+      opacity: 1;
+    }
+
+    #info-modal .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #000;
       padding: 20px;
+      border-radius: 5px;
+      border: 2px solid #00ffcc;
+      text-align: left;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+      max-height: 80vh;
+      overflow-y: auto;
+      font-family: 'VT323', 'IBM Plex Mono', monospace;
+      color: #00ffcc;
+      line-height: 1.6;
+    }
+
+    #info-modal .modal-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #info-modal .modal-content::-webkit-scrollbar-track {
+      background: rgba(0, 255, 204, 0.1);
+      border-radius: 3px;
+    }
+
+    #info-modal .modal-content::-webkit-scrollbar-thumb {
+      background: #00ffcc;
+      border-radius: 3px;
+      box-shadow: 0 0 5px #00ffcc;
+    }
+
+    #info-modal .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      color: #00ffcc;
+      font-size: 28px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-shadow: 0 0 5px #00ffcc;
+      padding: 5px 10px;
+      z-index: 1;
+    }
+
+    #info-modal .info-content {
+      white-space: pre-line;
       font-size: 18px;
-      z-index: 999;
-      white-space: pre-wrap;
+    }
+
+    #info-modal .info-content p {
+      margin: 0 0 1em 0;
     }
 
     /* Секретная кнопка по лампе */
@@ -68,47 +565,945 @@
       position: absolute;
       top: 8%;
       right: 10%;
-      width: 60px;
-      height: 60px;
+      width: 30px;
+      height: 30px;
       z-index: 50;
       cursor: pointer;
+      opacity: 0;
       background: transparent;
       border: none;
+    }
+
+    #secretLampBtn:hover {
+      background: transparent;
+      box-shadow: none;
+    }
+
+    /* Терминал */
+    #terminal {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 1200px;
+      height: 900px;
+      background: url('terminal_frame.png') no-repeat center center;
+      background-size: contain;
+      z-index: 999;
+    }
+
+    .terminal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 48%;
+      height: 40%;
+      background: transparent;
+      color: #00ff66;
+      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
+      font-size: 18px;
+      line-height: 1.6;
+      padding: 30px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      scrollbar-color: #00ff66 rgba(0, 255, 102, 0.1);
+      border: 1px solid rgba(0, 255, 102, 0.2);
+      box-shadow: inset 0 0 20px rgba(0, 255, 102, 0.1);
+      margin-top: -105px;
+      transition: color 0.3s ease;
+    }
+
+    /* Стилизация скроллбара для WebKit (Chrome, Safari) */
+    .terminal-content::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .terminal-content::-webkit-scrollbar-track {
+      background: rgba(0, 255, 102, 0.1);
+      border-radius: 3px;
+    }
+
+    .terminal-content::-webkit-scrollbar-thumb {
+      background: #00ff66;
+      border-radius: 3px;
+      box-shadow: 0 0 5px #00ff66;
+    }
+
+    .terminal-content::-webkit-scrollbar-thumb:hover {
+      background: #00ff99;
+      box-shadow: 0 0 8px #00ff99;
+    }
+
+    .terminal-input-wrapper {
+      position: absolute;
+      bottom: 33%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: transparent;
+      padding: 15px;
+      border-top: 1px solid rgba(0, 255, 102, 0.3);
+    }
+
+    .terminal-prompt {
+      color: #00ff66;
+      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
+      font-size: 16px;
+    }
+
+    .terminal-input {
+      flex-grow: 1;
+      background: transparent;
+      border: none;
+      color: #00ff66;
+      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
+      font-size: 16px;
+      outline: none;
+      caret-color: #00ff66;
+    }
+
+    .terminal-input::placeholder {
+      color: rgba(0, 255, 102, 0.5);
+    }
+
+    .terminal-indicator {
+      width: 8px;
+      height: 8px;
+      background: #00ff66;
+      border-radius: 50%;
+      margin-left: 10px;
+      box-shadow: 0 0 5px #00ff66;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .terminal-line {
+      opacity: 0;
+      transform: translateY(5px);
+      transition: all 0.3s ease;
+      margin-bottom: 5px;
+    }
+
+    .terminal-line.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Overlay for terminal background */
+    .terminal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 998;
+    }
+
+    /* Добавляем анимацию тряски */
+    @keyframes terminalShake {
+      0%, 100% { transform: translate(-50%, -50%); }
+      25% { transform: translate(-52%, -50%); }
+      50% { transform: translate(-50%, -51%); }
+      75% { transform: translate(-48%, -50%); }
+    }
+
+    .terminal-content.error {
+      color: #ff2a2a;
+      animation: terminalShake 0.2s ease-in-out infinite;
+    }
+
+    /* Добавляем анимации и стили для ошибок */
+    @keyframes textShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-2px); }
+      50% { transform: translateX(2px); }
+      75% { transform: translateX(-1px); }
+    }
+
+    @keyframes alertBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    .terminal-line {
+      transition: color 0.3s ease, transform 0.2s ease;
+    }
+
+    .terminal-content.error .terminal-line {
+      color: #ff2a2a;
+      animation: textShake 0.2s ease-in-out infinite;
+    }
+
+    /* Стили для системного алерта */
+    .system-alert {
+      display: none;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      border: 2px solid #ff2a2a;
+      padding: 15px 30px;
+      color: #ff2a2a;
+      font-family: 'VT323', monospace;
+      font-size: 24px;
+      z-index: 9999;
+      box-shadow: 0 0 20px rgba(255, 42, 42, 0.3);
+      animation: alertBlink 1s infinite;
+    }
+
+    .system-alert::after {
+      content: '_';
+      animation: alertBlink 0.8s infinite;
+    }
+
+    /* Красное свечение по краям */
+    .error-glow {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 9998;
+      background: 
+        linear-gradient(90deg, 
+          rgba(255, 42, 42, 0.2) 0%,
+          transparent 15%,
+          transparent 85%,
+          rgba(255, 42, 42, 0.2) 100%
+        );
+    }
+
+    /* Добавляем стили для фейерверков */
+    @keyframes firework {
+      0% { 
+        transform: translate(0, 0);
+        opacity: 1;
+        width: 4px;
+        height: 4px;
+      }
+      100% { 
+        transform: translate(var(--x), var(--y));
+        opacity: 0;
+        width: 2px;
+        height: 2px;
+      }
+    }
+
+    .firework-container {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9997;
+    }
+
+    .firework {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      animation: firework 0.8s ease-out forwards;
+    }
+
+    .firework-left {
+      left: 0;
+    }
+
+    .firework-right {
+      right: 0;
+    }
+
+    /* NFT Claim Modal Styles */
+    #nft-claim-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.98);
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #nft-claim-modal.active {
+      opacity: 1;
+    }
+
+    #nft-claim-modal .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      padding: 2rem;
+      border-radius: 5px;
+      border: 2px solid #00ff00;
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+      animation: borderPulse 2s infinite;
+      box-shadow: 
+        0 0 20px rgba(0, 255, 0, 0.5),
+        inset 0 0 20px rgba(0, 255, 0, 0.5);
+      overflow: hidden;
+    }
+
+    #nft-claim-modal .modal-title {
+      color: #00ff00;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      font-family: 'VT323', monospace;
+      letter-spacing: 2px;
+      animation: glitchText 0.4s infinite;
+      position: relative;
+      text-shadow: 
+        2px 2px #003300,
+        -2px -2px #00ff00;
+    }
+
+    #nft-claim-modal .nft-claim-content {
+      color: #00ff00;
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+      line-height: 1.6;
+      text-align: left;
+      white-space: pre-line;
+      margin-bottom: 2rem;
+    }
+
+    #nft-claim-modal .nft-claim-button {
+      background: transparent;
+      border: 2px solid #00ff00;
+      padding: 12px 40px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #00ff00;
+      text-transform: uppercase;
+      margin-top: 2rem;
+      font-family: 'VT323', monospace;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+
+    #nft-claim-modal .nft-claim-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 255, 0, 0.2),
+        transparent
+      );
+      animation: buttonGlow 3s infinite;
+    }
+
+    #nft-claim-modal .nft-claim-button:hover {
+      animation: buttonGlitch 0.3s infinite;
+      background: rgba(0, 255, 0, 0.1);
+      text-shadow: 0 0 8px #00ff00;
+    }
+
+    #nft-claim-modal .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      color: #00ff00;
+      font-size: 28px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-shadow: 0 0 5px #00ff00;
+      padding: 5px 10px;
+      animation: glitchText 1s infinite;
+    }
+
+    #nft-claim-modal .close-modal:hover {
+      animation: glitchText 0.2s infinite;
     }
   </style>
 </head>
 <body>
-  <!-- Фон -->
-  <img class="background" id="bg" src="sleepman_final_1_3s.gif" alt="Sleepman Background">
+  <!-- Добавляем элементы для эффектов ошибки -->
+  <div class="error-glow"></div>
+  <div class="system-alert">[ALERT] SYSTEM SECURITY FAILURE: SLEEP_ENTITY SCP-Δ777 IS WAKING UP.</div>
 
-  <!-- UI -->
-  <div class="ui" id="mainUI">
-    <div class="button">BUY $SLEEPMAN</div>
-    <div class="button">CLAIM NFT</div>
-    <div class="button">JOIN CULT</div>
+  <!-- Добавляем контейнеры для фейерверков -->
+  <div class="firework-container" id="fireworkLeft"></div>
+  <div class="firework-container" id="fireworkRight"></div>
+
+  <!-- Info Button -->
+  <button id="info-button">!</button>
+
+  <!-- Info Modal -->
+  <div id="info-modal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeInfoModal()">×</button>
+      <div class="info-content">
+[INFO FILE .SLPM-00X1]  
+Access granted. Warning: Background interference may affect signal integrity.
+
+If you're reading this — you've gone too far.
+
+Most close the tab before it finishes loading.  
+They look. They smirk. They move on.  
+But not you.  
+You're still here. That means you're curious.
+
+So... let's pretend you want to know what's going on.
+
+A half-baked site? A memecoin on life support? Another launch no one will remember?
+
+Could be.
+
+Or maybe you've entered something that's still becoming what it is.
+
+—
+
+Sleepman doesn't sleep. He waits.
+
+You've seen his face — in screen reflections at 3am.  
+He watches when you scroll charts.  
+The world doesn't need him — until it's too late.
+
+He's not a leader.  
+Not a hero.  
+He's a symptom.
+
+—
+
+This isn't a token. It's a format.
+
+It doesn't know what it's supposed to be.  
+It doesn't ask you to believe.  
+It lets you feel.
+
+NFTs? Sure. They exist.  
+What do they do?  
+(File removed.)
+
+Some have already collected 1 out of 5.  
+You? Not yet.  
+Maybe you won't.  
+Maybe it's already too late.
+
+—
+
+There is no team. No marketing.
+
+No investors. No pitch decks.  
+No bullshit.
+
+Just a lamp.  
+A terminal.  
+A page.  
+And intent.
+
+—
+
+I'll say this once:
+
+I have an idea. A real one. About changing the structure of cryptography.  
+Not with tokens. Not with hype.  
+With cognition.
+
+Sleepman is the first step.
+
+If it works — we won't just build a cult.  
+We'll prove that a new kind of presence is possible.
+
+—
+
+You can walk away.  
+Or you can stay.
+
+But if you stay — you won't walk away the same.
+      </div>
+    </div>
   </div>
 
-  <!-- Секретная кнопка -->
-  <div id="secretLampBtn" onclick="activateTerminal()"></div>
+  <!-- Intro Screen -->
+  <div id="introScreen">
+    <div class="intro-text">You are not supposed to be here.</div>
+    <div class="intro-text">But now that you are...</div>
+    <div class="intro-text">the game begins.</div>
+  </div>
 
-  <!-- Терминал -->
-  <div id="terminal">
-    ██████████████████████████████████████████████████████████████<br>
-    ███████ WELCOME TO THE DREAM PROTOCOL // SLEEPMAN █████████████<br>
-    ██████████████████████████████████████████████████████████████<br><br>
-    Loading sleep memory logs...<br><br>
-    [Access Level: Public]<br>
-    >> In the beginning... he only wanted rest.<br>
-    >> They called him lazy. Then... they called him dangerous.<br>
-    >> Now they follow him. Because only in sleep... he dreams of the Moon.<br>
+  <!-- Main Content -->
+  <div id="mainContent">
+    <!-- Фон -->
+    <img class="background" id="bg" src="sleepman_final_1_3s.gif" alt="Sleepman Background">
+
+    <!-- UI -->
+    <div class="ui" id="mainUI">
+      <div id="connectWallet" class="button" data-text="CONNECT WALLET" data-sound="buzz" onclick="connectWallet()">CONNECT WALLET</div>
+      <div id="walletAddress" class="button" style="display: none;"></div>
+      <div class="button" data-text="BUY $SLEEPMAN" data-sound="buzz" onclick="showTokenomics()">BUY $SLEEPMAN</div>
+      <div class="button" data-text="CLAIM NFT" data-sound="buzz">CLAIM NFT</div>
+      <div class="button" data-text="JOIN CULT" data-sound="buzz">JOIN CULT</div>
+    </div>
+
+    <!-- Секретная кнопка по лампе -->
+    <div id="secretLampBtn" onclick="activateTerminal()"></div>
+
+    <!-- Терминал -->
+    <div class="terminal-overlay"></div>
+    <div id="terminal">
+      <div class="terminal-content">
+        <div class="terminal-line">[LOG-██/██/██] // SLEEP ENTITY FILE - SCP-Δ777</div>
+        <div class="terminal-line">&nbsp;</div>
+        <div class="terminal-line">Designation: SLEEP_MAN</div>
+        <div class="terminal-line">Status: Semi-dormant</div>
+        <div class="terminal-line">Threat Level: Unclassified</div>
+        <div class="terminal-line">&nbsp;</div>
+        <div class="terminal-line">Fragmented Memory Extract:</div>
+        <div class="terminal-line">>> ...subject exhibits passive resistance to all stimuli...</div>
+        <div class="terminal-line">>> ...first contact recorded at dream depth level 6...</div>
+        <div class="terminal-line">>> ...eyes closed, but aware. always aware...</div>
+        <div class="terminal-line">>> ...he said: "don't wake me... I'm still uploading the dream..."</div>
+        <div class="terminal-line">&nbsp;</div>
+        <div class="terminal-line">Notes:</div>
+        <div class="terminal-line">Subject is believed to exist simultaneously in chain and meta-chain.</div>
+        <div class="terminal-line">Do not engage directly unless clearance Δ is provided.</div>
+        <div class="terminal-line">Await Phase: Dream Protocol.</div>
+      </div>
+      <div class="terminal-input-wrapper">
+        <span class="terminal-prompt">>></span>
+        <input type="text" class="terminal-input" placeholder="Enter command..." spellcheck="false" />
+        <div class="terminal-indicator"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tokenomics Modal -->
+  <div id="tokenomicsModal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal()">×</button>
+      <h2 class="modal-title">Sleepman Cult Tokenomics</h2>
+      <div class="modal-image-container">
+        <div class="tokenomics-content">
+          <div class="tokenomics-item">
+            <span>CULT TREASURY</span>
+            <span>30%</span>
+          </div>
+          <div class="tokenomics-item">
+            <span>VIRAL AIRDROPS</span>
+            <span>20%</span>
+          </div>
+          <div class="tokenomics-item">
+            <span>SLEEPMAN LIQUIDITY POOL</span>
+            <span>15%</span>
+          </div>
+          <div class="tokenomics-item">
+            <span>DEVS OF THE DREAM</span>
+            <span>10%</span>
+          </div>
+          <div class="tokenomics-item">
+            <span>GIFTS FOR THE CULT</span>
+            <span>25%</span>
+          </div>
+        </div>
+      </div>
+      <button class="modal-button" onclick="goToJupiter()">I'm in — Continue</button>
+    </div>
+  </div>
+
+  <!-- NFT Claim Modal -->
+  <div id="nft-claim-modal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeNFTClaim()">×</button>
+      <h2 class="modal-title">NFT Access</h2>
+      <div class="nft-claim-content">
+This is not a collectible.
+
+By claiming this NFT, you enter the first layer of the Sleepman system.
+
+It's your access key — not just to functions, but to meaning.
+
+Holding this NFT allows you to participate in the unfolding storyline hidden beneath the interface.
+
+You'll need it to go further.  
+You'll need it to understand the signals.
+
+No NFT — no entry.  
+No entry — no lore.
+
+Welcome to the mechanism.
+      </div>
+      <a href="https://thirdweb.com/base/0x2785b77adC320846497B894424977028a5CEef0d/nfts" target="_blank" class="nft-claim-button">BUY NFT 1.25$</a>
+    </div>
   </div>
 
   <script>
-    function activateTerminal() {
-      document.getElementById("bg").style.display = "none";
-      document.getElementById("mainUI").style.display = "none";
-      document.getElementById("terminal").style.display = "block";
+    // Check if intro has been shown before
+    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
+
+    if (!hasSeenIntro) {
+      // Show intro
+      setTimeout(() => {
+        const introScreen = document.getElementById('introScreen');
+        const mainContent = document.getElementById('mainContent');
+        
+        // Fade out intro
+        introScreen.style.transition = 'opacity 1s ease';
+        introScreen.style.opacity = '0';
+        
+        // Show main content
+        setTimeout(() => {
+          introScreen.style.display = 'none';
+          mainContent.classList.add('visible');
+          
+          // Mark intro as shown
+          sessionStorage.setItem('hasSeenIntro', 'true');
+        }, 1000);
+      }, 8000); // Wait for 8 seconds before transitioning
+    } else {
+      // Skip intro if already seen
+      document.getElementById('introScreen').style.display = 'none';
+      document.getElementById('mainContent').classList.add('visible');
     }
+
+    function activateTerminal() {
+      const terminal = document.getElementById('terminal');
+      const overlay = document.querySelector('.terminal-overlay');
+      const lines = document.querySelectorAll('.terminal-line');
+      
+      // Show terminal and overlay
+      terminal.style.display = 'block';
+      overlay.style.display = 'block';
+      
+      // Animate each line with delay
+      lines.forEach((line, index) => {
+        setTimeout(() => {
+          line.classList.add('visible');
+        }, index * 300); // 300ms delay between each line
+      });
+    }
+
+    // Close terminal when clicking overlay
+    document.querySelector('.terminal-overlay').addEventListener('click', function() {
+      const terminal = document.getElementById('terminal');
+      const overlay = document.querySelector('.terminal-overlay');
+      const lines = document.querySelectorAll('.terminal-line');
+      
+      terminal.style.display = 'none';
+      overlay.style.display = 'none';
+      
+      // Reset lines visibility for next time
+      lines.forEach(line => {
+        line.classList.remove('visible');
+      });
+    });
+
+    // Wallet Connection Logic
+    let userAddress = null;
+
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          await provider.send("eth_requestAccounts", []);
+          const signer = provider.getSigner();
+          userAddress = await signer.getAddress();
+          
+          // Display shortened address
+          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+          document.getElementById("walletAddress").innerText = shortenedAddress;
+          
+          // Hide connect button and show address
+          document.getElementById("connectWallet").style.display = "none";
+          document.getElementById("walletAddress").style.display = "block";
+        } catch (error) {
+          console.error("Error connecting wallet:", error);
+          alert("Ошибка подключения кошелька. Попробуйте еще раз.");
+        }
+      } else {
+        alert("Установите MetaMask или другой Web3-кошелёк!");
+      }
+    }
+
+    // Check if wallet is already connected
+    async function checkWalletConnection() {
+      if (window.ethereum) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const accounts = await provider.listAccounts();
+        
+        if (accounts.length > 0) {
+          userAddress = accounts[0];
+          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+          document.getElementById("walletAddress").innerText = shortenedAddress;
+          document.getElementById("connectWallet").style.display = "none";
+          document.getElementById("walletAddress").style.display = "block";
+        }
+      }
+    }
+
+    // Check connection on page load
+    window.addEventListener('load', checkWalletConnection);
+
+    // Listen for account changes
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          // Wallet disconnected
+          userAddress = null;
+          document.getElementById("connectWallet").style.display = "block";
+          document.getElementById("walletAddress").style.display = "none";
+        } else {
+          // Account changed
+          userAddress = accounts[0];
+          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+          document.getElementById("walletAddress").innerText = shortenedAddress;
+        }
+      });
+    }
+
+    // Modal Functions
+    function showTokenomics() {
+      const modal = document.getElementById('tokenomicsModal');
+      modal.style.display = 'block';
+      // Trigger reflow
+      modal.offsetHeight;
+      modal.classList.add('active');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('tokenomicsModal');
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    }
+
+    function goToJupiter() {
+      window.location.href = 'https://jup.ag/swap/SOL-CjUHJwUBS54jg1F1tj6WXaese5weWzyD8ZW3fv3FEcdz';
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const tokenomicsModal = document.getElementById('tokenomicsModal');
+      const infoModal = document.getElementById('info-modal');
+      
+      if (event.target === tokenomicsModal) {
+        closeModal();
+      }
+      if (event.target === infoModal) {
+        closeInfoModal();
+      }
+    }
+
+    // Массив забавных фраз о Sleepman
+    const sleepmanJokes = [
+      "Sleepman once had a wet dream so intense...\n...it triggered a tsunami warning in three metaverses.",
+      "Sleepman's snoring is so powerful...\n...it's classified as a Layer 2 scaling solution.",
+      "Sleepman sleep-walked into a DAO vote...\n...accidentally became the protocol's daddy.",
+      "Sleepman's morning wood is so legendary...\n...it's listed as a governance token on 4 chains.",
+      "Sleepman dozed off during a hack...\n...woke up owning 51% of Bitcoin's hashrate."
+    ];
+
+    // Функция создания фейерверка
+    function createFirework(container, isRight) {
+      const colors = ['#00ff66', '#ff2a2a', '#00ffff', '#ff00ff', '#ffff00'];
+      
+      for (let i = 0; i < 20; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'firework';
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        // Рандомные координаты для разлета частиц
+        const x = (isRight ? -1 : 1) * (Math.random() * 100 + 50);
+        const y = (Math.random() - 0.5) * 100;
+        particle.style.setProperty('--x', `${x}px`);
+        particle.style.setProperty('--y', `${y}px`);
+        
+        // Начальная позиция
+        particle.style.top = '50%';
+        particle.style.right = isRight ? '0' : 'auto';
+        particle.style.left = isRight ? 'auto' : '0';
+        
+        container.appendChild(particle);
+        
+        // Удаляем частицу после анимации
+        setTimeout(() => particle.remove(), 800);
+      }
+    }
+
+    // Обновляем обработчик ввода для терминала
+    document.querySelector('.terminal-input').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        const input = this.value.trim().toLowerCase();
+        const terminalContent = document.querySelector('.terminal-content');
+        const fireworkLeft = document.getElementById('fireworkLeft');
+        const fireworkRight = document.getElementById('fireworkRight');
+        
+        // Проверяем на пасхалку
+        if (['@sleepman', 'sleepman', '@SLEEPMAN', 'SLEEPMAN'].includes(input.toUpperCase())) {
+          // Проверяем, срабатывала ли пасхалка раньше
+          const hasTriggered = sessionStorage.getItem('sleepmanEasterEgg');
+          
+          if (!hasTriggered) {
+            // Первое срабатывание
+            const jokeMessage = document.createElement('div');
+            jokeMessage.className = 'terminal-line';
+            jokeMessage.innerHTML = '>> SYSTEM OVERRIDE:\n\nSleepman once had a wet dream so intense...\n...it triggered a tsunami warning in three metaverses.';
+            terminalContent.appendChild(jokeMessage);
+            terminalContent.scrollTop = terminalContent.scrollHeight;
+            
+            // Активируем фейерверки
+            fireworkLeft.style.display = 'block';
+            fireworkRight.style.display = 'block';
+            
+            // Запускаем несколько волн фейерверков
+            let waves = 0;
+            const fireworkInterval = setInterval(() => {
+              createFirework(fireworkLeft, false);
+              createFirework(fireworkRight, true);
+              waves++;
+              if (waves >= 4) clearInterval(fireworkInterval);
+            }, 800);
+            
+            // Очищаем через 3.5 секунды
+            setTimeout(() => {
+              fireworkLeft.style.display = 'none';
+              fireworkRight.style.display = 'none';
+              fireworkLeft.innerHTML = '';
+              fireworkRight.innerHTML = '';
+              this.value = '';
+              this.focus();
+            }, 3500);
+            
+            // Отмечаем, что пасхалка сработала
+            sessionStorage.setItem('sleepmanEasterEgg', 'true');
+            
+          } else {
+            // Повторное срабатывание
+            const repeatMessage = document.createElement('div');
+            repeatMessage.className = 'terminal-line repeat-message';
+            repeatMessage.innerHTML = '>>\nWelcome to the Sleepman universe.\nThis won\'t work again.';
+            terminalContent.appendChild(repeatMessage);
+            terminalContent.scrollTop = terminalContent.scrollHeight;
+            
+            // Очищаем поле ввода
+            this.value = '';
+          }
+          
+        } else if (input !== 'access-δ1') {
+          // Существующая логика для неверного ключа
+          const errorMessage = document.createElement('div');
+          errorMessage.className = 'terminal-line error-message';
+          errorMessage.textContent = '!! INTRUSION DETECTED. MEMORY CORE BREACH IN PROGRESS...';
+          
+          // Добавляем сообщение об ошибке
+          terminalContent.appendChild(errorMessage);
+          terminalContent.scrollTop = terminalContent.scrollHeight;
+          
+          // Активируем эффекты ошибки
+          terminalContent.classList.add('error');
+          this.disabled = true;
+          
+          // Через 3.5 секунды возвращаем всё в исходное состояние
+          setTimeout(() => {
+            terminalContent.classList.remove('error');
+            errorMessage.remove();
+            this.disabled = false;
+            this.value = '';
+            this.focus();
+          }, 3500);
+        }
+        
+        e.preventDefault();
+      }
+    });
+
+    // Info Modal Functions
+    function showInfoModal() {
+      const modal = document.getElementById('info-modal');
+      modal.style.display = 'block';
+      modal.offsetHeight; // Trigger reflow
+      modal.classList.add('active');
+      
+      // Get the info content
+      const infoContent = document.querySelector('.info-content');
+      const originalText = infoContent.innerHTML;
+      
+      // Clear the content
+      infoContent.innerHTML = '';
+      
+      // Add typewriter class
+      infoContent.classList.add('typewriter-text');
+      
+      // Typewriter effect
+      let i = 0;
+      const typeWriter = () => {
+        if (i < originalText.length) {
+          infoContent.innerHTML += originalText.charAt(i);
+          i++;
+          setTimeout(typeWriter, 40); // 40ms delay between characters
+        }
+      };
+      
+      // Start the typewriter effect
+      typeWriter();
+    }
+
+    function closeInfoModal() {
+      const modal = document.getElementById('info-modal');
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    }
+
+    // Add event listener for info button
+    document.getElementById('info-button').addEventListener('click', showInfoModal);
+
+    // NFT Claim Modal Functions
+    function showNFTClaim() {
+      const modal = document.getElementById('nft-claim-modal');
+      modal.style.display = 'block';
+      modal.offsetHeight; // Trigger reflow
+      modal.classList.add('active');
+    }
+
+    function closeNFTClaim() {
+      const modal = document.getElementById('nft-claim-modal');
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    }
+
+    function purchaseNFT() {
+      // Placeholder function for NFT purchase
+      console.log('NFT purchase functionality to be implemented');
+    }
+
+    // Update the Claim NFT button to trigger the modal
+    document.querySelector('.button[data-text="CLAIM NFT"]').addEventListener('click', showNFTClaim);
   </script>
 </body>
 </html>

@@ -4,61 +4,10 @@
   <meta charset="UTF-8">
   <title>$SLEEPMAN — Enter the Dream</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-  <script>
-    console.log('Starting ethers.js loading process...');
-    
-    // Create a promise to track ethers loading
-    window.ethersLoaded = new Promise((resolve, reject) => {
-      const script = document.createElement('script');
-      script.src = "https://raw.githubusercontent.com/ethers-io/ethers.js/v5.7.2/dist/ethers.umd.min.js";
-      script.type = "text/javascript";
-      
-      script.onload = () => {
-        console.log("ethers.js loaded successfully");
-        if (typeof ethers !== 'undefined') {
-          console.log("ethers object is available");
-          resolve();
-        } else {
-          console.error("ethers object is not defined after loading");
-          reject(new Error("ethers not defined"));
-        }
-      };
-      
-      script.onerror = (error) => {
-        console.error("Failed to load ethers.js:", error);
-        reject(error);
-      };
-      
-      console.log('Appending ethers.js script to head...');
-      document.head.appendChild(script);
-    }).catch(error => {
-      console.error("ethers.js loading failed:", error);
-      // Try fallback CDN if primary fails
-      return new Promise((resolve, reject) => {
-        console.log('Trying fallback CDN...');
-        const fallbackScript = document.createElement('script');
-        fallbackScript.src = "https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js";
-        fallbackScript.type = "text/javascript";
-        
-        fallbackScript.onload = () => {
-          console.log("ethers.js loaded successfully from fallback");
-          if (typeof ethers !== 'undefined') {
-            console.log("ethers object is available from fallback");
-            resolve();
-          } else {
-            console.error("ethers object is not defined after fallback loading");
-            reject(new Error("ethers not defined from fallback"));
-          }
-        };
-        
-        fallbackScript.onerror = (error) => {
-          console.error("Failed to load ethers.js from fallback:", error);
-          reject(error);
-        };
-        
-        document.head.appendChild(fallbackScript);
-      });
-    });
+  <script type="module">
+    import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm';
+    window.ethers = ethers;
+    console.log("ethers.js loaded successfully via ES module");
   </script>
   <script src="https://unpkg.com/@thirdweb-dev/sdk@3"></script>
   <style>

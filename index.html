@@ -1817,73 +1817,48 @@ Welcome to the mechanism.
       const terminalContent = document.querySelector('.terminal-content');
       
       if (hasNFT) {
-        const verifiedContent = `
-          <div class="terminal-line green-glow">[ACCESS LEVEL: Δ - VERIFIED]</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">SCP-??? // CLASS: KETER</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Description:</div>
-          <div class="terminal-line">Entity exhibits non-linear awareness and multiversal displacement. Referred to by insiders as "Sleepman", the subject appears dormant, yet traces of lucid cognitive residue persist.</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Anomalous Behavior:</div>
-          <div class="terminal-line">Subject simultaneously exists in chain and meta-chain layers. Periodic emissions of "dream fragments" detected. These fragments materialize as tokenized artifacts — 1 of 10,000.</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Extracted Log:</div>
-          <div class="terminal-line">>> "9823 / 10000 fragments claimed... the shift is near."</div>
-          <div class="terminal-line">>> "Those who hold their keys before the final mutation will unlock more than access..."</div>
-          <div class="terminal-line">>> "...encrypted movement detected... protocol A777 initiating..."</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Status: Semi-dormant</div>
-          <div class="terminal-line">Threat Level: UNCLASSIFIED</div>
-          <div class="terminal-line">Notes:</div>
-          <div class="terminal-line">Do not engage without clearance. Dream resonance is unstable.</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Final Directive:</div>
-          <div class="terminal-line">Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutation fragments will gain restricted access to project pathways, anomalies, and encrypted lore not available post-shift.</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">>> This is not just a drop. It's an awakening.</div>
-          <div class="terminal-line">>> Can you find the true dream before it finds you?</div>
-        `;
-        
-        terminalContent.innerHTML = verifiedContent;
-        
-        // Add visible class to each line with delay
-        const lines = terminalContent.querySelectorAll('.terminal-line');
-        lines.forEach((line, index) => {
-          setTimeout(() => {
-            line.classList.add('visible');
-          }, index * 100);
+        const nftText = `[ACCESS LEVEL: Δ - VERIFIED]
+
+SCP-??? // CLASS: KETER
+
+Description:
+Entity exhibits non-linear awareness and multiversal displacement. Referred to by insiders as "Sleepman", the subject appears dormant, yet traces of lucid cognitive residue persist.
+
+Anomalous Behavior:
+Subject simultaneously exists in chain and meta-chain layers. Periodic emissions of "dream fragments" detected. These fragments materialize as tokenized artifacts — 1 of 10,000.
+
+Extracted Log:
+>> "10000 fragments claimed... the shift is near."
+>> "Those who hold their keys before the final mutation will unlock more than access..."
+>> "...encrypted movement detected... protocol A777 initiating..."
+
+Status: Semi-dormant  
+Threat Level: UNCLASSIFIED  
+Notes:  
+Do not engage without clearance. Dream resonance is unstable.
+
+Final Directive:
+Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutation fragments will gain restricted access to project pathways, anomalies, and encrypted lore not available post-shift.
+
+>> This is not just a drop. It's an awakening.  
+>> Can you find the true dream before it finds you?`;
+
+        // Convert text to terminal lines with proper formatting
+        const formattedContent = nftText.split('\n').map(line => {
+          const div = document.createElement('div');
+          div.className = 'terminal-line';
+          div.textContent = line;
+          return div;
         });
-      } else {
-        // Keep existing content for non-NFT holders
-        const originalContent = `
-          <div class="terminal-line">[LOG-██/██/██] // SLEEP ENTITY FILE - SCP-???</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Designation: SLEEP_MAN</div>
-          <div class="terminal-line">Status: Semi-dormant</div>
-          <div class="terminal-line">Threat Level: Unclassified</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Fragmented Memory Extract:</div>
-          <div class="terminal-line">>> ...subject exhibits passive resistance to all stimuli...</div>
-          <div class="terminal-line">>> ...first contact recorded at dream depth level 6...</div>
-          <div class="terminal-line">>> ...eyes closed, but aware. always aware...</div>
-          <div class="terminal-line">>> ...he said: "don't wake me... I'm still uploading the dream..."</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Notes:</div>
-          <div class="terminal-line">Subject is believed to exist simultaneously in chain and meta-chain.</div>
-          <div class="terminal-line">Do not engage directly unless clearance Δ is provided.</div>
-          <div class="terminal-line">Await Phase: Dream Protocol.</div>
-        `;
-        
-        terminalContent.innerHTML = originalContent;
-        
-        // Add visible class to each line with delay
-        const lines = terminalContent.querySelectorAll('.terminal-line');
-        lines.forEach((line, index) => {
-          setTimeout(() => {
-            line.classList.add('visible');
-          }, index * 100);
+
+        // Clear terminal and add new content
+        terminalContent.innerHTML = '';
+        formattedContent.forEach(line => {
+          terminalContent.appendChild(line);
         });
+
+        // Add green glow to the first line
+        terminalContent.firstChild.classList.add('green-glow');
       }
     }
 

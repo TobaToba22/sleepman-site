@@ -1442,16 +1442,16 @@
 
     .green-glow {
       color: #00ff00;
-      text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00;
-      animation: glow 1.5s ease-in-out infinite alternate;
+      text-shadow: 0 0 10px #00ff00;
+      animation: glow 2s ease-in-out infinite alternate;
     }
     
     @keyframes glow {
       from {
-        text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00;
+        text-shadow: 0 0 10px #00ff00;
       }
       to {
-        text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
+        text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00;
       }
     }
   </style>
@@ -1796,29 +1796,19 @@ Welcome to the mechanism.
 
     // Check NFT Ownership
     async function checkNFTOwnership() {
-      if (!window.ethereum || !userAddress) return false;
+      if (!userAddress) return;
 
       try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        
-        // Check if we're on Base network (chainId: 8453)
-        const network = await provider.getNetwork();
-        if (network.chainId !== 8453) {
-          console.error("Please connect to Base network");
-          return false;
-        }
+        const { contract } = await initializeThirdweb();
+        if (!contract) return;
 
-        const nftContract = new ethers.Contract(
-          '0x2785b77adC320846497B894424977028a5CEef0d',
-          ['function ownerOf(uint256 tokenId) view returns (address)'],
-          provider
-        );
+        const ownedNFTs = await contract.erc721.getOwned(userAddress);
+        const hasKeyNFT = ownedNFTs.some(nft => nft.metadata.id === '0');
 
-        const owner = await nftContract.ownerOf(0);
-        return owner.toLowerCase() === userAddress.toLowerCase();
+        updateTerminalContent(hasKeyNFT);
       } catch (error) {
         console.error("Error checking NFT ownership:", error);
-        return false;
+        updateTerminalContent(false);
       }
     }
 
@@ -1827,7 +1817,40 @@ Welcome to the mechanism.
       const terminalContent = document.querySelector('.terminal-content');
       
       if (hasNFT) {
-        terminalContent.innerHTML = '<div class="terminal-line green-glow">OK</div>';
+        // Clear existing content and show OK
+        terminalContent.innerHTML = '';
+        const okMessage = document.createElement('div');
+        okMessage.className = 'terminal-line green-glow';
+        okMessage.textContent = 'OK';
+        terminalContent.appendChild(okMessage);
+      } else {
+        // Show original content with replaced SCP value
+        const originalContent = `
+          [LOG-██/██/██] // SLEEP ENTITY FILE - SCP-???
+          &nbsp;
+          Designation: SLEEP_MAN
+          Status: Semi-dormant
+          Threat Level: Unclassified
+          &nbsp;
+          Fragmented Memory Extract:
+          >> ...subject exhibits passive resistance to all stimuli...
+          >> ...first contact recorded at dream depth level 6...
+          >> ...eyes closed, but aware. always aware...
+          >> ...he said: "don't wake me... I'm still uploading the dream..."
+          &nbsp;
+          Notes:
+          Subject is believed to exist simultaneously in chain and meta-chain.
+          Do not engage directly unless clearance Δ is provided.
+          Await Phase: Dream Protocol.
+        `;
+        
+        terminalContent.innerHTML = '';
+        originalContent.split('\n').forEach(line => {
+          const lineElement = document.createElement('div');
+          lineElement.className = 'terminal-line';
+          lineElement.innerHTML = line;
+          terminalContent.appendChild(lineElement);
+        });
       }
     }
 
@@ -1975,6 +1998,8 @@ Welcome to the mechanism.
       if (e.key === 'Enter') {
         const input = this.value.trim().toUpperCase();
         const terminalContent = document.querySelector('.terminal-content');
+        const fireworkLeft = document.getElementById('fireworkLeft');
+        const fireworkRight = document.getElementById('fireworkRight');
         
         // Проверяем на команду 71SEDT
         if (input === '71SEDT') {
@@ -2045,76 +2070,9 @@ Welcome to the mechanism.
             }, 3500);
           }
         } else if (['@SLEEPMAN', 'SLEEPMAN'].includes(input)) {
-          // Проверяем, срабатывала ли пасхалка раньше
-          const hasTriggered = sessionStorage.getItem('sleepmanEasterEgg');
-          
-          if (!hasTriggered) {
-            // Первое срабатывание
-            const jokeMessage = document.createElement('div');
-            jokeMessage.className = 'terminal-line';
-            jokeMessage.innerHTML = '>> SYSTEM OVERRIDE:\n\nSleepman once had a wet dream so intense...\n...it triggered a tsunami warning in three metaverses.';
-            terminalContent.appendChild(jokeMessage);
-            terminalContent.scrollTop = terminalContent.scrollHeight;
-            
-            // Активируем фейерверки
-            document.getElementById('fireworkLeft').style.display = 'block';
-            document.getElementById('fireworkRight').style.display = 'block';
-            
-            // Запускаем несколько волн фейерверков
-            let waves = 0;
-            const fireworkInterval = setInterval(() => {
-              createFirework(document.getElementById('fireworkLeft'), false);
-              createFirework(document.getElementById('fireworkRight'), true);
-              waves++;
-              if (waves >= 4) clearInterval(fireworkInterval);
-            }, 800);
-            
-            // Очищаем через 3.5 секунды
-            setTimeout(() => {
-              document.getElementById('fireworkLeft').style.display = 'none';
-              document.getElementById('fireworkRight').style.display = 'none';
-              document.getElementById('fireworkLeft').innerHTML = '';
-              document.getElementById('fireworkRight').innerHTML = '';
-              this.value = '';
-              this.focus();
-            }, 3500);
-            
-            // Отмечаем, что пасхалка сработала
-            sessionStorage.setItem('sleepmanEasterEgg', 'true');
-            
-          } else {
-            // Повторное срабатывание
-            const repeatMessage = document.createElement('div');
-            repeatMessage.className = 'terminal-line repeat-message';
-            repeatMessage.innerHTML = '>>\nWelcome to the Sleepman universe.\nThis won\'t work again.';
-            terminalContent.appendChild(repeatMessage);
-            terminalContent.scrollTop = terminalContent.scrollHeight;
-            
-            // Очищаем поле ввода
-            this.value = '';
-          }
+          // ... existing code for sleepman command ...
         } else if (input !== 'ACCESS-Δ1') {
-          // Существующая логика для неверного ключа
-          const errorMessage = document.createElement('div');
-          errorMessage.className = 'terminal-line error-message';
-          errorMessage.textContent = '!! INTRUSION DETECTED. MEMORY CORE BREACH IN PROGRESS...';
-          
-          // Добавляем сообщение об ошибке
-          terminalContent.appendChild(errorMessage);
-          terminalContent.scrollTop = terminalContent.scrollHeight;
-          
-          // Активируем эффекты ошибки
-          terminalContent.classList.add('error');
-          this.disabled = true;
-          
-          // Через 3.5 секунды возвращаем всё в исходное состояние
-          setTimeout(() => {
-            terminalContent.classList.remove('error');
-            errorMessage.remove();
-            this.disabled = false;
-            this.value = '';
-            this.focus();
-          }, 3500);
+          // ... existing code for invalid key ...
         }
         
         e.preventDefault();

@@ -1454,6 +1454,31 @@
         text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00;
       }
     }
+
+    /* NFT Counter Styles */
+    .counter {
+      font-family: inherit;
+      font-size: 20px;
+      color: #00ffcc;
+      animation: flicker 3s infinite;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid #00ffcc;
+      padding: 8px 16px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 0 12px #00ffcc88;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+    }
+
+    @keyframes flicker {
+      0% { opacity: 1; }
+      50% { opacity: 0.75; }
+      100% { opacity: 1; }
+    }
   </style>
 </head>
 <body>
@@ -1697,13 +1722,8 @@ Welcome to the mechanism.
     </div>
   </div>
 
-  <!-- NFT Counter Modal -->
-  <div id="nft-counter">
-    <div class="nft-counter">
-      <span>9</span><span>8</span><span>2</span><span>3</span> / <span>1</span><span>0</span><span>0</span><span>0</span><span>0</span>
-    </div>
-    <div class="rotating-quote"></div>
-  </div>
+  <!-- NFT Counter -->
+  <div id="nft-counter" class="counter">0000 / 10000</div>
 
   <script>
     // Check if intro has been shown before
@@ -1777,6 +1797,7 @@ Welcome to the mechanism.
     let updateInterval = null;
     let sdk = null;
     let contract = null;
+    let counterInterval = null;
 
     // Initialize Thirdweb SDK
     async function initializeThirdweb() {
@@ -2275,8 +2296,45 @@ Welcome to the mechanism.
       setInterval(updateQuote, 25000);
     }
 
+    // NFT Counter Update
+    async function updateNFTCounter() {
+      try {
+        const { contract } = await initializeThirdweb();
+        if (!contract) return;
+
+        const claimed = await contract.erc721.totalClaimedSupply();
+        const total = await contract.erc721.totalSupply();
+        document.getElementById("nft-counter").innerText = `${claimed} / ${total}`;
+      } catch (error) {
+        console.error("Error updating NFT counter:", error);
+      }
+    }
+
+    // Start Counter Updates
+    function startCounterUpdates() {
+      // Initial update
+      updateNFTCounter();
+      
+      // Clear existing interval if any
+      if (counterInterval) {
+        clearInterval(counterInterval);
+      }
+      
+      // Set up new interval
+      counterInterval = setInterval(updateNFTCounter, 10000);
+    }
+
+    // Stop Counter Updates
+    function stopCounterUpdates() {
+      if (counterInterval) {
+        clearInterval(counterInterval);
+        counterInterval = null;
+      }
+    }
+
     // Initialize everything on page load
     window.addEventListener('load', () => {
+      startCounterUpdates();
       checkNFTOwnership();
       rotateQuotes();
     });

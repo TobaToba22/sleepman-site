@@ -2131,6 +2131,10 @@ Welcome to the mechanism.
           document.getElementById("walletAddress").style.display = "block";
           closeWalletModal();
           
+          // Check NFT ownership after successful connection
+          const hasNFT = await checkNFTOwnership();
+          console.log("NFT ownership after connection:", hasNFT);
+          
         } catch (error) {
           console.error("Error connecting wallet:", error);
           alert("Error connecting wallet. Please try again.");
@@ -2138,6 +2142,27 @@ Welcome to the mechanism.
       } else {
         alert("Please install MetaMask!");
       }
+    }
+
+    // Listen for account changes
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', async (accounts) => {
+        if (accounts.length === 0) {
+          // Wallet disconnected
+          userAddress = null;
+          document.getElementById("connectWallet").style.display = "block";
+          document.getElementById("walletAddress").style.display = "none";
+        } else {
+          // Account changed
+          userAddress = accounts[0];
+          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+          document.getElementById("walletAddress").innerText = shortenedAddress;
+          
+          // Check NFT ownership when account changes
+          const hasNFT = await checkNFTOwnership();
+          console.log("NFT ownership after account change:", hasNFT);
+        }
+      });
     }
 
     // Close wallet modal when clicking outside
@@ -2214,7 +2239,6 @@ Welcome to the mechanism.
 
     // Initialize everything on page load
     window.addEventListener('load', () => {
-      checkNFTOwnership();
       rotateQuotes();
     });
   </script>

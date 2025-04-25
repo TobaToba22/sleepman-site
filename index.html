@@ -5,9 +5,23 @@
   <title>$SLEEPMAN — Enter the Dream</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <script type="module">
-    import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm';
-    window.ethers = ethers;
-    console.log("ethers.js loaded successfully via ES module");
+    async function loadEthers() {
+      try {
+        const { ethers } = await import('./ethers.js');
+        window.ethers = ethers;
+        console.log("ethers.js loaded successfully via local ES module");
+      } catch (error) {
+        console.error("Failed to load ethers.js:", error);
+        try {
+          const { ethers } = await import('https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.esm.min.js');
+          window.ethers = ethers;
+          console.log("ethers.js loaded successfully via CDN ES module");
+        } catch (fallbackError) {
+          console.error("Failed to load ethers.js from fallback:", fallbackError);
+        }
+      }
+    }
+    loadEthers();
   </script>
   <script src="https://unpkg.com/@thirdweb-dev/sdk@3"></script>
   <style>
@@ -1785,6 +1799,19 @@ Welcome to the mechanism.
         if (!window.ethereum || !userAddress) {
           console.log("No wallet connected, skipping NFT check");
           return false;
+        }
+
+        // Wait for ethers to be available
+        if (!window.ethers) {
+          console.log("Waiting for ethers.js to load...");
+          await new Promise(resolve => {
+            const checkEthers = setInterval(() => {
+              if (window.ethers) {
+                clearInterval(checkEthers);
+                resolve();
+              }
+            }, 100);
+          });
         }
 
         const provider = new window.ethers.providers.Web3Provider(window.ethereum);

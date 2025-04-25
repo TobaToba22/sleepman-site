@@ -1815,67 +1815,99 @@ Welcome to the mechanism.
     // Update Terminal Content
     function updateTerminalContent(hasNFT) {
       const terminalContent = document.querySelector('.terminal-content');
+      terminalContent.innerHTML = ''; // Clear existing content
       
       if (hasNFT) {
-        // Show special content for NFT holders
-        const nftContent = `
-          <div class="terminal-line green-glow">[ACCESS LEVEL: Δ - VERIFIED]</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">SCP-??? // CLASS: KETER</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Description:</div>
-          <div class="terminal-line">Entity exhibits non-linear awareness and multiversal displacement. Referred to by insiders as "Sleepman", the subject appears dormant, yet traces of lucid cognitive residue persist.</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Anomalous Behavior:</div>
-          <div class="terminal-line">Subject simultaneously exists in chain and meta-chain layers. Periodic emissions of "dream fragments" detected. These fragments materialize as tokenized artifacts — 1 of 10,000.</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Extracted Log:</div>
-          <div class="terminal-line">>> " 10000 fragments claimed... the shift is near."</div>
-          <div class="terminal-line">>> "Those who hold their keys before the final mutation will unlock more than access..."</div>
-          <div class="terminal-line">>> "...encrypted movement detected... protocol A777 initiating..."</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Status: Semi-dormant</div>
-          <div class="terminal-line">Threat Level: UNCLASSIFIED</div>
-          <div class="terminal-line">Notes:</div>
-          <div class="terminal-line">Do not engage without clearance. Dream resonance is unstable.</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">Final Directive:</div>
-          <div class="terminal-line">Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutation fragments will gain restricted access to project pathways, anomalies, and encrypted lore not available post-shift.</div>
-          <div class="terminal-line">&nbsp;</div>
-          <div class="terminal-line">>> This is not just a drop. It's an awakening.</div>
-          <div class="terminal-line">>> Can you find the true dream before it finds you?</div>
-        `;
-        
-        terminalContent.innerHTML = nftContent;
-      } else {
-        // Show original content with replaced SCP value
-        const originalContent = `
-          [LOG-██/██/██] // SLEEP ENTITY FILE - SCP-???
-          &nbsp;
-          Designation: SLEEP_MAN
-          Status: Semi-dormant
-          Threat Level: Unclassified
-          &nbsp;
-          Fragmented Memory Extract:
-          >> ...subject exhibits passive resistance to all stimuli...
-          >> ...first contact recorded at dream depth level 6...
-          >> ...eyes closed, but aware. always aware...
-          >> ...he said: "don't wake me... I'm still uploading the dream..."
-          &nbsp;
-          Notes:
-          Subject is believed to exist simultaneously in chain and meta-chain.
-          Do not engage directly unless clearance Δ is provided.
-          Await Phase: Dream Protocol.
-        `;
-        
-        terminalContent.innerHTML = '';
-        originalContent.split('\n').forEach(line => {
+        const nftContent = [
+          { text: '[ACCESS LEVEL: Δ - VERIFIED]', class: 'green-glow' },
+          { text: '' },
+          { text: 'SCP-??? // CLASS: KETER' },
+          { text: '' },
+          { text: 'Description:' },
+          { text: 'Entity exhibits non-linear awareness and multiversal displacement. Referred to by insiders as "Sleepman", the subject appears dormant, yet traces of lucid cognitive residue persist.' },
+          { text: '' },
+          { text: 'Anomalous Behavior:' },
+          { text: 'Subject simultaneously exists in chain and meta-chain layers. Periodic emissions of "dream fragments" detected. These fragments materialize as tokenized artifacts — 1 of 10,000.' },
+          { text: '' },
+          { text: 'Extracted Log:' },
+          { text: '>> " 10,000 fragments claimed... the shift is near."' },
+          { text: '>> "Those who hold their keys before the final mutation will unlock more than access..."' },
+          { text: '>> "...encrypted movement detected... protocol A777 initiating..."' },
+          { text: '' },
+          { text: 'Status: Semi-dormant' },
+          { text: 'Threat Level: UNCLASSIFIED' },
+          { text: 'Notes:' },
+          { text: 'Do not engage without clearance. Dream resonance is unstable.' },
+          { text: '' },
+          { text: 'Final Directive:' },
+          { text: 'Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutation fragments will gain restricted access to project pathways, anomalies, and encrypted lore not available post-shift.' },
+          { text: '' },
+          { text: '>> This is not just a drop. It\'s an awakening.' },
+          { text: '>> Can you find the true dream before it finds you?' }
+        ];
+
+        // Create and append lines with animation delay
+        nftContent.forEach((line, index) => {
           const lineElement = document.createElement('div');
           lineElement.className = 'terminal-line';
-          lineElement.innerHTML = line;
+          if (line.class) {
+            lineElement.classList.add(line.class);
+          }
+          lineElement.textContent = line.text;
+          lineElement.style.animation = `fadeInUp 0.3s ease forwards ${index * 0.1}s`;
+          terminalContent.appendChild(lineElement);
+        });
+      } else {
+        const originalContent = [
+          { text: '[LOG-██/██/██] // SLEEP ENTITY FILE - SCP-???' },
+          { text: '' },
+          { text: 'Designation: SLEEP_MAN' },
+          { text: 'Status: Semi-dormant' },
+          { text: 'Threat Level: Unclassified' },
+          { text: '' },
+          { text: 'Fragmented Memory Extract:' },
+          { text: '>> ...subject exhibits passive resistance to all stimuli...' },
+          { text: '>> ...first contact recorded at dream depth level 6...' },
+          { text: '>> ...eyes closed, but aware. always aware...' },
+          { text: '>> ...he said: "don\'t wake me... I\'m still uploading the dream..."' },
+          { text: '' },
+          { text: 'Notes:' },
+          { text: 'Subject is believed to exist simultaneously in chain and meta-chain.' },
+          { text: 'Do not engage directly unless clearance Δ is provided.' },
+          { text: 'Await Phase: Dream Protocol.' }
+        ];
+
+        // Create and append lines with animation delay
+        originalContent.forEach((line, index) => {
+          const lineElement = document.createElement('div');
+          lineElement.className = 'terminal-line';
+          lineElement.textContent = line.text;
+          lineElement.style.animation = `fadeInUp 0.3s ease forwards ${index * 0.1}s`;
           terminalContent.appendChild(lineElement);
         });
       }
+    }
+
+    // Add the fadeInUp animation if it doesn't exist
+    if (!document.querySelector('style').textContent.includes('@keyframes fadeInUp')) {
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .terminal-line {
+          opacity: 0;
+          animation-fill-mode: forwards;
+        }
+      `;
+      document.head.appendChild(style);
     }
 
     // Start Updates

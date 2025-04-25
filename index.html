@@ -1001,7 +1001,7 @@
         -2px -2px #00ff00;
     }
 
-    #connect-phantom, #connect-metamask {
+    #connect-metamask {
       background: rgba(0, 0, 0, 0.7);
       border: 2px solid #00ffcc;
       padding: 10px 20px;
@@ -1021,7 +1021,7 @@
       font-family: 'VT323', monospace;
     }
 
-    #connect-phantom::before, #connect-metamask::before {
+    #connect-metamask::before {
       content: attr(data-text);
       position: absolute;
       left: 0;
@@ -1038,7 +1038,7 @@
       pointer-events: none;
     }
 
-    #connect-phantom:hover, #connect-metamask:hover {
+    #connect-metamask:hover {
       animation: buttonGlitch 0.2s infinite;
       box-shadow: 
         0 0 10px #00ffcc,
@@ -1052,26 +1052,9 @@
       transform: scale(1.05);
     }
 
-    #connect-phantom:hover::before, #connect-metamask:hover::before {
+    #connect-metamask:hover::before {
       animation: textGlitch 0.3s infinite;
       opacity: 0.8;
-    }
-
-    #connect-phantom {
-      border-color: #8a2be2;
-      box-shadow: 0 0 10px #8a2be2;
-      text-shadow: 0 0 5px #8a2be2;
-    }
-
-    #connect-phantom:hover {
-      box-shadow: 
-        0 0 10px #8a2be2,
-        0 0 20px #8a2be2,
-        0 0 30px #8a2be2;
-      text-shadow: 
-        0 0 5px #8a2be2,
-        0 0 10px #8a2be2,
-        0 0 15px #8a2be2;
     }
 
     #connect-metamask {
@@ -1671,8 +1654,7 @@ Welcome to the mechanism.
   <div id="wallet-select-modal" class="modal">
     <div class="modal-content">
       <button class="close-wallet-modal" onclick="closeWalletModal()">×</button>
-      <h2 class="modal-title">Select Wallet</h2>
-      <button id="connect-phantom" data-text="CONNECT PHANTOM" onclick="connectPhantom()">CONNECT PHANTOM</button>
+      <h2 class="modal-title">Connect Wallet</h2>
       <button id="connect-metamask" data-text="CONNECT METAMASK" onclick="connectMetaMask()">CONNECT METAMASK</button>
     </div>
   </div>
@@ -1796,34 +1778,28 @@ Welcome to the mechanism.
     // Check NFT Ownership
     async function checkNFTOwnership() {
       try {
-        if (!window.ethereum) {
-          throw new Error("MetaMask not installed");
-        }
-
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
-        const address = await signer.getAddress();
-        console.log("Checking NFT ownership for address:", address);
+        const userAddress = await signer.getAddress();
 
-        // Check ownerOf for tokenId 0
-        try {
-          const nftContract = new ethers.Contract(
-            NFT_CONTRACT_ADDRESS,
-            ["function ownerOf(uint256 tokenId) view returns (address)"],
-            provider
-          );
-          const owner = await nftContract.ownerOf(NFT_TOKEN_ID);
-          const hasNFT = owner.toLowerCase() === address.toLowerCase();
-          console.log("NFT owner:", owner);
-          console.log("Connected address:", address);
-          console.log("Ownership check result:", hasNFT);
-          return hasNFT;
-        } catch (error) {
-          console.error("Error checking NFT ownership:", error);
-          return false;
-        }
+        const contract = new ethers.Contract(
+          "0x2785b77adC320846497B894424977028a5CEef0d",
+          ["function ownerOf(uint256 tokenId) view returns (address)"],
+          provider
+        );
+
+        const owner = await contract.ownerOf(0);
+        const hasNFT = owner.toLowerCase() === userAddress.toLowerCase();
+        
+        console.log({
+          userAddress: userAddress.toLowerCase(),
+          owner: owner.toLowerCase(),
+          hasNFT
+        });
+        
+        return hasNFT;
       } catch (error) {
-        console.error("Error in wallet connection:", error);
+        console.error("Error checking NFT ownership:", error);
         return false;
       }
     }
@@ -1981,9 +1957,7 @@ Welcome to the mechanism.
         this.value = '';
 
         if (command.toUpperCase() === '71SEDT') {
-          console.log("Command 71SEDT entered, checking NFT ownership...");
           const hasNFT = await checkNFTOwnership();
-          console.log("NFT ownership verification result:", hasNFT);
           
           if (hasNFT) {
             const content = [
@@ -2108,41 +2082,57 @@ Welcome to the mechanism.
       }, 300);
     }
 
-    async function connectPhantom() {
-      if (window.solana && window.solana.isPhantom) {
-        try {
-          const resp = await window.solana.connect();
-          const publicKey = resp.publicKey.toString();
-          console.log('Connected to Phantom:', publicKey);
-          // Update UI with connected wallet
-          document.getElementById('walletAddress').innerText = publicKey.slice(0, 6) + '...' + publicKey.slice(-4);
-          document.getElementById('connectWallet').style.display = 'none';
-          document.getElementById('walletAddress').style.display = 'block';
-          closeWalletModal();
-        } catch (err) {
-          console.error('Phantom connection error:', err);
-        }
-      } else {
-        alert('Please install Phantom wallet');
-      }
-    }
-
     async function connectMetaMask() {
       if (window.ethereum) {
         try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const address = accounts[0];
-          console.log('Connected to MetaMask:', address);
-          // Update UI with connected wallet
-          document.getElementById('walletAddress').innerText = address.slice(0, 6) + '...' + address.slice(-4);
-          document.getElementById('connectWallet').style.display = 'none';
-          document.getElementById('walletAddress').style.display = 'block';
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const accounts = await provider.send("eth_requestAccounts", []);
+          userAddress = accounts[0];
+          
+          // Switch to Base network
+          try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x2105' }], // Base chainId
+            });
+            console.log("Switched to Base network");
+          } catch (switchError) {
+            if (switchError.code === 4902) {
+              try {
+                await window.ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: '0x2105',
+                    chainName: 'Base',
+                    nativeCurrency: {
+                      name: 'ETH',
+                      symbol: 'ETH',
+                      decimals: 18
+                    },
+                    rpcUrls: ['https://mainnet.base.org'],
+                    blockExplorerUrls: ['https://basescan.org']
+                  }]
+                });
+              } catch (addError) {
+                console.error("Error adding Base network:", addError);
+              }
+            }
+            console.error("Error switching to Base network:", switchError);
+          }
+          
+          // Update UI
+          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+          document.getElementById("walletAddress").innerText = shortenedAddress;
+          document.getElementById("connectWallet").style.display = "none";
+          document.getElementById("walletAddress").style.display = "block";
           closeWalletModal();
-        } catch (err) {
-          console.error('MetaMask connection error:', err);
+          
+        } catch (error) {
+          console.error("Error connecting wallet:", error);
+          alert("Error connecting wallet. Please try again.");
         }
       } else {
-        alert('Please install MetaMask');
+        alert("Please install MetaMask!");
       }
     }
 

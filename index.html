@@ -537,6 +537,11 @@
       box-shadow: 0 0 5px #00ffcc;
     }
 
+    #info-modal .modal-content::-webkit-scrollbar-thumb:hover {
+      background: #00ffcc;
+      box-shadow: 0 0 8px #00ffcc;
+    }
+
     #info-modal .close-modal {
       position: absolute;
       top: 15px;
@@ -945,6 +950,494 @@
     #nft-claim-modal .close-modal:hover {
       animation: glitchText 0.2s infinite;
     }
+
+    /* Wallet Selection Modal Styles */
+    #wallet-select-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.98);
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #wallet-select-modal.active {
+      opacity: 1;
+    }
+
+    #wallet-select-modal .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      padding: 2rem;
+      border-radius: 5px;
+      border: 2px solid #00ff00;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 
+        0 0 20px rgba(0, 255, 0, 0.5),
+        inset 0 0 20px rgba(0, 255, 0, 0.5);
+    }
+
+    #wallet-select-modal .modal-title {
+      color: #00ff00;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      font-family: 'VT323', monospace;
+      letter-spacing: 2px;
+      animation: glitchText 0.4s infinite;
+      position: relative;
+      text-shadow: 
+        2px 2px #003300,
+        -2px -2px #00ff00;
+    }
+
+    #connect-phantom, #connect-metamask {
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #00ffcc;
+      padding: 10px 20px;
+      font-size: 24px;
+      cursor: pointer;
+      text-align: center;
+      width: 280px;
+      text-transform: uppercase;
+      color: #00ffcc;
+      box-shadow: 0 0 10px #00ffcc;
+      text-shadow: 0 0 5px #00ffcc;
+      position: relative;
+      transition: all 0.3s ease-in-out;
+      border-radius: 5px;
+      margin: 1rem auto;
+      display: block;
+      font-family: 'VT323', monospace;
+    }
+
+    #connect-phantom::before, #connect-metamask::before {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      color: #00ffcc;
+      filter: blur(1px);
+      transform: scale(1.1);
+      pointer-events: none;
+    }
+
+    #connect-phantom:hover, #connect-metamask:hover {
+      animation: buttonGlitch 0.2s infinite;
+      box-shadow: 
+        0 0 10px #00ffcc,
+        0 0 20px #00ffcc,
+        0 0 30px #00ffcc;
+      text-shadow: 
+        0 0 5px #00ffcc,
+        0 0 10px #00ffcc,
+        0 0 15px #00ffcc;
+      letter-spacing: 1px;
+      transform: scale(1.05);
+    }
+
+    #connect-phantom:hover::before, #connect-metamask:hover::before {
+      animation: textGlitch 0.3s infinite;
+      opacity: 0.8;
+    }
+
+    #connect-phantom {
+      border-color: #8a2be2;
+      box-shadow: 0 0 10px #8a2be2;
+      text-shadow: 0 0 5px #8a2be2;
+    }
+
+    #connect-phantom:hover {
+      box-shadow: 
+        0 0 10px #8a2be2,
+        0 0 20px #8a2be2,
+        0 0 30px #8a2be2;
+      text-shadow: 
+        0 0 5px #8a2be2,
+        0 0 10px #8a2be2,
+        0 0 15px #8a2be2;
+    }
+
+    #connect-metamask {
+      border-color: #f6851b;
+      box-shadow: 0 0 10px #f6851b;
+      text-shadow: 0 0 5px #f6851b;
+    }
+
+    #connect-metamask:hover {
+      box-shadow: 
+        0 0 10px #f6851b,
+        0 0 20px #f6851b,
+        0 0 30px #f6851b;
+      text-shadow: 
+        0 0 5px #f6851b,
+        0 0 10px #f6851b,
+        0 0 15px #f6851b;
+    }
+
+    /* Social Media Blocks Styles */
+    .social-blocks {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .social-block {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid transparent;
+    }
+
+    .social-block::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, transparent, rgba(0, 255, 0, 0.2), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .social-block:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    }
+
+    .social-block:hover::before {
+      opacity: 1;
+    }
+
+    .social-block svg {
+      width: 40px;
+      height: 40px;
+      transition: all 0.3s ease;
+    }
+
+    .social-block:hover svg {
+      filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.5));
+    }
+
+    .telegram-block svg {
+      fill: #0088cc;
+    }
+
+    .twitter-block svg {
+      fill: #1DA1F2;
+    }
+
+    @media (max-width: 480px) {
+      .social-blocks {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+      }
+    }
+
+    /* Cult Modal Styles */
+    #cult-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.98);
+      z-index: 2000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #cult-modal.active {
+      opacity: 1;
+    }
+
+    #cult-modal .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      padding: 2rem;
+      border-radius: 5px;
+      border: 2px solid #00ff00;
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 
+        0 0 20px rgba(0, 255, 0, 0.5),
+        inset 0 0 20px rgba(0, 255, 0, 0.5);
+    }
+
+    #cult-modal .modal-title {
+      color: #00ff00;
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      font-family: 'VT323', monospace;
+      letter-spacing: 2px;
+      animation: glitchText 0.4s infinite;
+      position: relative;
+      text-shadow: 
+        2px 2px #003300,
+        -2px -2px #00ff00;
+    }
+
+    .social-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .social-button {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease-in-out;
+      position: relative;
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid transparent;
+    }
+
+    .social-button::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, transparent, rgba(0, 255, 0, 0.2), transparent);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .social-button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+    }
+
+    .social-button:hover::before {
+      opacity: 1;
+    }
+
+    .social-button svg {
+      width: 40px;
+      height: 40px;
+      transition: all 0.3s ease;
+    }
+
+    .social-button:hover svg {
+      filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.5));
+    }
+
+    .telegram-button svg {
+      fill: #0088cc;
+    }
+
+    .twitter-button svg {
+      fill: #1DA1F2;
+    }
+
+    #cult-modal .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      color: #00ff00;
+      font-size: 28px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-shadow: 0 0 5px #00ff00;
+      padding: 5px 10px;
+      animation: glitchText 1s infinite;
+    }
+
+    #cult-modal .close-modal:hover {
+      animation: glitchText 0.2s infinite;
+    }
+
+    @media (max-width: 480px) {
+      .social-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 1.5rem;
+      }
+    }
+
+    /* NFT Counter Modal Styles */
+    #nft-counter {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.95);
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      border: 2px solid #00ffcc;
+      box-shadow: 
+        0 0 20px rgba(0, 255, 204, 0.3),
+        inset 0 0 20px rgba(0, 255, 204, 0.1);
+      z-index: 1000;
+      text-align: center;
+      font-family: 'VT323', monospace;
+      color: #00ffcc;
+      min-width: 300px;
+      opacity: 0;
+      animation: counterAppear 1s ease forwards 10s;
+    }
+
+    @keyframes counterAppear {
+      0% {
+        opacity: 0;
+        transform: translateX(-50%) scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+    }
+
+    #nft-counter::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border-radius: 10px;
+      background: linear-gradient(
+        45deg,
+        transparent,
+        rgba(0, 255, 204, 0.1),
+        transparent
+      );
+      animation: borderGlow 3s infinite, shadowPulse 2s infinite;
+      z-index: -1;
+    }
+
+    @keyframes shadowPulse {
+      0%, 100% {
+        box-shadow: 
+          0 0 20px rgba(0, 255, 204, 0.3),
+          inset 0 0 20px rgba(0, 255, 204, 0.1);
+      }
+      50% {
+        box-shadow: 
+          0 0 30px rgba(0, 255, 204, 0.5),
+          inset 0 0 30px rgba(0, 255, 204, 0.2);
+      }
+    }
+
+    @keyframes borderGlow {
+      0%, 100% {
+        opacity: 0.5;
+        box-shadow: 
+          0 0 20px rgba(0, 255, 204, 0.3),
+          inset 0 0 20px rgba(0, 255, 204, 0.1);
+      }
+      50% {
+        opacity: 1;
+        box-shadow: 
+          0 0 30px rgba(0, 255, 204, 0.5),
+          inset 0 0 30px rgba(0, 255, 204, 0.2);
+      }
+    }
+
+    .nft-counter {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 10px #00ffcc;
+    }
+
+    .nft-counter span {
+      display: inline-block;
+      animation: digitPulse 2s infinite;
+    }
+
+    .nft-counter span:nth-child(odd) {
+      animation-delay: 0.1s;
+    }
+
+    .nft-counter span:nth-child(even) {
+      animation-delay: 0.2s;
+    }
+
+    .rotating-quote {
+      font-size: 14px;
+      color: #00fff7;
+      text-align: center;
+      opacity: 1;
+      transition: opacity 0.5s ease-in-out;
+      font-family: 'Orbitron', monospace;
+      text-shadow: 0 0 4px rgba(0,255,255,0.5), 0 0 8px rgba(0,255,255,0.2);
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    @keyframes digitPulse {
+      0%, 100% {
+        transform: translateY(0);
+        text-shadow: 0 0 10px #00ffcc;
+      }
+      25% {
+        transform: translateY(-2px);
+        text-shadow: 0 0 15px #00ffcc;
+      }
+      50% {
+        transform: translateY(0);
+        text-shadow: 0 0 10px #00ffcc;
+      }
+      75% {
+        transform: translateY(2px);
+        text-shadow: 0 0 15px #00ffcc;
+      }
+    }
+
+    @keyframes textFlicker {
+      0%, 100% {
+        opacity: 0.9;
+        text-shadow: 0 0 5px #00ffcc;
+      }
+      50% {
+        opacity: 1;
+        text-shadow: 0 0 8px #00ffcc;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1060,7 +1553,7 @@ But if you stay — you won't walk away the same.
 
     <!-- UI -->
     <div class="ui" id="mainUI">
-      <div id="connectWallet" class="button" data-text="CONNECT WALLET" data-sound="buzz" onclick="connectWallet()">CONNECT WALLET</div>
+      <div id="connectWallet" class="button" data-text="CONNECT WALLET" data-sound="buzz" onclick="showWalletModal()">CONNECT WALLET</div>
       <div id="walletAddress" class="button" style="display: none;"></div>
       <div class="button" data-text="BUY $SLEEPMAN" data-sound="buzz" onclick="showTokenomics()">BUY $SLEEPMAN</div>
       <div class="button" data-text="CLAIM NFT" data-sound="buzz">CLAIM NFT</div>
@@ -1158,6 +1651,44 @@ Welcome to the mechanism.
     </div>
   </div>
 
+  <!-- Wallet Selection Modal -->
+  <div id="wallet-select-modal" class="modal">
+    <div class="modal-content">
+      <button class="close-wallet-modal" onclick="closeWalletModal()">×</button>
+      <h2 class="modal-title">Select Wallet</h2>
+      <button id="connect-phantom" data-text="CONNECT PHANTOM" onclick="connectPhantom()">CONNECT PHANTOM</button>
+      <button id="connect-metamask" data-text="CONNECT METAMASK" onclick="connectMetaMask()">CONNECT METAMASK</button>
+    </div>
+  </div>
+
+  <!-- Cult Modal -->
+  <div id="cult-modal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeCultModal()">×</button>
+      <h2 class="modal-title">Join the Cult</h2>
+      <div class="social-buttons">
+        <a href="#" class="social-button telegram-button">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.95 1.24-5.5 3.65-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.25.38-.51 1.05-.78 4.12-1.79 6.87-2.97 8.26-3.54 3.93-1.6 4.75-1.87 5.27-1.88.12 0 .37.03.54.17.14.12.18.29.2.45-.01.06-.01.24 0 .38z"/>
+          </svg>
+        </a>
+        <a href="#" class="social-button twitter-button">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- NFT Counter Modal -->
+  <div id="nft-counter">
+    <div class="nft-counter">
+      <span>9</span><span>8</span><span>2</span><span>3</span> / <span>1</span><span>0</span><span>0</span><span>0</span><span>0</span>
+    </div>
+    <div class="rotating-quote"></div>
+  </div>
+
   <script>
     // Check if intro has been shown before
     const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
@@ -1191,10 +1722,12 @@ Welcome to the mechanism.
       const terminal = document.getElementById('terminal');
       const overlay = document.querySelector('.terminal-overlay');
       const lines = document.querySelectorAll('.terminal-line');
+      const nftCounter = document.getElementById('nft-counter');
       
-      // Show terminal and overlay
+      // Show terminal and overlay, hide NFT counter
       terminal.style.display = 'block';
       overlay.style.display = 'block';
+      nftCounter.style.display = 'none';
       
       // Animate each line with delay
       lines.forEach((line, index) => {
@@ -1209,9 +1742,11 @@ Welcome to the mechanism.
       const terminal = document.getElementById('terminal');
       const overlay = document.querySelector('.terminal-overlay');
       const lines = document.querySelectorAll('.terminal-line');
+      const nftCounter = document.getElementById('nft-counter');
       
       terminal.style.display = 'none';
       overlay.style.display = 'none';
+      nftCounter.style.display = 'block';
       
       // Reset lines visibility for next time
       lines.forEach(line => {
@@ -1504,6 +2039,168 @@ Welcome to the mechanism.
 
     // Update the Claim NFT button to trigger the modal
     document.querySelector('.button[data-text="CLAIM NFT"]').addEventListener('click', showNFTClaim);
+
+    // Update the connect button to open wallet selection
+    document.getElementById('connectWallet').addEventListener('click', showWalletModal);
+
+    // Wallet Selection Functions
+    function showWalletModal() {
+      const modal = document.getElementById('wallet-select-modal');
+      modal.style.display = 'block';
+      modal.offsetHeight; // Trigger reflow
+      modal.classList.add('active');
+    }
+
+    function closeWalletModal() {
+      const modal = document.getElementById('wallet-select-modal');
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    }
+
+    async function connectPhantom() {
+      if (window.solana && window.solana.isPhantom) {
+        try {
+          const resp = await window.solana.connect();
+          const publicKey = resp.publicKey.toString();
+          console.log('Connected to Phantom:', publicKey);
+          // Update UI with connected wallet
+          document.getElementById('walletAddress').innerText = publicKey.slice(0, 6) + '...' + publicKey.slice(-4);
+          document.getElementById('connectWallet').style.display = 'none';
+          document.getElementById('walletAddress').style.display = 'block';
+          closeWalletModal();
+        } catch (err) {
+          console.error('Phantom connection error:', err);
+        }
+      } else {
+        alert('Please install Phantom wallet');
+      }
+    }
+
+    async function connectMetaMask() {
+      if (window.ethereum) {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const address = accounts[0];
+          console.log('Connected to MetaMask:', address);
+          // Update UI with connected wallet
+          document.getElementById('walletAddress').innerText = address.slice(0, 6) + '...' + address.slice(-4);
+          document.getElementById('connectWallet').style.display = 'none';
+          document.getElementById('walletAddress').style.display = 'block';
+          closeWalletModal();
+        } catch (err) {
+          console.error('MetaMask connection error:', err);
+        }
+      } else {
+        alert('Please install MetaMask');
+      }
+    }
+
+    // Close wallet modal when clicking outside
+    window.addEventListener('click', function(event) {
+      const modal = document.getElementById('wallet-select-modal');
+      if (event.target === modal) {
+        closeWalletModal();
+      }
+    });
+
+    // Cult Modal Functions
+    function showCultModal() {
+      const modal = document.getElementById('cult-modal');
+      modal.style.display = 'block';
+      modal.offsetHeight; // Trigger reflow
+      modal.classList.add('active');
+    }
+
+    function closeCultModal() {
+      const modal = document.getElementById('cult-modal');
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    }
+
+    // Add event listener for JOIN CULT button
+    document.querySelector('.button[data-text="JOIN CULT"]').addEventListener('click', showCultModal);
+
+    // Close cult modal when clicking outside
+    window.addEventListener('click', function(event) {
+      const modal = document.getElementById('cult-modal');
+      if (event.target === modal) {
+        closeCultModal();
+      }
+    });
+
+    // NFT Counter Functions
+    async function updateNFTCounter() {
+      try {
+        const sdk = new ThirdwebSDK("base");
+        const contract = await sdk.getContract("0x2785b77adC320846497B894424977028a5CEef0d");
+        const claimed = await contract.erc721.getTotalClaimedSupply();
+        const remaining = 10000 - claimed;
+        
+        // Format numbers with commas
+        const formattedRemaining = remaining.toLocaleString();
+        const formattedTotal = "10,000";
+        
+        // Update counter display
+        const counter = document.querySelector('.nft-counter');
+        counter.innerHTML = `${formattedRemaining} / ${formattedTotal}`;
+        
+        // Add animation to each digit
+        const digits = counter.textContent.split('');
+        counter.innerHTML = digits.map(digit => 
+          digit === ' ' || digit === '/' ? digit : `<span>${digit}</span>`
+        ).join('');
+        
+      } catch (error) {
+        console.error("Error updating NFT counter:", error);
+      }
+    }
+
+    // Rotating Quotes
+    const quotes = [
+      "Those who claim now unlock more than just an NFT. Latecomers won't even know what they missed.",
+      "10,000 seals. When the last breaks — the cult awakens. Claim before it's over to receive the hidden gift.",
+      "10,000 fragments. Claim yours before the truth reveals itself.",
+      "This site holds secrets. Some visible, most buried. Claim early. Then start digging.",
+      "Hidden truths await those who explore. Unlock the NFT, uncover the path, earn the unseen reward.",
+      "Not all clues are obvious. But they're here. Claim your NFT and begin the decoding."
+    ];
+
+    function rotateQuotes() {
+      const quoteElement = document.querySelector('.rotating-quote');
+      let currentIndex = 0;
+
+      function updateQuote() {
+        // Fade out
+        quoteElement.style.opacity = '0';
+        
+        setTimeout(() => {
+          // Change text
+          quoteElement.textContent = quotes[currentIndex];
+          
+          // Fade in
+          quoteElement.style.opacity = '1';
+          
+          // Move to next quote
+          currentIndex = (currentIndex + 1) % quotes.length;
+        }, 500); // Wait for fade out to complete
+      }
+
+      // Initial quote
+      updateQuote();
+      
+      // Rotate quotes every 25 seconds
+      setInterval(updateQuote, 25000);
+    }
+
+    // Initialize everything on page load
+    window.addEventListener('load', () => {
+      updateNFTCounter();
+      rotateQuotes();
+    });
   </script>
 </body>
 </html>

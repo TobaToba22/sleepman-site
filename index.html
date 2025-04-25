@@ -1773,7 +1773,7 @@ Welcome to the mechanism.
     // Global variables
     let userAddress = null;
     const NFT_CONTRACT_ADDRESS = "0x527E497907afe2EBBd14cd6c48302bf40f29C953";
-    const NFT_TOKEN_ID = "0";
+    const NFT_TOKEN_ID = 0;
     let sdk = null;
     let contract = null;
 
@@ -1793,7 +1793,7 @@ Welcome to the mechanism.
       }
     }
 
-    // Check NFT Ownership
+    // Check NFT Ownership using multiple methods
     async function checkNFTOwnership() {
       try {
         if (!window.ethereum) {
@@ -1804,16 +1804,56 @@ Welcome to the mechanism.
         const signer = provider.getSigner();
         const address = await signer.getAddress();
 
-        const contract = new ethers.Contract(
-          NFT_CONTRACT_ADDRESS,
-          ["function balanceOf(address owner) view returns (uint256)"],
-          provider
-        );
+        // Method 1: Check balance
+        let hasNFT1 = false;
+        try {
+          const nftContract = new ethers.Contract(
+            NFT_CONTRACT_ADDRESS,
+            ["function balanceOf(address owner) view returns (uint256)"],
+            provider
+          );
+          const balance = await nftContract.balanceOf(address);
+          hasNFT1 = balance.gt(0);
+          console.log("Method 1 (balanceOf) result:", hasNFT1);
+        } catch (error) {
+          console.error("Error in balanceOf check:", error);
+        }
 
-        const balance = await contract.balanceOf(address);
-        return balance.gt(0);
+        // Method 2: Check ownerOf
+        let hasNFT2 = false;
+        try {
+          const nftContract = new ethers.Contract(
+            NFT_CONTRACT_ADDRESS,
+            ["function ownerOf(uint256 tokenId) view returns (address)"],
+            provider
+          );
+          const owner = await nftContract.ownerOf(NFT_TOKEN_ID);
+          hasNFT2 = owner.toLowerCase() === address.toLowerCase();
+          console.log("Method 2 (ownerOf) result:", hasNFT2);
+        } catch (error) {
+          console.error("Error in ownerOf check:", error);
+        }
+
+        // Method 3: Check using ThirdWeb SDK
+        let hasNFT3 = false;
+        try {
+          if (!contract) {
+            await initializeThirdweb();
+          }
+          const owned = await contract.erc721.getOwned(address);
+          hasNFT3 = owned.length > 0;
+          console.log("Method 3 (ThirdWeb) result:", hasNFT3);
+        } catch (error) {
+          console.error("Error in ThirdWeb check:", error);
+        }
+
+        // Combine results
+        const hasNFT = hasNFT1 || hasNFT2 || hasNFT3;
+        console.log("Final NFT ownership result:", hasNFT);
+        return hasNFT;
+
       } catch (error) {
-        console.error("Error checking NFT ownership:", error);
+        console.error("Error in NFT ownership check:", error);
         return false;
       }
     }
@@ -1971,7 +2011,9 @@ Welcome to the mechanism.
         this.value = '';
 
         if (command.toUpperCase() === '71SEDT') {
+          console.log("Command 71SEDT entered, checking NFT ownership...");
           const hasNFT = await checkNFTOwnership();
+          console.log("NFT ownership verification result:", hasNFT);
           
           if (hasNFT) {
             const content = [

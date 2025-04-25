@@ -1754,129 +1754,95 @@ Welcome to the mechanism.
       });
     });
 
-    // Wallet Connection Logic
+    // Global variables
     let userAddress = null;
+    let currentWallet = null; // 'metamask' or 'phantom'
+    const NFT_CONTRACT = "0x2785b77adC320846497B894424977028a5CEef0d";
+    const TOTAL_SUPPLY = 10000;
 
-    async function connectWallet() {
-      if (window.ethereum) {
-        try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          const signer = provider.getSigner();
-          userAddress = await signer.getAddress();
-          
-          // Display shortened address
-          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-          document.getElementById("walletAddress").innerText = shortenedAddress;
-          
-          // Hide connect button and show address
-          document.getElementById("connectWallet").style.display = "none";
-          document.getElementById("walletAddress").style.display = "block";
-        } catch (error) {
-          console.error("Error connecting wallet:", error);
-          alert("Ошибка подключения кошелька. Попробуйте еще раз.");
-        }
-      } else {
-        alert("Установите MetaMask или другой Web3-кошелёк!");
-      }
-    }
-
-    // Check if wallet is already connected
-    async function checkWalletConnection() {
-      if (window.ethereum) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const accounts = await provider.listAccounts();
-        
-        if (accounts.length > 0) {
-          userAddress = accounts[0];
-          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-          document.getElementById("walletAddress").innerText = shortenedAddress;
-          document.getElementById("connectWallet").style.display = "none";
-          document.getElementById("walletAddress").style.display = "block";
-          
-          // Check NFT balance when wallet is connected
-          checkNFTOwnership(userAddress);
-        }
-      }
-    }
-
-    // Listen for account changes
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', (accounts) => {
-        if (accounts.length === 0) {
-          // Wallet disconnected
-          userAddress = null;
-          document.getElementById("connectWallet").style.display = "block";
-          document.getElementById("walletAddress").style.display = "none";
-        } else {
-          // Account changed
-          userAddress = accounts[0];
-          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-          document.getElementById("walletAddress").innerText = shortenedAddress;
-          
-          // Check NFT balance when account changes
-          checkNFTOwnership(userAddress);
-        }
-      });
-    }
-
-    // NFT Balance Check
-    async function checkNFTOwnership(address) {
+    // Wallet Connection Functions
+    async function connectMetaMask() {
       try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const contract = new ethers.Contract(
-          "0x2785b77adC320846497B894424977028a5CEef0d",
-          ["function balanceOf(address owner, uint256 tokenId) view returns (uint256)"],
-          provider
-        );
-        
-        const balance = await contract.balanceOf(address, 0);
-        console.log("Wallet address:", address);
-        console.log("NFT balance:", balance.toString());
-        
-        const terminalContent = document.querySelector('.terminal-content');
-        
-        if (balance.gt(0)) {
-          // Clear existing content and show OK
-          terminalContent.innerHTML = '';
-          const okMessage = document.createElement('div');
-          okMessage.className = 'terminal-line';
-          okMessage.textContent = 'OK';
-          terminalContent.appendChild(okMessage);
-        } else {
-          // Show original content with replaced SCP value
-          const originalContent = `
-            [LOG-██/██/██] // SLEEP ENTITY FILE - SCP-???
-            &nbsp;
-            Designation: SLEEP_MAN
-            Status: Semi-dormant
-            Threat Level: Unclassified
-            &nbsp;
-            Fragmented Memory Extract:
-            >> ...subject exhibits passive resistance to all stimuli...
-            >> ...first contact recorded at dream depth level 6...
-            >> ...eyes closed, but aware. always aware...
-            >> ...he said: "don't wake me... I'm still uploading the dream..."
-            &nbsp;
-            Notes:
-            Subject is believed to exist simultaneously in chain and meta-chain.
-            Do not engage directly unless clearance Δ is provided.
-            Await Phase: Dream Protocol.
-          `;
-          
-          terminalContent.innerHTML = '';
-          originalContent.split('\n').forEach(line => {
-            const lineElement = document.createElement('div');
-            lineElement.className = 'terminal-line';
-            lineElement.innerHTML = line;
-            terminalContent.appendChild(lineElement);
-          });
+        if (!window.ethereum) {
+          alert("Please install MetaMask");
+          return;
         }
+
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        await provider.send("eth_requestAccounts", []);
+        const signer = provider.getSigner();
+        userAddress = await signer.getAddress();
+        currentWallet = 'metamask';
+        
+        updateUI();
+        startNFTUpdates();
       } catch (error) {
-        console.error("Error checking NFT balance:", error);
-        // Show original content with replaced SCP value on error
-        const terminalContent = document.querySelector('.terminal-content');
+        console.error("MetaMask connection error:", error);
+      }
+    }
+
+    async function connectPhantom() {
+      try {
+        if (!window.solana || !window.solana.isPhantom) {
+          alert("Please install Phantom wallet");
+          return;
+        }
+
+        const phantom = window.solana;
+        await phantom.connect();
+        userAddress = phantom.publicKey.toString();
+        currentWallet = 'phantom';
+        
+        updateUI();
+        startNFTUpdates();
+      } catch (error) {
+        console.error("Phantom connection error:", error);
+      }
+    }
+
+    // NFT Check Functions
+    async function checkNFTOwnership() {
+      if (!userAddress) return;
+
+      try {
+        let balance = 0;
+        
+        if (currentWallet === 'metamask') {
+          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const contract = new ethers.Contract(
+            NFT_CONTRACT,
+            ["function balanceOf(address owner) view returns (uint256)"],
+            provider
+          );
+          balance = await contract.balanceOf(userAddress);
+        } else if (currentWallet === 'phantom') {
+          // Phantom wallet logic would go here
+          // For now, we'll just log that Phantom is connected
+          console.log("Phantom wallet connected:", userAddress);
+        }
+
+        console.log("Wallet address:", userAddress);
+        console.log("NFT balance:", balance.toString());
+
+        updateTerminalContent(balance.gt(0));
+        updateNFTCounter(balance);
+      } catch (error) {
+        console.error("Error checking NFT ownership:", error);
+        updateTerminalContent(false);
+      }
+    }
+
+    // Terminal Content Update
+    function updateTerminalContent(hasNFT) {
+      const terminalContent = document.querySelector('.terminal-content');
+      
+      if (hasNFT) {
         terminalContent.innerHTML = '';
+        const okMessage = document.createElement('div');
+        okMessage.className = 'terminal-line';
+        okMessage.textContent = 'OK';
+        terminalContent.appendChild(okMessage);
+      } else {
         const originalContent = `
           [LOG-██/██/██] // SLEEP ENTITY FILE - SCP-???
           &nbsp;
@@ -1895,6 +1861,8 @@ Welcome to the mechanism.
           Do not engage directly unless clearance Δ is provided.
           Await Phase: Dream Protocol.
         `;
+        
+        terminalContent.innerHTML = '';
         originalContent.split('\n').forEach(line => {
           const lineElement = document.createElement('div');
           lineElement.className = 'terminal-line';
@@ -1902,6 +1870,74 @@ Welcome to the mechanism.
           terminalContent.appendChild(lineElement);
         });
       }
+    }
+
+    // NFT Counter Update
+    async function updateNFTCounter(balance) {
+      try {
+        const remaining = TOTAL_SUPPLY - balance.toNumber();
+        const counter = document.querySelector('.nft-counter');
+        counter.innerHTML = `${remaining} / ${TOTAL_SUPPLY}`;
+      } catch (error) {
+        console.error("Error updating NFT counter:", error);
+      }
+    }
+
+    // UI Update
+    function updateUI() {
+      if (userAddress) {
+        const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+        document.getElementById("walletAddress").innerText = shortenedAddress;
+        document.getElementById("connectWallet").style.display = "none";
+        document.getElementById("walletAddress").style.display = "block";
+      } else {
+        document.getElementById("connectWallet").style.display = "block";
+        document.getElementById("walletAddress").style.display = "none";
+      }
+    }
+
+    // Start NFT Updates
+    function startNFTUpdates() {
+      // Initial check
+      checkNFTOwnership();
+      
+      // Set up periodic updates
+      setInterval(checkNFTOwnership, 5000);
+    }
+
+    // Event Listeners
+    document.getElementById("connect-phantom").addEventListener("click", connectPhantom);
+    document.getElementById("connect-metamask").addEventListener("click", connectMetaMask);
+
+    // Check for wallet changes
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          userAddress = null;
+          currentWallet = null;
+          updateUI();
+        } else {
+          userAddress = accounts[0];
+          currentWallet = 'metamask';
+          updateUI();
+          checkNFTOwnership();
+        }
+      });
+    }
+
+    if (window.solana) {
+      window.solana.on('connect', () => {
+        userAddress = window.solana.publicKey.toString();
+        currentWallet = 'phantom';
+        updateUI();
+        checkNFTOwnership();
+      });
+
+      window.solana.on('disconnect', () => {
+        userAddress = null;
+        currentWallet = null;
+        updateUI();
+      });
     }
 
     // Modal Functions
@@ -2146,44 +2182,6 @@ Welcome to the mechanism.
       }, 300);
     }
 
-    async function connectPhantom() {
-      if (window.solana && window.solana.isPhantom) {
-        try {
-          const resp = await window.solana.connect();
-          const publicKey = resp.publicKey.toString();
-          console.log('Connected to Phantom:', publicKey);
-          // Update UI with connected wallet
-          document.getElementById('walletAddress').innerText = publicKey.slice(0, 6) + '...' + publicKey.slice(-4);
-          document.getElementById('connectWallet').style.display = 'none';
-          document.getElementById('walletAddress').style.display = 'block';
-          closeWalletModal();
-        } catch (err) {
-          console.error('Phantom connection error:', err);
-        }
-      } else {
-        alert('Please install Phantom wallet');
-      }
-    }
-
-    async function connectMetaMask() {
-      if (window.ethereum) {
-        try {
-          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-          const address = accounts[0];
-          console.log('Connected to MetaMask:', address);
-          // Update UI with connected wallet
-          document.getElementById('walletAddress').innerText = address.slice(0, 6) + '...' + address.slice(-4);
-          document.getElementById('connectWallet').style.display = 'none';
-          document.getElementById('walletAddress').style.display = 'block';
-          closeWalletModal();
-        } catch (err) {
-          console.error('MetaMask connection error:', err);
-        }
-      } else {
-        alert('Please install MetaMask');
-      }
-    }
-
     // Close wallet modal when clicking outside
     window.addEventListener('click', function(event) {
       const modal = document.getElementById('wallet-select-modal');
@@ -2218,33 +2216,6 @@ Welcome to the mechanism.
         closeCultModal();
       }
     });
-
-    // NFT Counter Functions
-    async function updateNFTCounter() {
-      try {
-        const sdk = new ThirdwebSDK("base");
-        const contract = await sdk.getContract("0x2785b77adC320846497B894424977028a5CEef0d");
-        const claimed = await contract.erc721.getTotalClaimedSupply();
-        const remaining = 10000 - claimed;
-        
-        // Format numbers with commas
-        const formattedRemaining = remaining.toLocaleString();
-        const formattedTotal = "10,000";
-        
-        // Update counter display
-        const counter = document.querySelector('.nft-counter');
-        counter.innerHTML = `${formattedRemaining} / ${formattedTotal}`;
-        
-        // Add animation to each digit
-        const digits = counter.textContent.split('');
-        counter.innerHTML = digits.map(digit => 
-          digit === ' ' || digit === '/' ? digit : `<span>${digit}</span>`
-        ).join('');
-        
-      } catch (error) {
-        console.error("Error updating NFT counter:", error);
-      }
-    }
 
     // Rotating Quotes
     const quotes = [

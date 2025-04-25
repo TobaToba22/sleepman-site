@@ -1773,118 +1773,59 @@ Welcome to the mechanism.
     // Global variables
     let userAddress = null;
     const NFT_CONTRACT_ADDRESS = "0x2785b77adC320846497B894424977028a5CEef0d";
-    const NFT_ABI = [
-      "function balanceOf(address owner) view returns (uint256)",
-      "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
-      "function ownerOf(uint256 tokenId) view returns (address)"
-    ];
+    let sdk = null;
+    let contract = null;
+
+    // Initialize Thirdweb SDK
+    async function initializeThirdweb() {
+      try {
+        console.log("Initializing Thirdweb SDK...");
+        sdk = new window.ThirdwebSDK("base");
+        console.log("SDK initialized");
+        
+        contract = await sdk.getContract(NFT_CONTRACT_ADDRESS);
+        console.log("Contract instance created");
+        return true;
+      } catch (error) {
+        console.error("Error initializing Thirdweb:", error);
+        return false;
+      }
+    }
 
     // Check NFT Ownership
     async function checkNFTOwnership() {
-      if (!userAddress || !window.ethereum) {
+      console.log("=== Starting NFT ownership check ===");
+      
+      if (!userAddress) {
         console.log("No wallet connected");
         return false;
       }
 
       try {
-        console.log("Checking NFT ownership for address:", userAddress);
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const nftContract = new ethers.Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, provider);
-
-        // First check if user has any NFTs from this collection
-        const balance = await nftContract.balanceOf(userAddress);
-        console.log("User NFT balance:", balance.toString());
-
-        if (balance.toNumber() === 0) {
-          console.log("User has no NFTs from this collection");
-          return false;
-        }
-
-        // Check each NFT the user owns to find token ID 0
-        for (let i = 0; i < balance.toNumber(); i++) {
-          try {
-            const tokenId = await nftContract.tokenOfOwnerByIndex(userAddress, i);
-            console.log("Found token ID:", tokenId.toString());
-            if (tokenId.toNumber() === 0) {
-              console.log("User owns NFT 1/5 (Token ID 0)");
-              return true;
-            }
-          } catch (err) {
-            console.error("Error checking token ID:", err);
+        console.log("Connected wallet address:", userAddress);
+        
+        // Initialize SDK if not already initialized
+        if (!sdk || !contract) {
+          const initialized = await initializeThirdweb();
+          if (!initialized) {
+            console.log("Failed to initialize Thirdweb");
+            return false;
           }
         }
 
-        console.log("User does not own NFT 1/5");
-        return false;
+        // Get all NFTs owned by the user
+        console.log("Fetching NFTs for address:", userAddress);
+        const ownedNFTs = await contract.erc721.getOwned(userAddress);
+        console.log("Owned NFTs:", ownedNFTs);
+
+        // Check if user owns NFT with ID 0
+        const hasNFT = ownedNFTs.some(nft => nft.metadata.id === "0");
+        console.log("Has NFT with ID 0:", hasNFT);
+        
+        return hasNFT;
       } catch (error) {
         console.error("Error in checkNFTOwnership:", error);
         return false;
-      }
-    }
-
-    // Update Terminal Content
-    function updateTerminalContent(hasNFT) {
-      const terminalContent = document.querySelector('.terminal-content');
-      
-      if (hasNFT) {
-        // Clear existing content and show OK
-        terminalContent.innerHTML = '';
-        const okMessage = document.createElement('div');
-        okMessage.className = 'terminal-line green-glow';
-        okMessage.textContent = 'OK';
-        terminalContent.appendChild(okMessage);
-      } else {
-        // Show original content with replaced SCP value
-        const originalContent = `
-          [LOG-██/██/██] // SLEEP ENTITY FILE - SCP-???
-          &nbsp;
-          Designation: SLEEP_MAN
-          Status: Semi-dormant
-          Threat Level: Unclassified
-          &nbsp;
-          Fragmented Memory Extract:
-          >> ...subject exhibits passive resistance to all stimuli...
-          >> ...first contact recorded at dream depth level 6...
-          >> ...eyes closed, but aware. always aware...
-          >> ...he said: "don't wake me... I'm still uploading the dream..."
-          &nbsp;
-          Notes:
-          Subject is believed to exist simultaneously in chain and meta-chain.
-          Do not engage directly unless clearance Δ is provided.
-          Await Phase: Dream Protocol.
-        `;
-        
-        terminalContent.innerHTML = '';
-        originalContent.split('\n').forEach(line => {
-          const lineElement = document.createElement('div');
-          lineElement.className = 'terminal-line';
-          lineElement.innerHTML = line;
-          terminalContent.appendChild(lineElement);
-        });
-      }
-    }
-
-    // Start Updates
-    function startUpdates() {
-      // Initial updates
-      checkNFTOwnership();
-      
-      // Clear existing interval if any
-      if (updateInterval) {
-        clearInterval(updateInterval);
-      }
-      
-      // Set up new interval
-      updateInterval = setInterval(() => {
-        checkNFTOwnership();
-      }, 10000); // Update every 10 seconds
-    }
-
-    // Stop Updates
-    function stopUpdates() {
-      if (updateInterval) {
-        clearInterval(updateInterval);
-        updateInterval = null;
       }
     }
 
@@ -1895,6 +1836,18 @@ Welcome to the mechanism.
           const provider = new ethers.providers.Web3Provider(window.ethereum);
           const accounts = await provider.send("eth_requestAccounts", []);
           userAddress = accounts[0];
+          console.log("Wallet connected:", userAddress);
+          
+          // Switch to Base network
+          try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0x2105' }], // Base chainId
+            });
+            console.log("Switched to Base network");
+          } catch (switchError) {
+            console.error("Error switching network:", switchError);
+          }
           
           // Update UI
           const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
@@ -1902,7 +1855,8 @@ Welcome to the mechanism.
           document.getElementById("connectWallet").style.display = "none";
           document.getElementById("walletAddress").style.display = "block";
           
-          // Check NFT ownership immediately after connecting
+          // Initialize Thirdweb and check NFT
+          await initializeThirdweb();
           const hasNFT = await checkNFTOwnership();
           console.log("Initial NFT check result:", hasNFT);
           
@@ -2010,18 +1964,33 @@ Welcome to the mechanism.
     document.querySelector('.terminal-input').addEventListener('keypress', async function(e) {
       if (e.key === 'Enter') {
         const input = this.value.trim().toUpperCase();
-        const terminalContent = document.querySelector('.terminal-content');
+        console.log("Terminal command entered:", input);
         
-        // Check for 71SEDT command
+        const terminalContent = document.querySelector('.terminal-content');
+        this.value = '';
+
         if (input === '71SEDT') {
-          const hasNFT = await checkNFTOwnership();
+          console.log("Processing 71SEDT command");
           
-          if (hasNFT) {
-            // Clear existing content
-            terminalContent.innerHTML = '';
-            
-            // New content with proper formatting
-            const newContent = `SCP-??? // CLASS: KETER
+          if (!userAddress) {
+            console.log("No wallet connected, showing error");
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'terminal-line error-message';
+            errorMessage.textContent = '!! ACCESS DENIED. CONNECT WALLET FIRST.';
+            terminalContent.appendChild(errorMessage);
+            setTimeout(() => errorMessage.remove(), 3500);
+            return;
+          }
+
+          try {
+            const hasNFT = await checkNFTOwnership();
+            console.log("NFT check result:", hasNFT);
+
+            if (hasNFT) {
+              console.log("NFT verified, updating terminal content");
+              terminalContent.innerHTML = '';
+              
+              const newContent = `SCP-??? // CLASS: KETER
 
 Description:
 Entity exhibits non-linear awareness and multiversal displacement. Referred to by insiders as "Sleepman", the subject appears dormant, yet traces of lucid cognitive residue persist.
@@ -2045,41 +2014,40 @@ Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutat
 >> This is not just a drop. It's an awakening.  
 >> Can you find the true dream before it finds you?`;
 
-            // Split content into lines and animate them
-            const lines = newContent.split('\n');
-            lines.forEach((line, index) => {
-              setTimeout(() => {
-                const lineElement = document.createElement('div');
-                lineElement.className = 'terminal-line';
-                lineElement.textContent = line;
-                terminalContent.appendChild(lineElement);
-                lineElement.classList.add('visible');
-              }, index * 50);
-            });
-          } else {
-            // Show error for no NFT
+              const lines = newContent.split('\n');
+              lines.forEach((line, index) => {
+                setTimeout(() => {
+                  const lineElement = document.createElement('div');
+                  lineElement.className = 'terminal-line';
+                  lineElement.textContent = line;
+                  terminalContent.appendChild(lineElement);
+                  lineElement.classList.add('visible');
+                }, index * 50);
+              });
+            } else {
+              console.log("NFT verification failed, showing error");
+              const errorMessage = document.createElement('div');
+              errorMessage.className = 'terminal-line error-message';
+              errorMessage.textContent = '!! ACCESS DENIED. NFT VERIFICATION FAILED.';
+              terminalContent.appendChild(errorMessage);
+              setTimeout(() => errorMessage.remove(), 3500);
+            }
+          } catch (error) {
+            console.error("Error in 71SEDT command handler:", error);
             const errorMessage = document.createElement('div');
             errorMessage.className = 'terminal-line error-message';
-            errorMessage.textContent = '!! ACCESS DENIED. NFT VERIFICATION FAILED.';
+            errorMessage.textContent = '!! SYSTEM ERROR. PLEASE TRY AGAIN.';
             terminalContent.appendChild(errorMessage);
-            terminalContent.classList.add('error');
-            
-            setTimeout(() => {
-              terminalContent.classList.remove('error');
-              errorMessage.remove();
-            }, 3500);
+            setTimeout(() => errorMessage.remove(), 3500);
           }
-          
-          // Clear input
-          this.value = '';
-          return;
-        }
-        
-        // Handle other commands as before
-        if (['@SLEEPMAN', 'SLEEPMAN'].includes(input)) {
+        } else if (['@SLEEPMAN', 'SLEEPMAN'].includes(input)) {
           // ... existing sleepman command code ...
         } else if (input !== 'ACCESS-Δ1') {
-          // ... existing invalid command code ...
+          const errorMessage = document.createElement('div');
+          errorMessage.className = 'terminal-line error-message';
+          errorMessage.textContent = '!! INTRUSION DETECTED. MEMORY CORE BREACH IN PROGRESS...';
+          terminalContent.appendChild(errorMessage);
+          setTimeout(() => errorMessage.remove(), 3500);
         }
       }
     });

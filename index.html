@@ -599,6 +599,7 @@
       z-index: 999;
     }
 
+    /* Terminal Content Styles */
     .terminal-content {
       position: absolute;
       top: 50%;
@@ -619,9 +620,38 @@
       box-shadow: inset 0 0 20px rgba(0, 255, 102, 0.1);
       margin-top: -105px;
       transition: color 0.3s ease;
+      opacity: 0;
+      animation: fadeIn 0.5s ease forwards;
     }
 
-    /* Стилизация скроллбара для WebKit (Chrome, Safari) */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .terminal-content::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 255, 102, 0.05),
+        rgba(0, 255, 102, 0.05) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      animation: scanline 10s linear infinite;
+    }
+
+    @keyframes scanline {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(100%); }
+    }
+
     .terminal-content::-webkit-scrollbar {
       width: 6px;
     }
@@ -640,6 +670,10 @@
     .terminal-content::-webkit-scrollbar-thumb:hover {
       background: #00ff99;
       box-shadow: 0 0 8px #00ff99;
+    }
+
+    .terminal-line {
+      margin-bottom: 5px;
     }
 
     .terminal-input-wrapper {
@@ -1442,16 +1476,16 @@
 
     .green-glow {
       color: #00ff00;
-      text-shadow: 0 0 10px #00ff00;
+      text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
       animation: glow 2s ease-in-out infinite alternate;
     }
-    
+
     @keyframes glow {
       from {
-        text-shadow: 0 0 10px #00ff00;
+        text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
       }
       to {
-        text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00;
+        text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00, 0 0 40px #00ff00;
       }
     }
   </style>
@@ -1772,21 +1806,17 @@ Welcome to the mechanism.
 
     // Global variables
     let userAddress = null;
-    const NFT_CONTRACT = "0x2785b77adC320846497B894424977028a5CEef0d";
+    const NFT_CONTRACT_ADDRESS = "0x2785b77adC320846497B894424977028a5CEef0d";
     const TOTAL_SUPPLY = 10000;
-    let updateInterval = null;
+    let updateInterval;
     let sdk = null;
     let contract = null;
 
     // Initialize Thirdweb SDK
     async function initializeThirdweb() {
       try {
-        if (!sdk) {
-          sdk = new ThirdwebSDK("base");
-        }
-        if (!contract) {
-          contract = await sdk.getContract(NFT_CONTRACT, "nft-drop");
-        }
+        const sdk = new ThirdwebSDK.ThirdwebSDK("base");
+        const contract = await sdk.getContract(NFT_CONTRACT_ADDRESS);
         return { sdk, contract };
       } catch (error) {
         console.error("Error initializing Thirdweb:", error);
@@ -1796,85 +1826,55 @@ Welcome to the mechanism.
 
     // Check NFT Ownership
     async function checkNFTOwnership() {
-      if (!userAddress) return;
-
       try {
-        const { contract } = await initializeThirdweb();
-        if (!contract) return;
+        if (!window.ethereum) {
+          console.log('MetaMask is not installed');
+          return false;
+        }
 
-        const ownedNFTs = await contract.erc721.getOwned(userAddress);
-        const hasKeyNFT = ownedNFTs.some(nft => nft.metadata.id === '0');
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length === 0) {
+          console.log('No accounts connected');
+          return false;
+        }
 
-        updateTerminalContent(hasKeyNFT);
+        const userAddress = accounts[0];
+        const contract = await initializeThirdweb();
+        const balance = await contract.erc1155.balanceOf(userAddress, 0);
+        
+        return balance.gt(0);
       } catch (error) {
-        console.error("Error checking NFT ownership:", error);
-        updateTerminalContent(false);
+        console.error('Error checking NFT ownership:', error);
+        return false;
       }
     }
 
     // Update Terminal Content
-    function updateTerminalContent(hasNFT) {
-      const terminalContent = document.querySelector('.terminal-content');
-      
+    async function updateTerminalContent(hasNFT) {
+      const terminalContent = document.getElementById('terminal-content');
       if (hasNFT) {
-        // Clear existing content and show OK
-        terminalContent.innerHTML = '';
-        const okMessage = document.createElement('div');
-        okMessage.className = 'terminal-line green-glow';
-        okMessage.textContent = 'OK';
-        terminalContent.appendChild(okMessage);
+        terminalContent.innerHTML = '<span class="glow-green">OK</span>';
       } else {
-        // Show original content with replaced SCP value
-        const originalContent = `
-          [LOG-██/██/██] // SLEEP ENTITY FILE - SCP-???
-          &nbsp;
-          Designation: SLEEP_MAN
-          Status: Semi-dormant
-          Threat Level: Unclassified
-          &nbsp;
-          Fragmented Memory Extract:
-          >> ...subject exhibits passive resistance to all stimuli...
-          >> ...first contact recorded at dream depth level 6...
-          >> ...eyes closed, but aware. always aware...
-          >> ...he said: "don't wake me... I'm still uploading the dream..."
-          &nbsp;
-          Notes:
-          Subject is believed to exist simultaneously in chain and meta-chain.
-          Do not engage directly unless clearance Δ is provided.
-          Await Phase: Dream Protocol.
+        terminalContent.innerHTML = `
+          <div class="terminal-line">> INITIALIZING TERMINAL...</div>
+          <div class="terminal-line">> CONNECTING TO DATABASE...</div>
+          <div class="terminal-line">> LOADING SCP-??? PROTOCOLS...</div>
+          <div class="terminal-line">> ACCESS GRANTED</div>
         `;
-        
-        terminalContent.innerHTML = '';
-        originalContent.split('\n').forEach(line => {
-          const lineElement = document.createElement('div');
-          lineElement.className = 'terminal-line';
-          lineElement.innerHTML = line;
-          terminalContent.appendChild(lineElement);
-        });
       }
     }
 
     // Start Updates
     function startUpdates() {
-      // Initial updates
-      checkNFTOwnership();
-      
-      // Clear existing interval if any
-      if (updateInterval) {
-        clearInterval(updateInterval);
-      }
-      
-      // Set up new interval
-      updateInterval = setInterval(() => {
-        checkNFTOwnership();
-      }, 10000); // Update every 10 seconds
+      stopUpdates();
+      updateNFTCounter();
+      updateInterval = setInterval(updateNFTCounter, 30000); // Update every 30 seconds
     }
 
     // Stop Updates
     function stopUpdates() {
       if (updateInterval) {
         clearInterval(updateInterval);
-        updateInterval = null;
       }
     }
 
@@ -2273,6 +2273,21 @@ Welcome to the mechanism.
       
       // Rotate quotes every 25 seconds
       setInterval(updateQuote, 25000);
+    }
+
+    async function updateNFTCounter() {
+      try {
+        const contract = await initializeThirdweb();
+        const totalMinted = await contract.erc1155.totalSupply(0);
+        const remaining = TOTAL_SUPPLY - totalMinted.toNumber();
+        
+        const counter = document.getElementById('nft-counter');
+        if (counter) {
+          counter.textContent = `${remaining} / ${TOTAL_SUPPLY}`;
+        }
+      } catch (error) {
+        console.error('Error updating NFT counter:', error);
+      }
     }
 
     // Initialize everything on page load

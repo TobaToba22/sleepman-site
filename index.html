@@ -5,6 +5,7 @@
   <title>$SLEEPMAN — Enter the Dream</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
   <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="application/javascript"></script>
+  <script src="https://unpkg.com/@thirdweb-dev/sdk@3"></script>
   <style>
     html, body {
       margin: 0;
@@ -1438,6 +1439,21 @@
         text-shadow: 0 0 8px #00ffcc;
       }
     }
+
+    .green-glow {
+      color: #00ff00;
+      text-shadow: 0 0 10px #00ff00;
+      animation: glow 2s ease-in-out infinite alternate;
+    }
+    
+    @keyframes glow {
+      from {
+        text-shadow: 0 0 10px #00ff00;
+      }
+      to {
+        text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00;
+      }
+    }
   </style>
 </head>
 <body>
@@ -1754,9 +1770,115 @@ Welcome to the mechanism.
       });
     });
 
-    // Wallet Connection Logic
+    // Global variables
     let userAddress = null;
+    const NFT_CONTRACT = "0x2785b77adC320846497B894424977028a5CEef0d";
+    const TOTAL_SUPPLY = 10000;
+    let updateInterval = null;
+    let sdk = null;
+    let contract = null;
 
+    // Initialize Thirdweb SDK
+    async function initializeThirdweb() {
+      try {
+        if (!sdk) {
+          sdk = new ThirdwebSDK("base");
+        }
+        if (!contract) {
+          contract = await sdk.getContract(NFT_CONTRACT, "nft-drop");
+        }
+        return { sdk, contract };
+      } catch (error) {
+        console.error("Error initializing Thirdweb:", error);
+        return null;
+      }
+    }
+
+    // Check NFT Ownership
+    async function checkNFTOwnership() {
+      if (!userAddress) return;
+
+      try {
+        const { contract } = await initializeThirdweb();
+        if (!contract) return;
+
+        const ownedNFTs = await contract.erc721.getOwned(userAddress);
+        const hasKeyNFT = ownedNFTs.some(nft => nft.metadata.id === '0');
+
+        updateTerminalContent(hasKeyNFT);
+      } catch (error) {
+        console.error("Error checking NFT ownership:", error);
+        updateTerminalContent(false);
+      }
+    }
+
+    // Update Terminal Content
+    function updateTerminalContent(hasNFT) {
+      const terminalContent = document.querySelector('.terminal-content');
+      
+      if (hasNFT) {
+        // Clear existing content and show OK
+        terminalContent.innerHTML = '';
+        const okMessage = document.createElement('div');
+        okMessage.className = 'terminal-line green-glow';
+        okMessage.textContent = 'OK';
+        terminalContent.appendChild(okMessage);
+      } else {
+        // Show original content with replaced SCP value
+        const originalContent = `
+          [LOG-██/██/██] // SLEEP ENTITY FILE - SCP-???
+          &nbsp;
+          Designation: SLEEP_MAN
+          Status: Semi-dormant
+          Threat Level: Unclassified
+          &nbsp;
+          Fragmented Memory Extract:
+          >> ...subject exhibits passive resistance to all stimuli...
+          >> ...first contact recorded at dream depth level 6...
+          >> ...eyes closed, but aware. always aware...
+          >> ...he said: "don't wake me... I'm still uploading the dream..."
+          &nbsp;
+          Notes:
+          Subject is believed to exist simultaneously in chain and meta-chain.
+          Do not engage directly unless clearance Δ is provided.
+          Await Phase: Dream Protocol.
+        `;
+        
+        terminalContent.innerHTML = '';
+        originalContent.split('\n').forEach(line => {
+          const lineElement = document.createElement('div');
+          lineElement.className = 'terminal-line';
+          lineElement.innerHTML = line;
+          terminalContent.appendChild(lineElement);
+        });
+      }
+    }
+
+    // Start Updates
+    function startUpdates() {
+      // Initial updates
+      checkNFTOwnership();
+      
+      // Clear existing interval if any
+      if (updateInterval) {
+        clearInterval(updateInterval);
+      }
+      
+      // Set up new interval
+      updateInterval = setInterval(() => {
+        checkNFTOwnership();
+      }, 10000); // Update every 10 seconds
+    }
+
+    // Stop Updates
+    function stopUpdates() {
+      if (updateInterval) {
+        clearInterval(updateInterval);
+        updateInterval = null;
+      }
+    }
+
+    // Wallet Connection Functions
     async function connectWallet() {
       if (window.ethereum) {
         try {
@@ -1765,38 +1887,20 @@ Welcome to the mechanism.
           const signer = provider.getSigner();
           userAddress = await signer.getAddress();
           
-          // Display shortened address
+          // Update UI
           const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
           document.getElementById("walletAddress").innerText = shortenedAddress;
-          
-          // Hide connect button and show address
           document.getElementById("connectWallet").style.display = "none";
           document.getElementById("walletAddress").style.display = "block";
+          
+          // Start updates
+          startUpdates();
         } catch (error) {
           console.error("Error connecting wallet:", error);
           alert("Ошибка подключения кошелька. Попробуйте еще раз.");
         }
       } else {
         alert("Установите MetaMask или другой Web3-кошелёк!");
-      }
-    }
-
-    // Check if wallet is already connected
-    async function checkWalletConnection() {
-      if (window.ethereum) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const accounts = await provider.listAccounts();
-        
-        if (accounts.length > 0) {
-          userAddress = accounts[0];
-          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-          document.getElementById("walletAddress").innerText = shortenedAddress;
-          document.getElementById("connectWallet").style.display = "none";
-          document.getElementById("walletAddress").style.display = "block";
-          
-          // Check NFT ownership when wallet is connected
-          checkNFTOwnership(userAddress);
-        }
       }
     }
 
@@ -1808,48 +1912,15 @@ Welcome to the mechanism.
           userAddress = null;
           document.getElementById("connectWallet").style.display = "block";
           document.getElementById("walletAddress").style.display = "none";
+          stopUpdates();
         } else {
           // Account changed
           userAddress = accounts[0];
           const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
           document.getElementById("walletAddress").innerText = shortenedAddress;
-          
-          // Check NFT ownership when account changes
-          checkNFTOwnership(userAddress);
+          startUpdates();
         }
       });
-    }
-
-    // NFT Ownership Check
-    async function checkNFTOwnership(address) {
-      try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const contract = new ethers.Contract(
-          "0x2785b77adC320846497B894424977028a5CEef0d",
-          ["function ownerOf(uint256 tokenId) view returns (address)"],
-          provider
-        );
-        
-        const owner = await contract.ownerOf(0);
-        const terminalContent = document.querySelector('.terminal-content');
-        
-        if (owner.toLowerCase() === address.toLowerCase()) {
-          // Clear existing content
-          terminalContent.innerHTML = '';
-          // Add OK message
-          const okMessage = document.createElement('div');
-          okMessage.className = 'terminal-line';
-          okMessage.textContent = 'OK';
-          terminalContent.appendChild(okMessage);
-        } else {
-          // Clear terminal content if not owner
-          terminalContent.innerHTML = '';
-        }
-      } catch (error) {
-        console.error("Error checking NFT ownership:", error);
-        // Clear terminal content on error
-        document.querySelector('.terminal-content').innerHTML = '';
-      }
     }
 
     // Modal Functions
@@ -2167,33 +2238,6 @@ Welcome to the mechanism.
       }
     });
 
-    // NFT Counter Functions
-    async function updateNFTCounter() {
-      try {
-        const sdk = new ThirdwebSDK("base");
-        const contract = await sdk.getContract("0x2785b77adC320846497B894424977028a5CEef0d");
-        const claimed = await contract.erc721.getTotalClaimedSupply();
-        const remaining = 10000 - claimed;
-        
-        // Format numbers with commas
-        const formattedRemaining = remaining.toLocaleString();
-        const formattedTotal = "10,000";
-        
-        // Update counter display
-        const counter = document.querySelector('.nft-counter');
-        counter.innerHTML = `${formattedRemaining} / ${formattedTotal}`;
-        
-        // Add animation to each digit
-        const digits = counter.textContent.split('');
-        counter.innerHTML = digits.map(digit => 
-          digit === ' ' || digit === '/' ? digit : `<span>${digit}</span>`
-        ).join('');
-        
-      } catch (error) {
-        console.error("Error updating NFT counter:", error);
-      }
-    }
-
     // Rotating Quotes
     const quotes = [
       "Those who claim now unlock more than just an NFT. Latecomers won't even know what they missed.",
@@ -2233,7 +2277,7 @@ Welcome to the mechanism.
 
     // Initialize everything on page load
     window.addEventListener('load', () => {
-      updateNFTCounter();
+      checkNFTOwnership();
       rotateQuotes();
     });
   </script>

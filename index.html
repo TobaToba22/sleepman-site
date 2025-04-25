@@ -1772,8 +1772,8 @@ Welcome to the mechanism.
 
     // Global variables
     let userAddress = null;
-    const NFT_CONTRACT_ADDRESS = '0x2785b77adC320846497B894424977028a5CEef0d';
-    const NFT_TOKEN_ID = 0;
+    const NFT_CONTRACT_ADDRESS = "0x527E497907afe2EBBd14cd6c48302bf40f29C953";
+    const NFT_TOKEN_ID = "0";
     let sdk = null;
     let contract = null;
 
@@ -1797,7 +1797,7 @@ Welcome to the mechanism.
     async function checkNFTOwnership() {
       try {
         if (!window.ethereum) {
-          throw new Error('MetaMask not installed');
+          throw new Error("MetaMask not installed");
         }
 
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -1806,14 +1806,14 @@ Welcome to the mechanism.
 
         const contract = new ethers.Contract(
           NFT_CONTRACT_ADDRESS,
-          ['function ownerOf(uint256 tokenId) view returns (address)'],
+          ["function balanceOf(address owner) view returns (uint256)"],
           provider
         );
 
-        const owner = await contract.ownerOf(NFT_TOKEN_ID);
-        return owner.toLowerCase() === address.toLowerCase();
+        const balance = await contract.balanceOf(address);
+        return balance.gt(0);
       } catch (error) {
-        console.error('Error checking NFT ownership:', error);
+        console.error("Error checking NFT ownership:", error);
         return false;
       }
     }

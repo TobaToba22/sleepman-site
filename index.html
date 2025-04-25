@@ -1442,16 +1442,16 @@
 
     .green-glow {
       color: #00ff00;
-      text-shadow: 0 0 10px #00ff00;
-      animation: glow 2s ease-in-out infinite alternate;
+      text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00;
+      animation: glow 1.5s ease-in-out infinite alternate;
     }
     
     @keyframes glow {
       from {
-        text-shadow: 0 0 10px #00ff00;
+        text-shadow: 0 0 5px #00ff00, 0 0 10px #00ff00, 0 0 15px #00ff00;
       }
       to {
-        text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00;
+        text-shadow: 0 0 10px #00ff00, 0 0 20px #00ff00, 0 0 30px #00ff00;
       }
     }
   </style>
@@ -1796,19 +1796,29 @@ Welcome to the mechanism.
 
     // Check NFT Ownership
     async function checkNFTOwnership() {
-      if (!userAddress) return;
+      if (!window.ethereum || !userAddress) return false;
 
       try {
-        const { contract } = await initializeThirdweb();
-        if (!contract) return;
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        
+        // Check if we're on Base network (chainId: 8453)
+        const network = await provider.getNetwork();
+        if (network.chainId !== 8453) {
+          console.error("Please connect to Base network");
+          return false;
+        }
 
-        const ownedNFTs = await contract.erc721.getOwned(userAddress);
-        const hasKeyNFT = ownedNFTs.some(nft => nft.metadata.id === '0');
+        const nftContract = new ethers.Contract(
+          '0x2785b77adC320846497B894424977028a5CEef0d',
+          ['function ownerOf(uint256 tokenId) view returns (address)'],
+          provider
+        );
 
-        updateTerminalContent(hasKeyNFT);
+        const owner = await nftContract.ownerOf(0);
+        return owner.toLowerCase() === userAddress.toLowerCase();
       } catch (error) {
         console.error("Error checking NFT ownership:", error);
-        updateTerminalContent(false);
+        return false;
       }
     }
 
@@ -1817,71 +1827,8 @@ Welcome to the mechanism.
       const terminalContent = document.querySelector('.terminal-content');
       
       if (hasNFT) {
-        const nftText = `[ACCESS LEVEL: Δ - VERIFIED]
-
-SCP-??? // CLASS: KETER
-
-Description:
-Entity exhibits non-linear awareness and multiversal displacement. Referred to by insiders as "Sleepman", the subject appears dormant, yet traces of lucid cognitive residue persist.
-
-Anomalous Behavior:
-Subject simultaneously exists in chain and meta-chain layers. Periodic emissions of "dream fragments" detected. These fragments materialize as tokenized artifacts — 1 of 10,000.
-
-Extracted Log:
->> "10000 fragments claimed... the shift is near."
->> "Those who hold their keys before the final mutation will unlock more than access..."
->> "...encrypted movement detected... protocol A777 initiating..."
-
-Status: Semi-dormant  
-Threat Level: UNCLASSIFIED  
-Notes:  
-Do not engage without clearance. Dream resonance is unstable.
-
-Final Directive:
-Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutation fragments will gain restricted access to project pathways, anomalies, and encrypted lore not available post-shift.
-
->> This is not just a drop. It's an awakening.  
->> Can you find the true dream before it finds you?`;
-
-        // Convert text to terminal lines with proper formatting
-        const formattedContent = nftText.split('\n').map(line => {
-          const div = document.createElement('div');
-          div.className = 'terminal-line';
-          div.textContent = line;
-          return div;
-        });
-
-        // Clear terminal and add new content
-        terminalContent.innerHTML = '';
-        formattedContent.forEach(line => {
-          terminalContent.appendChild(line);
-        });
-
-        // Add green glow to the first line
-        terminalContent.firstChild.classList.add('green-glow');
+        terminalContent.innerHTML = '<div class="terminal-line green-glow">OK</div>';
       }
-    }
-
-    // Add the fadeInUp animation if it doesn't exist
-    if (!document.querySelector('style').textContent.includes('@keyframes fadeInUp')) {
-      const style = document.createElement('style');
-      style.textContent = `
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .terminal-line {
-          opacity: 0;
-          animation-fill-mode: forwards;
-        }
-      `;
-      document.head.appendChild(style);
     }
 
     // Start Updates
@@ -2024,15 +1971,80 @@ Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutat
     }
 
     // Обновляем обработчик ввода для терминала
-    document.querySelector('.terminal-input').addEventListener('keypress', function(e) {
+    document.querySelector('.terminal-input').addEventListener('keypress', async function(e) {
       if (e.key === 'Enter') {
-        const input = this.value.trim().toLowerCase();
+        const input = this.value.trim().toUpperCase();
         const terminalContent = document.querySelector('.terminal-content');
-        const fireworkLeft = document.getElementById('fireworkLeft');
-        const fireworkRight = document.getElementById('fireworkRight');
         
-        // Проверяем на пасхалку
-        if (['@sleepman', 'sleepman', '@SLEEPMAN', 'SLEEPMAN'].includes(input.toUpperCase())) {
+        // Проверяем на команду 71SEDT
+        if (input === '71SEDT') {
+          // Проверяем наличие NFT
+          const hasNFT = await checkNFTOwnership();
+          
+          if (hasNFT) {
+            // Очищаем существующий контент
+            terminalContent.innerHTML = '';
+            
+            // Создаем новый контент
+            const newContent = [
+              { text: 'SCP-??? // CLASS: KETER', class: 'terminal-line' },
+              { text: '&nbsp;', class: 'terminal-line' },
+              { text: 'Description:', class: 'terminal-line' },
+              { text: 'Entity exhibits non-linear awareness and multiversal displacement. Referred to by insiders as "Sleepman", the subject appears dormant, yet traces of lucid cognitive residue persist.', class: 'terminal-line' },
+              { text: '&nbsp;', class: 'terminal-line' },
+              { text: 'Anomalous Behavior:', class: 'terminal-line' },
+              { text: 'Subject simultaneously exists in chain and meta-chain layers. Periodic emissions of "dream fragments" detected. These fragments materialize as tokenized artifacts — 1 of 10,000.', class: 'terminal-line' },
+              { text: '&nbsp;', class: 'terminal-line' },
+              { text: 'Extracted Log:', class: 'terminal-line' },
+              { text: '>> "10000 fragments claimed... the shift is near."', class: 'terminal-line' },
+              { text: '>> "Those who hold their keys before the final mutation will unlock more than access..."', class: 'terminal-line' },
+              { text: '>> "...encrypted movement detected... protocol A777 initiating..."', class: 'terminal-line' },
+              { text: '&nbsp;', class: 'terminal-line' },
+              { text: 'Status: Semi-dormant', class: 'terminal-line' },
+              { text: 'Threat Level: UNCLASSIFIED', class: 'terminal-line' },
+              { text: 'Notes:', class: 'terminal-line' },
+              { text: 'Do not engage without clearance. Dream resonance is unstable.', class: 'terminal-line' },
+              { text: '&nbsp;', class: 'terminal-line' },
+              { text: 'Final Directive:', class: 'terminal-line' },
+              { text: 'Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutation fragments will gain restricted access to project pathways, anomalies, and encrypted lore not available post-shift.', class: 'terminal-line' },
+              { text: '&nbsp;', class: 'terminal-line' },
+              { text: '>> This is not just a drop. It\'s an awakening.', class: 'terminal-line' },
+              { text: '>> Can you find the true dream before it finds you?', class: 'terminal-line' }
+            ];
+            
+            // Добавляем контент с анимацией
+            newContent.forEach((item, index) => {
+              setTimeout(() => {
+                const line = document.createElement('div');
+                line.className = item.class;
+                line.innerHTML = item.text;
+                terminalContent.appendChild(line);
+              }, index * 50);
+            });
+            
+            // Очищаем поле ввода
+            this.value = '';
+          } else {
+            // Если NFT нет, показываем сообщение об ошибке
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'terminal-line error-message';
+            errorMessage.textContent = '!! ACCESS DENIED. NFT VERIFICATION FAILED.';
+            terminalContent.appendChild(errorMessage);
+            
+            // Активируем эффекты ошибки
+            terminalContent.classList.add('error');
+            this.disabled = true;
+            
+            // Через 3.5 секунды возвращаем всё в исходное состояние
+            setTimeout(() => {
+              terminalContent.classList.remove('error');
+              errorMessage.remove();
+              this.disabled = false;
+              this.value = '';
+              this.focus();
+            }, 3500);
+          }
+        } else if (['@SLEEPMAN', 'SLEEPMAN'].includes(input)) {
           // Проверяем, срабатывала ли пасхалка раньше
           const hasTriggered = sessionStorage.getItem('sleepmanEasterEgg');
           
@@ -2045,24 +2057,24 @@ Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutat
             terminalContent.scrollTop = terminalContent.scrollHeight;
             
             // Активируем фейерверки
-            fireworkLeft.style.display = 'block';
-            fireworkRight.style.display = 'block';
+            document.getElementById('fireworkLeft').style.display = 'block';
+            document.getElementById('fireworkRight').style.display = 'block';
             
             // Запускаем несколько волн фейерверков
             let waves = 0;
             const fireworkInterval = setInterval(() => {
-              createFirework(fireworkLeft, false);
-              createFirework(fireworkRight, true);
+              createFirework(document.getElementById('fireworkLeft'), false);
+              createFirework(document.getElementById('fireworkRight'), true);
               waves++;
               if (waves >= 4) clearInterval(fireworkInterval);
             }, 800);
             
             // Очищаем через 3.5 секунды
             setTimeout(() => {
-              fireworkLeft.style.display = 'none';
-              fireworkRight.style.display = 'none';
-              fireworkLeft.innerHTML = '';
-              fireworkRight.innerHTML = '';
+              document.getElementById('fireworkLeft').style.display = 'none';
+              document.getElementById('fireworkRight').style.display = 'none';
+              document.getElementById('fireworkLeft').innerHTML = '';
+              document.getElementById('fireworkRight').innerHTML = '';
               this.value = '';
               this.focus();
             }, 3500);
@@ -2081,8 +2093,7 @@ Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutat
             // Очищаем поле ввода
             this.value = '';
           }
-          
-        } else if (input !== 'access-δ1') {
+        } else if (input !== 'ACCESS-Δ1') {
           // Существующая логика для неверного ключа
           const errorMessage = document.createElement('div');
           errorMessage.className = 'terminal-line error-message';

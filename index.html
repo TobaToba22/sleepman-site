@@ -1773,25 +1773,51 @@ Welcome to the mechanism.
     // Global variables
     let userAddress = null;
     const NFT_CONTRACT_ADDRESS = "0x2785b77adC320846497B894424977028a5CEef0d";
-    const TOTAL_SUPPLY = 10000;
-    let updateInterval = null;
+    const NFT_ABI = [
+      "function balanceOf(address owner) view returns (uint256)",
+      "function tokenOfOwnerByIndex(address owner, uint256 index) view returns (uint256)",
+      "function ownerOf(uint256 tokenId) view returns (address)"
+    ];
 
     // Check NFT Ownership
     async function checkNFTOwnership() {
-      if (!userAddress || !window.ethereum) return false;
+      if (!userAddress || !window.ethereum) {
+        console.log("No wallet connected");
+        return false;
+      }
 
       try {
+        console.log("Checking NFT ownership for address:", userAddress);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const contract = new ethers.Contract(
-          NFT_CONTRACT_ADDRESS,
-          ['function ownerOf(uint256 tokenId) view returns (address)'],
-          provider
-        );
+        const nftContract = new ethers.Contract(NFT_CONTRACT_ADDRESS, NFT_ABI, provider);
 
-        const tokenOwner = await contract.ownerOf(0); // Check ownership of token ID 0 (1/5)
-        return tokenOwner.toLowerCase() === userAddress.toLowerCase();
+        // First check if user has any NFTs from this collection
+        const balance = await nftContract.balanceOf(userAddress);
+        console.log("User NFT balance:", balance.toString());
+
+        if (balance.toNumber() === 0) {
+          console.log("User has no NFTs from this collection");
+          return false;
+        }
+
+        // Check each NFT the user owns to find token ID 0
+        for (let i = 0; i < balance.toNumber(); i++) {
+          try {
+            const tokenId = await nftContract.tokenOfOwnerByIndex(userAddress, i);
+            console.log("Found token ID:", tokenId.toString());
+            if (tokenId.toNumber() === 0) {
+              console.log("User owns NFT 1/5 (Token ID 0)");
+              return true;
+            }
+          } catch (err) {
+            console.error("Error checking token ID:", err);
+          }
+        }
+
+        console.log("User does not own NFT 1/5");
+        return false;
       } catch (error) {
-        console.error("Error checking NFT ownership:", error);
+        console.error("Error in checkNFTOwnership:", error);
         return false;
       }
     }
@@ -1867,9 +1893,8 @@ Welcome to the mechanism.
       if (window.ethereum) {
         try {
           const provider = new ethers.providers.Web3Provider(window.ethereum);
-          await provider.send("eth_requestAccounts", []);
-          const signer = provider.getSigner();
-          userAddress = await signer.getAddress();
+          const accounts = await provider.send("eth_requestAccounts", []);
+          userAddress = accounts[0];
           
           // Update UI
           const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
@@ -1877,32 +1902,36 @@ Welcome to the mechanism.
           document.getElementById("connectWallet").style.display = "none";
           document.getElementById("walletAddress").style.display = "block";
           
-          // Start updates
-          startUpdates();
+          // Check NFT ownership immediately after connecting
+          const hasNFT = await checkNFTOwnership();
+          console.log("Initial NFT check result:", hasNFT);
+          
         } catch (error) {
           console.error("Error connecting wallet:", error);
-          alert("Ошибка подключения кошелька. Попробуйте еще раз.");
+          alert("Error connecting wallet. Please try again.");
         }
       } else {
-        alert("Установите MetaMask или другой Web3-кошелёк!");
+        alert("Please install MetaMask!");
       }
     }
 
     // Listen for account changes
     if (window.ethereum) {
-      window.ethereum.on('accountsChanged', (accounts) => {
+      window.ethereum.on('accountsChanged', async (accounts) => {
         if (accounts.length === 0) {
           // Wallet disconnected
           userAddress = null;
           document.getElementById("connectWallet").style.display = "block";
           document.getElementById("walletAddress").style.display = "none";
-          stopUpdates();
         } else {
           // Account changed
           userAddress = accounts[0];
           const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
           document.getElementById("walletAddress").innerText = shortenedAddress;
-          startUpdates();
+          
+          // Check NFT ownership when account changes
+          const hasNFT = await checkNFTOwnership();
+          console.log("NFT check after account change:", hasNFT);
         }
       });
     }

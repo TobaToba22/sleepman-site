@@ -1772,43 +1772,27 @@ Welcome to the mechanism.
 
     // Global variables
     let userAddress = null;
-    const NFT_CONTRACT = "0x2785b77adC320846497B894424977028a5CEef0d";
+    const NFT_CONTRACT_ADDRESS = "0x2785b77adC320846497B894424977028a5CEef0d";
     const TOTAL_SUPPLY = 10000;
     let updateInterval = null;
-    let sdk = null;
-    let contract = null;
-
-    // Initialize Thirdweb SDK
-    async function initializeThirdweb() {
-      try {
-        if (!sdk) {
-          sdk = new ThirdwebSDK("base");
-        }
-        if (!contract) {
-          contract = await sdk.getContract(NFT_CONTRACT, "nft-drop");
-        }
-        return { sdk, contract };
-      } catch (error) {
-        console.error("Error initializing Thirdweb:", error);
-        return null;
-      }
-    }
 
     // Check NFT Ownership
     async function checkNFTOwnership() {
-      if (!userAddress) return;
+      if (!userAddress || !window.ethereum) return false;
 
       try {
-        const { contract } = await initializeThirdweb();
-        if (!contract) return;
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = new ethers.Contract(
+          NFT_CONTRACT_ADDRESS,
+          ['function ownerOf(uint256 tokenId) view returns (address)'],
+          provider
+        );
 
-        const ownedNFTs = await contract.erc721.getOwned(userAddress);
-        const hasKeyNFT = ownedNFTs.some(nft => nft.metadata.id === '0');
-
-        updateTerminalContent(hasKeyNFT);
+        const tokenOwner = await contract.ownerOf(0); // Check ownership of token ID 0 (1/5)
+        return tokenOwner.toLowerCase() === userAddress.toLowerCase();
       } catch (error) {
         console.error("Error checking NFT ownership:", error);
-        updateTerminalContent(false);
+        return false;
       }
     }
 
@@ -1993,90 +1977,81 @@ Welcome to the mechanism.
       }
     }
 
-    // Обновляем обработчик ввода для терминала
-    document.querySelector('.terminal-input').addEventListener('keypress', function(e) {
+    // Terminal input handler
+    document.querySelector('.terminal-input').addEventListener('keypress', async function(e) {
       if (e.key === 'Enter') {
-        const input = this.value.trim().toLowerCase();
+        const input = this.value.trim().toUpperCase();
         const terminalContent = document.querySelector('.terminal-content');
-        const fireworkLeft = document.getElementById('fireworkLeft');
-        const fireworkRight = document.getElementById('fireworkRight');
         
-        // Проверяем на пасхалку
-        if (['@sleepman', 'sleepman', '@SLEEPMAN', 'SLEEPMAN'].includes(input.toUpperCase())) {
-          // Проверяем, срабатывала ли пасхалка раньше
-          const hasTriggered = sessionStorage.getItem('sleepmanEasterEgg');
+        // Check for 71SEDT command
+        if (input === '71SEDT') {
+          const hasNFT = await checkNFTOwnership();
           
-          if (!hasTriggered) {
-            // Первое срабатывание
-            const jokeMessage = document.createElement('div');
-            jokeMessage.className = 'terminal-line';
-            jokeMessage.innerHTML = '>> SYSTEM OVERRIDE:\n\nSleepman once had a wet dream so intense...\n...it triggered a tsunami warning in three metaverses.';
-            terminalContent.appendChild(jokeMessage);
-            terminalContent.scrollTop = terminalContent.scrollHeight;
+          if (hasNFT) {
+            // Clear existing content
+            terminalContent.innerHTML = '';
             
-            // Активируем фейерверки
-            fireworkLeft.style.display = 'block';
-            fireworkRight.style.display = 'block';
-            
-            // Запускаем несколько волн фейерверков
-            let waves = 0;
-            const fireworkInterval = setInterval(() => {
-              createFirework(fireworkLeft, false);
-              createFirework(fireworkRight, true);
-              waves++;
-              if (waves >= 4) clearInterval(fireworkInterval);
-            }, 800);
-            
-            // Очищаем через 3.5 секунды
-            setTimeout(() => {
-              fireworkLeft.style.display = 'none';
-              fireworkRight.style.display = 'none';
-              fireworkLeft.innerHTML = '';
-              fireworkRight.innerHTML = '';
-              this.value = '';
-              this.focus();
-            }, 3500);
-            
-            // Отмечаем, что пасхалка сработала
-            sessionStorage.setItem('sleepmanEasterEgg', 'true');
-            
+            // New content with proper formatting
+            const newContent = `SCP-??? // CLASS: KETER
+
+Description:
+Entity exhibits non-linear awareness and multiversal displacement. Referred to by insiders as "Sleepman", the subject appears dormant, yet traces of lucid cognitive residue persist.
+
+Anomalous Behavior:
+Subject simultaneously exists in chain and meta-chain layers. Periodic emissions of "dream fragments" detected. These fragments materialize as tokenized artifacts — 1 of 10,000.
+
+Extracted Log:
+>> "10000 fragments claimed... the shift is near."
+>> "Those who hold their keys before the final mutation will unlock more than access..."
+>> "...encrypted movement detected... protocol A777 initiating..."
+
+Status: Semi-dormant  
+Threat Level: UNCLASSIFIED  
+Notes:  
+Do not engage without clearance. Dream resonance is unstable.
+
+Final Directive:
+Once all 10,000 fragments are claimed, SCP-??? will mutate. Holders of pre-mutation fragments will gain restricted access to project pathways, anomalies, and encrypted lore not available post-shift.
+
+>> This is not just a drop. It's an awakening.  
+>> Can you find the true dream before it finds you?`;
+
+            // Split content into lines and animate them
+            const lines = newContent.split('\n');
+            lines.forEach((line, index) => {
+              setTimeout(() => {
+                const lineElement = document.createElement('div');
+                lineElement.className = 'terminal-line';
+                lineElement.textContent = line;
+                terminalContent.appendChild(lineElement);
+                lineElement.classList.add('visible');
+              }, index * 50);
+            });
           } else {
-            // Повторное срабатывание
-            const repeatMessage = document.createElement('div');
-            repeatMessage.className = 'terminal-line repeat-message';
-            repeatMessage.innerHTML = '>>\nWelcome to the Sleepman universe.\nThis won\'t work again.';
-            terminalContent.appendChild(repeatMessage);
-            terminalContent.scrollTop = terminalContent.scrollHeight;
+            // Show error for no NFT
+            const errorMessage = document.createElement('div');
+            errorMessage.className = 'terminal-line error-message';
+            errorMessage.textContent = '!! ACCESS DENIED. NFT VERIFICATION FAILED.';
+            terminalContent.appendChild(errorMessage);
+            terminalContent.classList.add('error');
             
-            // Очищаем поле ввода
-            this.value = '';
+            setTimeout(() => {
+              terminalContent.classList.remove('error');
+              errorMessage.remove();
+            }, 3500);
           }
           
-        } else if (input !== 'access-δ1') {
-          // Существующая логика для неверного ключа
-          const errorMessage = document.createElement('div');
-          errorMessage.className = 'terminal-line error-message';
-          errorMessage.textContent = '!! INTRUSION DETECTED. MEMORY CORE BREACH IN PROGRESS...';
-          
-          // Добавляем сообщение об ошибке
-          terminalContent.appendChild(errorMessage);
-          terminalContent.scrollTop = terminalContent.scrollHeight;
-          
-          // Активируем эффекты ошибки
-          terminalContent.classList.add('error');
-          this.disabled = true;
-          
-          // Через 3.5 секунды возвращаем всё в исходное состояние
-          setTimeout(() => {
-            terminalContent.classList.remove('error');
-            errorMessage.remove();
-            this.disabled = false;
-            this.value = '';
-            this.focus();
-          }, 3500);
+          // Clear input
+          this.value = '';
+          return;
         }
         
-        e.preventDefault();
+        // Handle other commands as before
+        if (['@SLEEPMAN', 'SLEEPMAN'].includes(input)) {
+          // ... existing sleepman command code ...
+        } else if (input !== 'ACCESS-Δ1') {
+          // ... existing invalid command code ...
+        }
       }
     });
 

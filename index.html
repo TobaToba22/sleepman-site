@@ -2625,6 +2625,120 @@
     .glitch-effect .terminal-line {
       animation: glitchLine 0.2s infinite;
     }
+
+    /** Добавим универсальный градиент для терминала */
+    .terminal-glow {
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      pointer-events: none;
+      z-index: 10;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .terminal-glow.active {
+      opacity: 1;
+    }
+    .terminal-glow.red {
+      background: linear-gradient(90deg, rgba(255,42,42,0.35) 0%, transparent 15%, transparent 85%, rgba(255,42,42,0.35) 100%);
+      box-shadow: 0 0 40px 10px #ff2a2a, 0 0 80px 0 #ff2a2a inset;
+    }
+    .terminal-glow.tiffany {
+      background: linear-gradient(90deg, rgba(0,255,204,0.35) 0%, transparent 15%, transparent 85%, rgba(0,255,247,0.35) 100%);
+      box-shadow: 0 0 40px 10px #00fff7, 0 0 80px 0 #00fff7 inset;
+    }
+
+    /* Пасхалка: стиль для текста анекдота */
+    .terminal-easter-egg-line {
+      color: #00fff7 !important;
+      text-shadow: 0 0 12px #00fff7, 0 0 24px #00fff7;
+      font-size: 18px;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s cubic-bezier(.77,0,.18,1);
+      font-family: 'VT323', monospace;
+      letter-spacing: 1px;
+      animation: glitchLineTiffany 0.3s infinite alternate;
+    }
+    @keyframes glitchLineTiffany {
+      0% { filter: brightness(1.2); }
+      50% { filter: brightness(2.2) blur(1px); }
+      100% { filter: brightness(1.2); }
+    }
+
+    // ... existing code ...
+
+    <div id="terminal" style="position:relative;">
+      <div class="terminal-glow"></div>
+      <div class="terminal-content">
+        ...
+      </div>
+      ...
+    </div>
+
+    // ... existing code ...
+
+    // Easter egg joke lines
+    const easterEggJokeLines = [
+      'They asked a mathematician:',
+      '— What are the chances that if you walk outside right now, you\'ll meet Napoleon?',
+      'The mathematician locked himself in a room for three days with books, calculators, and computers, then came back with the answer:',
+      '— Approximately 0.000001 percent.',
+      '',
+      'They asked the same question to an experienced trader.',
+      'The trader replied instantly:',
+      '— 50/50. Either I meet him, or I don\'t.'
+    ];
+
+    async function processCommand(command) {
+      if (isProcessingCommand) return;
+      isProcessingCommand = true;
+      const normalizedCommand = command.trim();
+      if (!normalizedCommand) { isProcessingCommand = false; return; }
+
+      // Easter egg
+      if (["sleepman","SLEEPMAN","$SLEEPMAN"].includes(normalizedCommand)) {
+        const originalContent = terminalContent.innerHTML;
+        const glow = terminal.querySelector('.terminal-glow');
+        glow.classList.remove('red');
+        glow.classList.add('tiffany','active');
+        terminalContent.innerHTML = '';
+        terminal.classList.add('glitch-effect');
+        // Построчно выводим анекдот
+        for (let i = 0; i < easterEggJokeLines.length; i++) {
+          const line = document.createElement('div');
+          line.className = 'terminal-line terminal-easter-egg-line';
+          line.textContent = easterEggJokeLines[i];
+          terminalContent.appendChild(line);
+          await new Promise(r => setTimeout(r, 350));
+          line.style.opacity = '1';
+          line.style.transform = 'translateY(0)';
+        }
+        createConfetti();
+        setTimeout(() => {
+          glow.classList.remove('tiffany','active');
+          terminal.classList.remove('glitch-effect');
+          terminalContent.innerHTML = originalContent;
+          isProcessingCommand = false;
+        }, 13000);
+        return;
+      }
+
+      // Ошибка
+      if (!VALID_COMMANDS.includes(normalizedCommand)) {
+        const originalContent = terminalContent.innerHTML;
+        const glow = terminal.querySelector('.terminal-glow');
+        glow.classList.remove('tiffany');
+        glow.classList.add('red','active');
+        // ... остальной код ошибки ...
+        setTimeout(() => {
+          glow.classList.remove('red','active');
+          terminalContent.innerHTML = originalContent;
+          isProcessingCommand = false;
+        }, 5000);
+        return;
+      }
+      // ... остальная обработка ...
+    }
   </style>
 </head>
 <body>
@@ -2751,9 +2865,8 @@ But if you stay — you won't walk away the same.
     <div id="secretLampBtn" onclick="activateTerminal()"></div>
 
     <!-- Терминал -->
-    <div class="terminal-overlay"></div>
-    <div id="terminal">
-      <div class="terminal-error-overlay"></div>
+    <div id="terminal" style="position:relative;">
+      <div class="terminal-glow"></div>
       <div class="terminal-content">
         <div class="terminal-line">[LOG-██/██/██] // SLEEP ENTITY FILE - SCP-Δ777</div>
         <div class="terminal-line">&nbsp;</div>

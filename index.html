@@ -1774,44 +1774,19 @@ Welcome to the mechanism.
     let userAddress = null;
     const NFT_CONTRACT_ADDRESS = "0x2785b77adC320846497B894424977028a5CEef0d";
     const NFT_TOKEN_ID = 0;
-    let sdk = null;
-    let contract = null;
-
-    // Initialize Thirdweb SDK
-    async function initializeThirdweb() {
-      try {
-        console.log("Initializing Thirdweb SDK...");
-        sdk = new window.ThirdwebSDK("base");
-        console.log("SDK initialized");
-        
-        contract = await sdk.getContract(NFT_CONTRACT_ADDRESS);
-        console.log("Contract instance created");
-        return true;
-      } catch (error) {
-        console.error("Error initializing Thirdweb:", error);
-        return false;
-      }
-    }
+    let isWalletConnected = false;
 
     // Check NFT Ownership
     async function checkNFTOwnership() {
       try {
-        if (!window.ethereum || !userAddress) {
-          console.log("No wallet connected, skipping NFT check");
+        if (!isWalletConnected || !userAddress) {
+          console.log("Wallet not connected, cannot check NFT");
           return false;
         }
 
-        // Wait for ethers to be available
         if (!window.ethers) {
-          console.log("Waiting for ethers.js to load...");
-          await new Promise(resolve => {
-            const checkEthers = setInterval(() => {
-              if (window.ethers) {
-                clearInterval(checkEthers);
-                resolve();
-              }
-            }, 100);
-          });
+          console.log("ethers.js not loaded yet");
+          return false;
         }
 
         const provider = new window.ethers.providers.Web3Provider(window.ethereum);
@@ -1824,7 +1799,7 @@ Welcome to the mechanism.
         const owner = await contract.ownerOf(NFT_TOKEN_ID);
         const hasNFT = owner.toLowerCase() === userAddress.toLowerCase();
         
-        console.log({
+        console.log("NFT check result:", {
           userAddress: userAddress.toLowerCase(),
           owner: owner.toLowerCase(),
           hasNFT
@@ -1853,13 +1828,13 @@ Welcome to the mechanism.
     }
 
     // Wallet Connection Functions
-    async function connectWallet() {
+    async function connectMetaMask() {
       if (window.ethereum) {
         try {
-          const provider = new ethers.providers.Web3Provider(window.ethereum);
+          const provider = new window.ethers.providers.Web3Provider(window.ethereum);
           const accounts = await provider.send("eth_requestAccounts", []);
           userAddress = accounts[0];
-          console.log("Wallet connected:", userAddress);
+          isWalletConnected = true;
           
           // Switch to Base network
           try {
@@ -1869,7 +1844,27 @@ Welcome to the mechanism.
             });
             console.log("Switched to Base network");
           } catch (switchError) {
-            console.error("Error switching network:", switchError);
+            if (switchError.code === 4902) {
+              try {
+                await window.ethereum.request({
+                  method: 'wallet_addEthereumChain',
+                  params: [{
+                    chainId: '0x2105',
+                    chainName: 'Base',
+                    nativeCurrency: {
+                      name: 'ETH',
+                      symbol: 'ETH',
+                      decimals: 18
+                    },
+                    rpcUrls: ['https://mainnet.base.org'],
+                    blockExplorerUrls: ['https://basescan.org']
+                  }]
+                });
+              } catch (addError) {
+                console.error("Error adding Base network:", addError);
+              }
+            }
+            console.error("Error switching to Base network:", switchError);
           }
           
           // Update UI
@@ -1877,11 +1872,11 @@ Welcome to the mechanism.
           document.getElementById("walletAddress").innerText = shortenedAddress;
           document.getElementById("connectWallet").style.display = "none";
           document.getElementById("walletAddress").style.display = "block";
+          closeWalletModal();
           
-          // Initialize Thirdweb and check NFT
-          await initializeThirdweb();
+          // Check NFT ownership after successful connection
           const hasNFT = await checkNFTOwnership();
-          console.log("Initial NFT check result:", hasNFT);
+          console.log("NFT ownership after connection:", hasNFT);
           
         } catch (error) {
           console.error("Error connecting wallet:", error);
@@ -1898,17 +1893,19 @@ Welcome to the mechanism.
         if (accounts.length === 0) {
           // Wallet disconnected
           userAddress = null;
+          isWalletConnected = false;
           document.getElementById("connectWallet").style.display = "block";
           document.getElementById("walletAddress").style.display = "none";
         } else {
           // Account changed
           userAddress = accounts[0];
+          isWalletConnected = true;
           const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
           document.getElementById("walletAddress").innerText = shortenedAddress;
           
           // Check NFT ownership when account changes
           const hasNFT = await checkNFTOwnership();
-          console.log("NFT check after account change:", hasNFT);
+          console.log("NFT ownership after account change:", hasNFT);
         }
       });
     }
@@ -1990,7 +1987,7 @@ Welcome to the mechanism.
         this.value = '';
 
         if (command.toUpperCase() === '71SEDT') {
-          if (!userAddress) {
+          if (!isWalletConnected) {
             await displayTerminalContent([
               { text: '!! CONNECT WALLET FIRST TO ACCESS THIS COMMAND.', class: 'error-message' }
             ]);
@@ -2121,85 +2118,6 @@ Welcome to the mechanism.
       setTimeout(() => {
         modal.style.display = 'none';
       }, 300);
-    }
-
-    async function connectMetaMask() {
-      if (window.ethereum) {
-        try {
-          const provider = new window.ethers.providers.Web3Provider(window.ethereum);
-          const accounts = await provider.send("eth_requestAccounts", []);
-          userAddress = accounts[0];
-          
-          // Switch to Base network
-          try {
-            await window.ethereum.request({
-              method: 'wallet_switchEthereumChain',
-              params: [{ chainId: '0x2105' }], // Base chainId
-            });
-            console.log("Switched to Base network");
-          } catch (switchError) {
-            if (switchError.code === 4902) {
-              try {
-                await window.ethereum.request({
-                  method: 'wallet_addEthereumChain',
-                  params: [{
-                    chainId: '0x2105',
-                    chainName: 'Base',
-                    nativeCurrency: {
-                      name: 'ETH',
-                      symbol: 'ETH',
-                      decimals: 18
-                    },
-                    rpcUrls: ['https://mainnet.base.org'],
-                    blockExplorerUrls: ['https://basescan.org']
-                  }]
-                });
-              } catch (addError) {
-                console.error("Error adding Base network:", addError);
-              }
-            }
-            console.error("Error switching to Base network:", switchError);
-          }
-          
-          // Update UI
-          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-          document.getElementById("walletAddress").innerText = shortenedAddress;
-          document.getElementById("connectWallet").style.display = "none";
-          document.getElementById("walletAddress").style.display = "block";
-          closeWalletModal();
-          
-          // Check NFT ownership after successful connection
-          const hasNFT = await checkNFTOwnership();
-          console.log("NFT ownership after connection:", hasNFT);
-          
-        } catch (error) {
-          console.error("Error connecting wallet:", error);
-          alert("Error connecting wallet. Please try again.");
-        }
-      } else {
-        alert("Please install MetaMask!");
-      }
-    }
-
-    // Listen for account changes
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', async (accounts) => {
-        if (accounts.length === 0) {
-          // Wallet disconnected
-          userAddress = null;
-          document.getElementById("connectWallet").style.display = "block";
-          document.getElementById("walletAddress").style.display = "none";
-        } else {
-          // Account changed
-          userAddress = accounts[0];
-          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-          document.getElementById("walletAddress").innerText = shortenedAddress;
-          
-          // Check NFT ownership when account changes
-          const hasNFT = await checkNFTOwnership();
-          console.log("NFT ownership after account change:", hasNFT);
-        }
-      });
     }
 
     // Close wallet modal when clicking outside

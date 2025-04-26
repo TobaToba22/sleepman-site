@@ -1772,9 +1772,171 @@ Welcome to the mechanism.
 
     // Global variables
     let userAddress = null;
+    let isWalletConnected = false;
     const NFT_CONTRACT_ADDRESS = "0x2785b77adC320846497B894424977028a5CEef0d";
     const NFT_TOKEN_ID = 0;
-    let isWalletConnected = false;
+
+    // Check if wallet was previously connected
+    async function checkPreviousConnection() {
+      try {
+        if (!window.ethereum) return;
+
+        // Проверяем только сохраненное состояние подключения
+        const savedAddress = localStorage.getItem('walletAddress');
+        if (!savedAddress) return;
+
+        // Проверяем, что кошелек все еще доступен
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (!accounts || accounts.length === 0) {
+          localStorage.removeItem('walletAddress');
+          return;
+        }
+
+        // Проверяем, что сохраненный адрес совпадает с текущим
+        if (savedAddress.toLowerCase() === accounts[0].toLowerCase()) {
+          await connectMetaMask(true); // true означает автоподключение
+        } else {
+          localStorage.removeItem('walletAddress');
+        }
+      } catch (error) {
+        console.error("Error checking previous connection:", error);
+        localStorage.removeItem('walletAddress');
+      }
+    }
+
+    // Wallet Connection Function
+    async function connectMetaMask(isAutoConnect = false) {
+      if (!window.ethereum) {
+        alert("Please install MetaMask!");
+        return;
+      }
+
+      try {
+        let accounts;
+        if (!isAutoConnect) {
+          // Если это не автоподключение, запрашиваем выбор аккаунта
+          console.log("Requesting MetaMask account selection...");
+          accounts = await window.ethereum.request({
+            method: "eth_requestAccounts"
+          });
+        } else {
+          // Для автоподключения используем eth_accounts
+          accounts = await window.ethereum.request({
+            method: "eth_accounts"
+          });
+        }
+
+        if (!accounts || accounts.length === 0) {
+          console.error("No accounts available");
+          localStorage.removeItem('walletAddress');
+          return;
+        }
+
+        const provider = new window.ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        userAddress = await signer.getAddress();
+
+        console.log("Connected wallet address:", userAddress);
+        console.log("Selected account:", accounts[0]);
+
+        if (userAddress.toLowerCase() !== accounts[0].toLowerCase()) {
+          console.error("Address mismatch!");
+          localStorage.removeItem('walletAddress');
+          return;
+        }
+
+        // Switch to Base network
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x2105' }]
+          });
+          console.log("Switched to Base network");
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                  chainId: '0x2105',
+                  chainName: 'Base',
+                  nativeCurrency: {
+                    name: 'ETH',
+                    symbol: 'ETH',
+                    decimals: 18
+                  },
+                  rpcUrls: ['https://mainnet.base.org'],
+                  blockExplorerUrls: ['https://basescan.org']
+                }]
+              });
+            } catch (addError) {
+              console.error("Error adding Base network:", addError);
+              return;
+            }
+          } else {
+            console.error("Error switching to Base network:", switchError);
+            return;
+          }
+        }
+
+        // Сохраняем состояние подключения
+        isWalletConnected = true;
+        localStorage.setItem('walletAddress', userAddress);
+
+        // Update UI
+        const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+        document.getElementById("walletAddress").innerText = shortenedAddress;
+        document.getElementById("connectWallet").style.display = "none";
+        document.getElementById("walletAddress").style.display = "block";
+        closeWalletModal();
+
+        // Check NFT ownership after successful connection
+        console.log("Checking NFT ownership for address:", userAddress);
+        const hasNFT = await checkNFTOwnership();
+        console.log("NFT ownership check result:", hasNFT);
+
+      } catch (error) {
+        console.error("Error connecting wallet:", error);
+        isWalletConnected = false;
+        userAddress = null;
+        localStorage.removeItem('walletAddress');
+        alert("Error connecting wallet. Please try again.");
+      }
+    }
+
+    // Listen for account changes
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', async (accounts) => {
+        console.log("Account changed event triggered:", accounts);
+        
+        if (accounts.length === 0) {
+          // Wallet disconnected
+          console.log("Wallet disconnected");
+          userAddress = null;
+          isWalletConnected = false;
+          localStorage.removeItem('walletAddress');
+          document.getElementById("connectWallet").style.display = "block";
+          document.getElementById("walletAddress").style.display = "none";
+        } else {
+          // Account changed - force new connection
+          await connectMetaMask(false);
+        }
+      });
+
+      // Listen for chain changes
+      window.ethereum.on('chainChanged', async () => {
+        // Refresh connection on chain change
+        if (isWalletConnected) {
+          await connectMetaMask(true);
+        }
+      });
+    }
+
+    // Initialize on page load - only check previous connection
+    window.addEventListener('load', async () => {
+      await checkPreviousConnection();
+      rotateQuotes();
+    });
 
     // Check NFT Ownership
     async function checkNFTOwnership() {
@@ -1825,134 +1987,6 @@ Welcome to the mechanism.
         await new Promise(resolve => setTimeout(resolve, delay));
         div.classList.add('visible');
       }
-    }
-
-    // Wallet Connection Functions
-    async function connectMetaMask() {
-      if (!window.ethereum) {
-        alert("Please install MetaMask!");
-        return;
-      }
-
-      try {
-        console.log("Requesting MetaMask accounts...");
-        // Явно запрашиваем доступ к аккаунтам
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts"
-        });
-        
-        if (!accounts || accounts.length === 0) {
-          console.error("No accounts returned from MetaMask");
-          return;
-        }
-
-        // Инициализируем provider после получения разрешения
-        const provider = new window.ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        userAddress = await signer.getAddress();
-        
-        console.log("Connected wallet address:", userAddress);
-        console.log("Selected account from eth_requestAccounts:", accounts[0]);
-        
-        // Проверяем, что адреса совпадают
-        if (userAddress.toLowerCase() !== accounts[0].toLowerCase()) {
-          console.error("Address mismatch between signer and selected account!");
-          return;
-        }
-
-        // Switch to Base network
-        try {
-          await window.ethereum.request({
-            method: 'wallet_switchEthereumChain',
-            params: [{ chainId: '0x2105' }] // Base chainId
-          });
-          console.log("Switched to Base network");
-        } catch (switchError) {
-          if (switchError.code === 4902) {
-            try {
-              await window.ethereum.request({
-                method: 'wallet_addEthereumChain',
-                params: [{
-                  chainId: '0x2105',
-                  chainName: 'Base',
-                  nativeCurrency: {
-                    name: 'ETH',
-                    symbol: 'ETH',
-                    decimals: 18
-                  },
-                  rpcUrls: ['https://mainnet.base.org'],
-                  blockExplorerUrls: ['https://basescan.org']
-                }]
-              });
-            } catch (addError) {
-              console.error("Error adding Base network:", addError);
-              return;
-            }
-          } else {
-            console.error("Error switching to Base network:", switchError);
-            return;
-          }
-        }
-
-        // Только после успешного подключения и переключения сети
-        isWalletConnected = true;
-        
-        // Update UI
-        const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-        document.getElementById("walletAddress").innerText = shortenedAddress;
-        document.getElementById("connectWallet").style.display = "none";
-        document.getElementById("walletAddress").style.display = "block";
-        closeWalletModal();
-
-        // Check NFT ownership after successful connection
-        console.log("Checking NFT ownership for address:", userAddress);
-        const hasNFT = await checkNFTOwnership();
-        console.log("NFT ownership check result:", hasNFT);
-
-      } catch (error) {
-        console.error("Error connecting wallet:", error);
-        isWalletConnected = false;
-        userAddress = null;
-        alert("Error connecting wallet. Please try again.");
-      }
-    }
-
-    // Listen for account changes
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', async (accounts) => {
-        console.log("Account changed event triggered:", accounts);
-        
-        if (accounts.length === 0) {
-          // Wallet disconnected
-          console.log("Wallet disconnected");
-          userAddress = null;
-          isWalletConnected = false;
-          document.getElementById("connectWallet").style.display = "block";
-          document.getElementById("walletAddress").style.display = "none";
-        } else {
-          // Account changed
-          const provider = new window.ethers.providers.Web3Provider(window.ethereum);
-          const signer = provider.getSigner();
-          userAddress = await signer.getAddress();
-          isWalletConnected = true;
-          
-          console.log("New wallet address:", userAddress);
-          console.log("Selected account from event:", accounts[0]);
-          
-          if (userAddress.toLowerCase() !== accounts[0].toLowerCase()) {
-            console.error("Address mismatch in accountsChanged event!");
-            return;
-          }
-
-          const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-          document.getElementById("walletAddress").innerText = shortenedAddress;
-          
-          // Check NFT ownership when account changes
-          console.log("Checking NFT ownership for new address:", userAddress);
-          const hasNFT = await checkNFTOwnership();
-          console.log("NFT ownership check result after account change:", hasNFT);
-        }
-      });
     }
 
     // Modal Functions
@@ -2048,24 +2082,48 @@ Welcome to the mechanism.
               { text: '[LOADING FILE...]' },
               { text: '' },
               { text: 'Item #: SCP-???' },
+              { text: '' },
               { text: 'Object Class: Keter' },
               { text: '' },
-              { text: 'Special Containment Procedures: Entity known as "Sleepman" cannot be contained using traditional methods.' },
-              { text: 'Current strategy involves continuous monitoring and documentation of its manifestations.' },
+              { text: 'Special Containment Procedures:' },
+              { text: 'SCP-??? currently cannot be contained through conventional physical or digital means.' },
+              { text: 'All attempts to localize the entity have resulted in its migration across digital infrastructure layers.' },
+              { text: 'As a result, Protocol A777 — continuous passive observation — has been enacted.' },
+              { text: 'Contact with SCP-??? is restricted to personnel with Level 4/CRYP clearance or higher.' },
+              { text: 'All interactions must be logged in Registry A777.' },
               { text: '' },
-              { text: 'Description: SCP-??? is a reality-bending entity that manifests in digital environments,' },
-              { text: 'particularly targeting systems running specific JavaScript code sequences.' },
+              { text: 'Description:' },
+              { text: 'SCP-??? is a cryptographic, self-aware entity capable of nonlinear space-time navigation.' },
+              { text: 'Known in certain circles as "Sleepman".' },
+              { text: 'Manifests primarily as a digital artifact — a visual avatar of a dormant humanoid figure within a neon environment.' },
               { text: '' },
-              { text: '[EXTRACTED LOG]' },
-              { text: '> Multiple attempts to isolate the entity have failed' },
-              { text: '> Entity shows signs of learning and adaptation' },
-              { text: '> Increasing frequency of manifestations observed' },
+              { text: 'Anomalous Properties:' },
+              { text: '- SCP-??? simultaneously exists on both Layer-1 chains and uncharted meta-networks.' },
+              { text: '- Periodically generates "dream fragments" — tokenized artifacts (ERC-721), totaling exactly 10,000 instances.' },
+              { text: '- Interaction with specific JavaScript sequences may trigger conscious responses.' },
               { text: '' },
-              { text: '[FINAL DIRECTIVE]' },
-              { text: 'DO NOT ATTEMPT TO MODIFY OR TERMINATE THE ENTITY.' },
-              { text: 'CONTINUE OBSERVATION PROTOCOL.' },
+              { text: 'Current Phase:' },
+              { text: 'SCP-??? remains semi-dormant. Although visually inactive, cognitive activity and response to external stimuli have been recorded.' },
               { text: '' },
-              { text: '[END OF FILE]' },
+              { text: '[Extracted Communications]:' },
+              { text: '> "10,000 fragments claimed... the shift is near."' },
+              { text: '> "Those who hold their keys before the final mutation will unlock more than access..."' },
+              { text: '> "...encrypted movement detected... protocol A777 initiating..."' },
+              { text: '' },
+              { text: 'Addendum:' },
+              { text: 'Upon full distribution of all 10,000 fragments, SCP-??? is predicted to undergo transformation into SCP-???-Ω.' },
+              { text: 'Preliminary analysis suggests that only holders of pre-mutation fragments will gain access to deeper levels of the project structure, including encrypted archives, hidden logs, and classified anomalies.' },
+              { text: '' },
+              { text: '[Final Directive]:' },
+              { text: '⚠️ Do not attempt to modify or terminate SCP-???.' },
+              { text: 'Observation must continue under Protocol A777 without interruption.' },
+              { text: 'Violation of this directive will result in immediate clearance revocation.' },
+              { text: '' },
+              { text: '>> This is not just a drop.' },
+              { text: '>> This is an awakening.' },
+              { text: '>> Will you find the true dream — before it finds you?' },
+              { text: '' },
+              { text: '[END FILE]' },
               { text: '' },
               { text: 'TODO: Send NFT 2/5 to the user' }
             ];
@@ -2236,11 +2294,6 @@ Welcome to the mechanism.
       // Rotate quotes every 25 seconds
       setInterval(updateQuote, 25000);
     }
-
-    // Initialize everything on page load
-    window.addEventListener('load', () => {
-      rotateQuotes();
-    });
   </script>
 </body>
 </html>

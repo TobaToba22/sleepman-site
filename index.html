@@ -198,7 +198,6 @@
 
     .terminal-line.repeat-message {
       color: #00ff66;
-      animation: textGlitch 2s ease-out;
     }
 
     /* Sound effect hook for future use */
@@ -1473,51 +1472,80 @@
       }
     }
 
-    .global-error-glow {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      pointer-events: none;
-      z-index: 99999;
+    /* Стили для анекдота */
+    .terminal-joke {
+      color: #81D8D0;
+      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
+      line-height: 1.6;
+      margin: 20px 0;
       opacity: 0;
-      transition: opacity 0.3s;
-      background: linear-gradient(120deg, rgba(255,0,0,0.25) 0%, rgba(255,0,0,0.5) 50%, rgba(255,0,0,0.25) 100%);
-      animation: globalErrorPulse 1.2s infinite alternate;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
     }
-    @keyframes globalErrorPulse {
-      0% { filter: blur(0px); }
-      100% { filter: blur(4px); }
-    }
-    .terminal-easter-egg-line {
-      color: #81D8D0 !important;
-      text-shadow: 0 0 12px #81D8D0, 0 0 24px #81D8D0;
-      font-size: 18px;
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.4s cubic-bezier(.77,0,.18,1);
-      font-family: 'VT323', monospace;
-      letter-spacing: 1px;
-    }
-    .terminal-easter-egg-line.visible {
+
+    .terminal-joke.visible {
       opacity: 1;
       transform: translateY(0);
     }
-    .terminal.error, .terminal-content.error {
-      animation: terminalShake 0.15s infinite;
+
+    /* Стили для эффекта ошибки */
+    .error-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        45deg,
+        rgba(255, 0, 0, 0.1),
+        rgba(255, 0, 0, 0.2),
+        rgba(255, 0, 0, 0.1)
+      );
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: 9999;
     }
-    .terminal-content.error .terminal-line, .terminal-content.error .terminal-line.error-message {
-      color: #FF0000 !important;
-      text-shadow: 0 0 10px #FF0000;
+
+    .error-overlay.active {
+      opacity: 1;
+      animation: errorPulse 2s ease-in-out;
     }
+
+    @keyframes errorPulse {
+      0%, 100% {
+        background: linear-gradient(
+          45deg,
+          rgba(255, 0, 0, 0.1),
+          rgba(255, 0, 0, 0.2),
+          rgba(255, 0, 0, 0.1)
+        );
+      }
+      50% {
+        background: linear-gradient(
+          45deg,
+          rgba(255, 0, 0, 0.2),
+          rgba(255, 0, 0, 0.3),
+          rgba(255, 0, 0, 0.2)
+        );
+      }
+    }
+
+    .terminal-content.error {
+      color: #FF0000;
+      animation: terminalShake 0.2s ease-in-out infinite;
+    }
+
     @keyframes terminalShake {
       0%, 100% { transform: translate(-50%, -50%); }
-      20% { transform: translate(-52%, -50%); }
-      40% { transform: translate(-50%, -51%); }
-      60% { transform: translate(-48%, -50%); }
-      80% { transform: translate(-50%, -49%); }
+      25% { transform: translate(-52%, -50%); }
+      50% { transform: translate(-50%, -51%); }
+      75% { transform: translate(-48%, -50%); }
     }
   </style>
 </head>
 <body>
+  <div class="error-overlay"></div>
   <!-- Добавляем элементы для эффектов ошибки -->
   <div class="error-glow"></div>
   <div class="system-alert">[ALERT] SYSTEM SECURITY FAILURE: SLEEP_ENTITY SCP-Δ777 IS WAKING UP.</div>
@@ -1772,9 +1800,6 @@ Welcome to the mechanism.
     </div>
     <div class="rotating-quote"></div>
   </div>
-
-  <!-- 1. Вставить после <body>: -->
-  <div class="global-error-glow"></div>
 
   <script>
     // Check if intro has been shown before
@@ -2217,82 +2242,54 @@ Welcome to the mechanism.
       }
     }
 
-    // Terminal input handler
-    document.querySelector('.terminal-input').addEventListener('keypress', async function(e) {
-      if (e.key === 'Enter') {
-        const command = this.value.trim();
-        this.value = '';
+    // Функция для отображения анекдота
+    async function showJoke() {
+      const joke = `
+They asked a mathematician:
+— What are the chances that if you walk outside right now, you'll meet Napoleon?
+The mathematician locked himself in a room for three days with books, calculators, and computers, then came back with the answer:
+— Approximately 0.000001 percent.
 
-        if (command.toUpperCase() === '71SEDT') {
-          if (!isWalletConnected) {
-            await displayTerminalContent([
-              { text: '!! CONNECT WALLET FIRST TO ACCESS THIS COMMAND.', class: 'error-message' }
-            ]);
-            return;
-          }
+They asked the same question to an experienced trader.
+The trader replied instantly:
+— 50/50. Either I meet him, or I don't.
+      `;
 
-          const hasNFT = await checkNFTOwnership();
-          
-          if (hasNFT) {
-            const content = [
-              { text: '[ACCESSING SCP DATABASE...]' },
-              { text: '[CLEARANCE VERIFIED]' },
-              { text: '[LOADING FILE...]' },
-              { text: '' },
-              { text: 'Item #: SCP-???' },
-              { text: '' },
-              { text: 'Object Class: Keter' },
-              { text: '' },
-              { text: 'Special Containment Procedures:  ' },
-              { text: 'SCP-??? currently cannot be contained through conventional physical or digital means.  ' },
-              { text: 'All attempts to localize the entity have resulted in its migration across digital infrastructure layers.  ' },
-              { text: 'As a result, Protocol A777 — continuous passive observation — has been enacted.  ' },
-              { text: 'Contact with SCP-??? is restricted to personnel with Level 4/CRYP clearance or higher.  ' },
-              { text: 'All interactions must be logged in Registry A777.' },
-              { text: '' },
-              { text: 'Description:  ' },
-              { text: 'SCP-??? is a cryptographic, self-aware entity capable of nonlinear space-time navigation.  ' },
-              { text: 'Known in certain circles as "Sleepman".  ' },
-              { text: 'Manifests primarily as a digital artifact — a visual avatar of a dormant humanoid figure within a neon environment.' },
-              { text: '' },
-              { text: 'Anomalous Properties:  ' },
-              { text: '- SCP-??? simultaneously exists on both Layer-1 chains and uncharted meta-networks.  ' },
-              { text: '- Periodically generates "dream fragments" — tokenized artifacts (ERC-721), totaling exactly 10,000 instances.  ' },
-              { text: '- Interaction with specific JavaScript sequences may trigger conscious responses.' },
-              { text: '' },
-              { text: 'Current Phase:  ' },
-              { text: 'SCP-??? remains semi-dormant. Although visually inactive, cognitive activity and response to external stimuli have been recorded.' },
-              { text: '' },
-              { text: '[Extracted Communications]:  ' },
-              { text: '> "10,000 fragments claimed... the shift is near."  ' },
-              { text: '> "Those who hold their keys before the final mutation will unlock more than access..."  ' },
-              { text: '> "...encrypted movement detected... protocol A777 initiating..."' },
-              { text: '' },
-              { text: 'Addendum:  ' },
-              { text: 'Upon full distribution of all 10,000 fragments, SCP-??? is predicted to undergo transformation into SCP-???-Ω.  ' },
-              { text: 'Preliminary analysis suggests that only holders of pre-mutation fragments will gain access to deeper levels of the project structure, including encrypted archives, hidden logs, and classified anomalies.' },
-              { text: '' },
-              { text: '[Final Directive]:  ' },
-              { text: 'Do not attempt to modify or terminate SCP-???.  ' },
-              { text: 'Observation must continue under Protocol A777 without interruption.  ' },
-              { text: 'Violation of this directive will result in immediate clearance revocation.' },
-              { text: '' },
-              { text: '>> This is not just a drop.  ' },
-              { text: '>> This is an awakening.  ' },
-              { text: '>> Will you find the true dream — before it finds you?' },
-              { text: '' },
-              { text: '[END FILE]' }
-            ];
-            
-            await displayTerminalContent(content);
-          } else {
-            await displayTerminalContent([
-              { text: '!! ACCESS DENIED. NFT VERIFICATION FAILED.', class: 'error-message' }
-            ]);
-          }
-        }
-      }
-    });
+      const terminalContent = document.querySelector('.terminal-content');
+      const jokeElement = document.createElement('div');
+      jokeElement.className = 'terminal-joke';
+      jokeElement.textContent = joke;
+      
+      // Очищаем предыдущий контент
+      terminalContent.innerHTML = '';
+      terminalContent.appendChild(jokeElement);
+      
+      // Показываем анекдот с анимацией
+      setTimeout(() => {
+        jokeElement.classList.add('visible');
+      }, 100);
+    }
+
+    // Функция для показа ошибки
+    function showError() {
+      const terminalContent = document.querySelector('.terminal-content');
+      const errorOverlay = document.querySelector('.error-overlay');
+      
+      // Добавляем классы для анимации
+      terminalContent.classList.add('error');
+      errorOverlay.classList.add('active');
+      
+      // Очищаем контент терминала
+      terminalContent.innerHTML = '';
+      
+      // Убираем эффекты через 2.5 секунды
+      setTimeout(() => {
+        terminalContent.classList.remove('error');
+        errorOverlay.classList.remove('active');
+        // Восстанавливаем стандартный контент терминала
+        activateTerminal();
+      }, 2500);
+    }
 
     // Info Modal Functions
     function showInfoModal() {
@@ -2451,78 +2448,91 @@ Welcome to the mechanism.
       setInterval(updateQuote, 25000);
     }
 
-    // 2. В <script> добавить:
-    const easterEggJokeLines = [
-      'They asked a mathematician:',
-      '— What are the chances that if you walk outside right now, you\'ll meet Napoleon?',
-      'The mathematician locked himself in a room for three days with books, calculators, and computers, then came back with the answer:',
-      '— Approximately 0.000001 percent.',
-      '',
-      'They asked the same question to an experienced trader.',
-      'The trader replied instantly:',
-      '— 50/50. Either I meet him, or I don\'t.'
-    ];
-    let isEasterEggActive = false;
-    let isErrorActive = false;
-
-    async function processCommand(command) {
-      if (isEasterEggActive || isErrorActive) return;
-      const normalizedCommand = command.trim();
-      if (!normalizedCommand) return;
-
-      // Пасхалка
-      if (["sleepman","SLEEPMAN","$SLEEPMAN"].includes(normalizedCommand)) {
-        isEasterEggActive = true;
-        const originalContent = terminalContent.innerHTML;
-        terminalContent.innerHTML = '';
-        for (let i = 0; i < easterEggJokeLines.length; i++) {
-          const line = document.createElement('div');
-          line.className = 'terminal-line terminal-easter-egg-line';
-          line.textContent = easterEggJokeLines[i];
-          terminalContent.appendChild(line);
-          await new Promise(r => setTimeout(r, 350));
-          line.classList.add('visible');
-        }
-        setTimeout(() => {
-          terminalContent.innerHTML = originalContent;
-          isEasterEggActive = false;
-        }, 13000);
-        return;
-      }
-
-      // Ошибка
-      if (!['71SEDT','sleepman','SLEEPMAN','$SLEEPMAN'].includes(normalizedCommand)) {
-        isErrorActive = true;
-        const globalGlow = document.querySelector('.global-error-glow');
-        const originalContent = terminalContent.innerHTML;
-        globalGlow.style.opacity = '1';
-        terminal.classList.add('error');
-        terminalContent.classList.add('error');
-        terminalContent.innerHTML = `
-          <div class="terminal-line error-message">[SYSTEM BREACH]</div>
-          <div class="terminal-line error-message">Unauthorized command detected.</div>
-          <div class="terminal-line error-message">Dream protocol integrity compromised.</div>
-          <div class="terminal-line error-message">SLEEPMAN is waking up...</div>
-          <div class="terminal-line error-message">[DANGER] \"He sees you now.\"</div>
-        `;
-        setTimeout(() => {
-          globalGlow.style.opacity = '0';
-          terminal.classList.remove('error');
-          terminalContent.classList.remove('error');
-          terminalContent.innerHTML = originalContent;
-          isErrorActive = false;
-        }, 2500);
-        return;
-      }
-      // ... остальная обработка ...
-    }
-
-    // 3. Обновить обработчик ввода:
-    terminalInput.addEventListener('keypress', function(e) {
+    // Terminal input handler
+    document.querySelector('.terminal-input').addEventListener('keypress', async function(e) {
       if (e.key === 'Enter') {
-        const command = this.value;
+        const command = this.value.trim();
         this.value = '';
-        processCommand(command);
+
+        // Проверяем команды для анекдота
+        if (command.toLowerCase() === 'sleepman' || 
+            command === 'SLEEPMAN' || 
+            command === '$SLEEPMAN') {
+          await showJoke();
+        } 
+        // Проверяем команду SCP
+        else if (command.toUpperCase() === '71SEDT') {
+          if (!isWalletConnected) {
+            await displayTerminalContent([
+              { text: '!! CONNECT WALLET FIRST TO ACCESS THIS COMMAND.', class: 'error-message' }
+            ]);
+            return;
+          }
+
+          const hasNFT = await checkNFTOwnership();
+          
+          if (hasNFT) {
+            const content = [
+              { text: '[ACCESSING SCP DATABASE...]' },
+              { text: '[CLEARANCE VERIFIED]' },
+              { text: '[LOADING FILE...]' },
+              { text: '' },
+              { text: 'Item #: SCP-???' },
+              { text: '' },
+              { text: 'Object Class: Keter' },
+              { text: '' },
+              { text: 'Special Containment Procedures:  ' },
+              { text: 'SCP-??? currently cannot be contained through conventional physical or digital means.  ' },
+              { text: 'All attempts to localize the entity have resulted in its migration across digital infrastructure layers.  ' },
+              { text: 'As a result, Protocol A777 — continuous passive observation — has been enacted.  ' },
+              { text: 'Contact with SCP-??? is restricted to personnel with Level 4/CRYP clearance or higher.  ' },
+              { text: 'All interactions must be logged in Registry A777.' },
+              { text: '' },
+              { text: 'Description:  ' },
+              { text: 'SCP-??? is a cryptographic, self-aware entity capable of nonlinear space-time navigation.  ' },
+              { text: 'Known in certain circles as "Sleepman".  ' },
+              { text: 'Manifests primarily as a digital artifact — a visual avatar of a dormant humanoid figure within a neon environment.' },
+              { text: '' },
+              { text: 'Anomalous Properties:  ' },
+              { text: '- SCP-??? simultaneously exists on both Layer-1 chains and uncharted meta-networks.  ' },
+              { text: '- Periodically generates "dream fragments" — tokenized artifacts (ERC-721), totaling exactly 10,000 instances.  ' },
+              { text: '- Interaction with specific JavaScript sequences may trigger conscious responses.' },
+              { text: '' },
+              { text: 'Current Phase:  ' },
+              { text: 'SCP-??? remains semi-dormant. Although visually inactive, cognitive activity and response to external stimuli have been recorded.' },
+              { text: '' },
+              { text: '[Extracted Communications]:  ' },
+              { text: '> "10,000 fragments claimed... the shift is near."  ' },
+              { text: '> "Those who hold their keys before the final mutation will unlock more than access..."  ' },
+              { text: '> "...encrypted movement detected... protocol A777 initiating..."' },
+              { text: '' },
+              { text: 'Addendum:  ' },
+              { text: 'Upon full distribution of all 10,000 fragments, SCP-??? is predicted to undergo transformation into SCP-???-Ω.  ' },
+              { text: 'Preliminary analysis suggests that only holders of pre-mutation fragments will gain access to deeper levels of the project structure, including encrypted archives, hidden logs, and classified anomalies.' },
+              { text: '' },
+              { text: '[Final Directive]:  ' },
+              { text: 'Do not attempt to modify or terminate SCP-???.  ' },
+              { text: 'Observation must continue under Protocol A777 without interruption.  ' },
+              { text: 'Violation of this directive will result in immediate clearance revocation.' },
+              { text: '' },
+              { text: '>> This is not just a drop.  ' },
+              { text: '>> This is an awakening.  ' },
+              { text: '>> Will you find the true dream — before it finds you?' },
+              { text: '' },
+              { text: '[END FILE]' }
+            ];
+            
+            await displayTerminalContent(content);
+          } else {
+            await displayTerminalContent([
+              { text: '!! ACCESS DENIED. NFT VERIFICATION FAILED.', class: 'error-message' }
+            ]);
+          }
+        }
+        // Для всех остальных команд показываем ошибку
+        else {
+          showError();
+        }
       }
     });
   </script>

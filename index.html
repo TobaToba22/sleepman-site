@@ -1776,74 +1776,36 @@ Welcome to the mechanism.
     const NFT_CONTRACT_ADDRESS = "0x2785b77adC320846497B894424977028a5CEef0d";
     const NFT_TOKEN_ID = 0;
 
-    // Check if wallet was previously connected
-    async function checkPreviousConnection() {
-      try {
-        if (!window.ethereum) return;
-
-        // Проверяем только сохраненное состояние подключения
-        const savedAddress = localStorage.getItem('walletAddress');
-        if (!savedAddress) return;
-
-        // Проверяем, что кошелек все еще доступен
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
-        if (!accounts || accounts.length === 0) {
-          localStorage.removeItem('walletAddress');
-          return;
-        }
-
-        // Проверяем, что сохраненный адрес совпадает с текущим
-        if (savedAddress.toLowerCase() === accounts[0].toLowerCase()) {
-          await connectMetaMask(true); // true означает автоподключение
-        } else {
-          localStorage.removeItem('walletAddress');
-        }
-      } catch (error) {
-        console.error("Error checking previous connection:", error);
-        localStorage.removeItem('walletAddress');
-      }
-    }
+    // Remove automatic connection check
+    window.addEventListener('load', async () => {
+      rotateQuotes();
+    });
 
     // Wallet Connection Function
-    async function connectMetaMask(isAutoConnect = false) {
+    async function connectMetaMask() {
       if (!window.ethereum) {
         alert("Please install MetaMask!");
         return;
       }
 
       try {
-        let accounts;
-        if (!isAutoConnect) {
-          // Если это не автоподключение, запрашиваем выбор аккаунта
-          console.log("Requesting MetaMask account selection...");
-          accounts = await window.ethereum.request({
-            method: "eth_requestAccounts"
-          });
-        } else {
-          // Для автоподключения используем eth_accounts
-          accounts = await window.ethereum.request({
-            method: "eth_accounts"
-          });
-        }
+        // Always request account selection
+        console.log("Requesting MetaMask account selection...");
+        const accounts = await window.ethereum.request({
+          method: "eth_requestAccounts"
+        });
 
         if (!accounts || accounts.length === 0) {
           console.error("No accounts available");
-          localStorage.removeItem('walletAddress');
           return;
         }
 
+        // Get provider and signer after account selection
         const provider = new window.ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         userAddress = await signer.getAddress();
 
-        console.log("Connected wallet address:", userAddress);
-        console.log("Selected account:", accounts[0]);
-
-        if (userAddress.toLowerCase() !== accounts[0].toLowerCase()) {
-          console.error("Address mismatch!");
-          localStorage.removeItem('walletAddress');
-          return;
-        }
+        console.log("✅ Connected wallet:", userAddress);
 
         // Switch to Base network
         try {
@@ -1879,9 +1841,8 @@ Welcome to the mechanism.
           }
         }
 
-        // Сохраняем состояние подключения
+        // Update connection state
         isWalletConnected = true;
-        localStorage.setItem('walletAddress', userAddress);
 
         // Update UI
         const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
@@ -1899,7 +1860,6 @@ Welcome to the mechanism.
         console.error("Error connecting wallet:", error);
         isWalletConnected = false;
         userAddress = null;
-        localStorage.removeItem('walletAddress');
         alert("Error connecting wallet. Please try again.");
       }
     }
@@ -1914,21 +1874,18 @@ Welcome to the mechanism.
           console.log("Wallet disconnected");
           userAddress = null;
           isWalletConnected = false;
-          localStorage.removeItem('walletAddress');
           document.getElementById("connectWallet").style.display = "block";
           document.getElementById("walletAddress").style.display = "none";
         } else {
           // Account changed - force new connection
-          await connectMetaMask(false);
+          await connectMetaMask();
         }
       });
 
       // Listen for chain changes
-      window.ethereum.on('chainChanged', async () => {
-        // Refresh connection on chain change
-        if (isWalletConnected) {
-          await connectMetaMask(true);
-        }
+      window.ethereum.on('chainChanged', () => {
+        // Refresh page on chain change
+        window.location.reload();
       });
     }
 

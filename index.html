@@ -4,25 +4,8 @@
   <meta charset="UTF-8">
   <title>$SLEEPMAN — Enter the Dream</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-  <script type="module">
-    async function loadEthers() {
-      try {
-        const { ethers } = await import('./ethers.js');
-        window.ethers = ethers;
-        console.log("ethers.js loaded successfully via local ES module");
-      } catch (error) {
-        console.error("Failed to load ethers.js:", error);
-        try {
-          const { ethers } = await import('https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.esm.min.js');
-          window.ethers = ethers;
-          console.log("ethers.js loaded successfully via CDN ES module");
-        } catch (fallbackError) {
-          console.error("Failed to load ethers.js from fallback:", fallbackError);
-        }
-      }
-    }
-    loadEthers();
-  </script>
+  <!-- Remove the old ethers.js script -->
+  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="text/javascript"></script>
   <script src="https://unpkg.com/@thirdweb-dev/sdk@3"></script>
   <style>
     html, body {
@@ -1789,19 +1772,25 @@ Welcome to the mechanism.
       }
 
       try {
-        // Always request account selection
-        console.log("Requesting MetaMask account selection...");
+        // Reset any existing connection
+        userAddress = null;
+        isWalletConnected = false;
+
+        // Force MetaMask popup
         const accounts = await window.ethereum.request({
           method: "eth_requestAccounts"
         });
 
         if (!accounts || accounts.length === 0) {
-          console.error("No accounts available");
-          return;
+          throw new Error("No accounts selected");
         }
 
-        // Get provider and signer after account selection
-        const provider = new window.ethers.providers.Web3Provider(window.ethereum);
+        // Create new provider instance
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        
+        // Force MetaMask popup again to ensure user interaction
+        await provider.send("eth_requestAccounts", []);
+        
         const signer = provider.getSigner();
         userAddress = await signer.getAddress();
 
@@ -1851,7 +1840,7 @@ Welcome to the mechanism.
         document.getElementById("walletAddress").style.display = "block";
         closeWalletModal();
 
-        // Check NFT ownership after successful connection
+        // Check NFT ownership
         console.log("Checking NFT ownership for address:", userAddress);
         const hasNFT = await checkNFTOwnership();
         console.log("NFT ownership check result:", hasNFT);
@@ -1864,28 +1853,27 @@ Welcome to the mechanism.
       }
     }
 
-    // Listen for account changes
+    // Event Listeners for MetaMask
     if (window.ethereum) {
-      window.ethereum.on('accountsChanged', async (accounts) => {
-        console.log("Account changed event triggered:", accounts);
-        
-        if (accounts.length === 0) {
-          // Wallet disconnected
-          console.log("Wallet disconnected");
-          userAddress = null;
-          isWalletConnected = false;
-          document.getElementById("connectWallet").style.display = "block";
-          document.getElementById("walletAddress").style.display = "none";
-        } else {
-          // Account changed - force new connection
-          await connectMetaMask();
-        }
+      window.ethereum.on('accountsChanged', () => {
+        // Reset state and UI on account change
+        userAddress = null;
+        isWalletConnected = false;
+        document.getElementById("connectWallet").style.display = "block";
+        document.getElementById("walletAddress").style.display = "none";
       });
 
-      // Listen for chain changes
       window.ethereum.on('chainChanged', () => {
-        // Refresh page on chain change
+        // Reload page on network change
         window.location.reload();
+      });
+
+      window.ethereum.on('disconnect', () => {
+        // Reset state and UI on disconnect
+        userAddress = null;
+        isWalletConnected = false;
+        document.getElementById("connectWallet").style.display = "block";
+        document.getElementById("walletAddress").style.display = "none";
       });
     }
 

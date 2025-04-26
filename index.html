@@ -672,12 +672,7 @@
       background: transparent;
       padding: 15px;
       border-top: 1px solid rgba(0, 255, 102, 0.3);
-    }
-
-    .terminal-prompt {
-      color: #00ff66;
-      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
-      font-size: 16px;
+      z-index: 1000;
     }
 
     .terminal-input {
@@ -689,10 +684,68 @@
       font-size: 16px;
       outline: none;
       caret-color: #00ff66;
+      transition: color 0.3s ease;
     }
 
-    .terminal-input::placeholder {
-      color: rgba(0, 255, 102, 0.5);
+    .terminal-input.error {
+      color: #ff2a2a !important;
+      text-shadow: 0 0 5px rgba(255, 42, 42, 0.5);
+    }
+
+    .terminal-content {
+      transition: color 0.3s ease;
+    }
+
+    .terminal-error-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 42, 42, 0.2) 0%,
+        transparent 15%,
+        transparent 85%,
+        rgba(255, 42, 42, 0.2) 100%
+      );
+      z-index: 998;
+    }
+
+    .terminal-error-overlay.active {
+      opacity: 1;
+    }
+
+    @keyframes terminalShake {
+      0%, 100% { transform: translate(-50%, -50%); }
+      10%, 30%, 50%, 70%, 90% { transform: translate(-51%, -50%); }
+      20%, 40%, 60%, 80% { transform: translate(-49%, -50%); }
+    }
+
+    .terminal.error {
+      animation: terminalShake 0.5s ease-in-out;
+    }
+
+    .terminal-line.error-message {
+      color: #ff2a2a;
+      text-shadow: 0 0 5px rgba(255, 42, 42, 0.5);
+      opacity: 0;
+      transform: translateY(5px);
+      transition: all 0.3s ease;
+    }
+
+    .terminal-line.error-message.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .terminal-prompt {
+      color: #00ff66;
+      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
+      font-size: 16px;
     }
 
     .terminal-indicator {
@@ -1752,6 +1805,7 @@ But if you stay — you won't walk away the same.
     <!-- Терминал -->
     <div class="terminal-overlay"></div>
     <div id="terminal">
+      <div class="terminal-error-overlay"></div>
       <div class="terminal-content">
         <div class="terminal-line">[LOG-██/██/██] // SLEEP ENTITY FILE - SCP-Δ777</div>
         <div class="terminal-line">&nbsp;</div>
@@ -2661,6 +2715,97 @@ The trader replied instantly:
         modal.style.display = 'none';
       }, 300);
     }
+
+    // Terminal command processing
+    const terminal = document.getElementById('terminal');
+    const terminalContent = document.querySelector('.terminal-content');
+    const terminalInput = document.querySelector('.terminal-input');
+    const errorOverlay = document.querySelector('.terminal-error-overlay');
+    let isProcessingCommand = false;
+
+    // Valid commands
+    const VALID_COMMANDS = ['71SEDT', 'sleepman', 'SLEEPMAN', '$SLEEPMAN'];
+
+    async function processCommand(command) {
+      if (isProcessingCommand) return;
+      isProcessingCommand = true;
+
+      // Normalize command
+      const normalizedCommand = command.trim();
+
+      // Check if command is empty
+      if (!normalizedCommand) {
+        isProcessingCommand = false;
+        return;
+      }
+
+      // Check for Easter egg commands
+      if (['sleepman', 'SLEEPMAN', '$SLEEPMAN'].includes(normalizedCommand)) {
+        createConfetti();
+        showJokeModal();
+        isProcessingCommand = false;
+        return;
+      }
+
+      // Check for 71SEDT command
+      if (normalizedCommand === '71SEDT') {
+        if (!isWalletConnected) {
+          showTerminalError('!! CONNECT WALLET FIRST TO ACCESS THIS COMMAND.');
+          isProcessingCommand = false;
+          return;
+        }
+
+        const hasNFT = await checkNFTOwnership();
+        if (!hasNFT) {
+          showTerminalError('!! ACCESS DENIED. NFT VERIFICATION FAILED.');
+          isProcessingCommand = false;
+          return;
+        }
+
+        // Process 71SEDT command (existing code)
+        // ... 71SEDT processing code ...
+        isProcessingCommand = false;
+        return;
+      }
+
+      // Invalid command
+      showTerminalError('!! INVALID COMMAND. TRY AGAIN.');
+      isProcessingCommand = false;
+    }
+
+    function showTerminalError(message) {
+      // Add error classes
+      terminal.classList.add('error');
+      terminalInput.classList.add('error');
+      errorOverlay.classList.add('active');
+
+      // Create and show error message
+      const errorLine = document.createElement('div');
+      errorLine.className = 'terminal-line error-message';
+      errorLine.textContent = message;
+      terminalContent.appendChild(errorLine);
+
+      // Trigger animation
+      setTimeout(() => errorLine.classList.add('visible'), 50);
+
+      // Reset after delay
+      setTimeout(() => {
+        terminal.classList.remove('error');
+        terminalInput.classList.remove('error');
+        errorOverlay.classList.remove('active');
+        errorLine.classList.remove('visible');
+        setTimeout(() => errorLine.remove(), 300);
+      }, 2000);
+    }
+
+    // Terminal input handler
+    terminalInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        const command = this.value;
+        this.value = '';
+        processCommand(command);
+      }
+    });
   </script>
 </body>
 </html>

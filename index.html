@@ -1472,6 +1472,158 @@
         text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00;
       }
     }
+
+    /* Confetti Animation Styles */
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .confetti {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: #00ffcc;
+      opacity: 0.8;
+      animation: confetti-fall 3s ease-in-out forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Joke Modal Styles */
+    #joke-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.98);
+      z-index: 10000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    #joke-modal.active {
+      opacity: 1;
+    }
+
+    #joke-modal .modal-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0, 0, 0, 0.95);
+      padding: 2rem;
+      border-radius: 5px;
+      border: 2px solid #00ffcc;
+      text-align: center;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 
+        0 0 20px rgba(0, 255, 204, 0.5),
+        inset 0 0 20px rgba(0, 255, 204, 0.5);
+    }
+
+    #joke-modal .joke-text {
+      color: #00ffcc;
+      font-family: 'VT323', monospace;
+      font-size: 18px;
+      line-height: 1.6;
+      text-align: left;
+      white-space: pre-line;
+    }
+
+    #joke-modal .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      color: #00ffcc;
+      font-size: 28px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      text-shadow: 0 0 5px #00ffcc;
+      padding: 5px 10px;
+    }
+
+    /* Terminal Error Animation Styles */
+    .terminal-error-glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        90deg,
+        rgba(255, 42, 42, 0.2) 0%,
+        transparent 15%,
+        transparent 85%,
+        rgba(255, 42, 42, 0.2) 100%
+      );
+      animation: errorGlow 2s ease-in-out;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    @keyframes errorGlow {
+      0%, 100% { opacity: 0; }
+      25% { opacity: 0.5; }
+      50% { opacity: 0.8; }
+      75% { opacity: 0.5; }
+    }
+
+    .terminal-shake {
+      animation: terminalShake 0.5s ease-in-out;
+    }
+
+    @keyframes terminalShake {
+      0%, 100% { transform: translate(-50%, -50%); }
+      10%, 30%, 50%, 70%, 90% { transform: translate(-51%, -50%); }
+      20%, 40%, 60%, 80% { transform: translate(-49%, -50%); }
+    }
+
+    .terminal-input.error {
+      color: #ff2a2a;
+      text-shadow: 0 0 5px rgba(255, 42, 42, 0.5);
+    }
+
+    .terminal-content.error {
+      color: #ff2a2a;
+      animation: textShake 0.5s ease-in-out;
+    }
+
+    @keyframes textShake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-2px); }
+      50% { transform: translateX(2px); }
+      75% { transform: translateX(-1px); }
+    }
+
+    .error-message {
+      color: #ff2a2a;
+      text-shadow: 0 0 5px rgba(255, 42, 42, 0.5);
+      animation: errorBlink 1s infinite;
+    }
+
+    @keyframes errorBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
   </style>
 </head>
 <body>
@@ -1728,6 +1880,23 @@ Welcome to the mechanism.
       <span>9</span><span>8</span><span>2</span><span>3</span> / <span>1</span><span>0</span><span>0</span><span>0</span><span>0</span>
     </div>
     <div class="rotating-quote"></div>
+  </div>
+
+  <!-- Joke Modal -->
+  <div id="joke-modal" class="modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeJokeModal()">×</button>
+      <div class="joke-text">
+They asked a mathematician:  
+— What are the chances that if you walk outside right now, you'll meet Napoleon?  
+The mathematician locked himself in a room for three days with books, calculators, and computers, then came back with the answer:  
+— Approximately 0.000001 percent.  
+
+They asked the same question to an experienced trader.  
+The trader replied instantly:  
+— 50/50. Either I meet him, or I don't.
+      </div>
+    </div>
   </div>
 
   <script>
@@ -2171,12 +2340,28 @@ Welcome to the mechanism.
       }
     }
 
+    // Track if Easter egg has been triggered in this session
+    let easterEggTriggered = false;
+
     // Terminal input handler
     document.querySelector('.terminal-input').addEventListener('keypress', async function(e) {
       if (e.key === 'Enter') {
         const command = this.value.trim();
         this.value = '';
 
+        // Check for sleepman commands (Easter egg)
+        if (!easterEggTriggered && (
+            command.toLowerCase() === 'sleepman' || 
+            command === 'SLEEPMAN' || 
+            command === '$SLEEPMAN'
+        )) {
+          easterEggTriggered = true;
+          createConfetti();
+          showJokeModal();
+          return;
+        }
+
+        // Check for valid commands
         if (command.toUpperCase() === '71SEDT') {
           if (!isWalletConnected) {
             await displayTerminalContent([
@@ -2245,8 +2430,45 @@ Welcome to the mechanism.
             ]);
           }
         }
+
+        // Handle invalid command
+        if (command) {
+          showTerminalError();
+        }
       }
     });
+
+    // Terminal error animation
+    function showTerminalError() {
+      const terminal = document.getElementById('terminal');
+      const input = document.querySelector('.terminal-input');
+      const content = document.querySelector('.terminal-content');
+      
+      // Add error glow
+      const errorGlow = document.createElement('div');
+      errorGlow.className = 'terminal-error-glow';
+      terminal.appendChild(errorGlow);
+      
+      // Add error classes
+      terminal.classList.add('terminal-shake');
+      input.classList.add('error');
+      content.classList.add('error');
+      
+      // Display error message
+      const errorLine = document.createElement('div');
+      errorLine.className = 'terminal-line error-message';
+      errorLine.textContent = '!! INVALID COMMAND. TRY AGAIN.';
+      content.appendChild(errorLine);
+      
+      // Reset after animation
+      setTimeout(() => {
+        terminal.classList.remove('terminal-shake');
+        input.classList.remove('error');
+        content.classList.remove('error');
+        errorGlow.remove();
+        errorLine.remove();
+      }, 2000);
+    }
 
     // Info Modal Functions
     function showInfoModal() {
@@ -2403,6 +2625,41 @@ Welcome to the mechanism.
       
       // Rotate quotes every 25 seconds
       setInterval(updateQuote, 25000);
+    }
+
+    // Confetti Animation
+    function createConfetti() {
+      const container = document.createElement('div');
+      container.className = 'confetti-container';
+      document.body.appendChild(container);
+
+      for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.className = 'confetti';
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.animationDelay = Math.random() * 2 + 's';
+        container.appendChild(confetti);
+      }
+
+      setTimeout(() => {
+        container.remove();
+      }, 3000);
+    }
+
+    // Joke Modal Functions
+    function showJokeModal() {
+      const modal = document.getElementById('joke-modal');
+      modal.style.display = 'block';
+      modal.offsetHeight; // Trigger reflow
+      modal.classList.add('active');
+    }
+
+    function closeJokeModal() {
+      const modal = document.getElementById('joke-modal');
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
     }
   </script>
 </body>

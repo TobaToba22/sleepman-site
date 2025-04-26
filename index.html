@@ -24,6 +24,7 @@
     loadEthers();
   </script>
   <script src="https://unpkg.com/@thirdweb-dev/sdk@3"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     html, body {
       margin: 0;
@@ -1525,6 +1526,7 @@
 </head>
 <body>
   <div class="error-overlay"></div>
+  <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9998;display:none;"></canvas>
   <!-- Добавляем элементы для эффектов ошибки -->
   <div class="error-glow"></div>
   <div class="system-alert">[ALERT] SYSTEM SECURITY FAILURE: SLEEP_ENTITY SCP-Δ777 IS WAKING UP.</div>
@@ -2221,7 +2223,46 @@ Welcome to the mechanism.
       }
     }
 
-    // Функция для отображения анекдота
+    // Функция запуска конфетти и салюта
+    function startConfettiAndFirework(duration = 12000) {
+      const canvas = document.getElementById('confetti-canvas');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      canvas.style.display = 'block';
+
+      // Конфетти сверху вниз
+      const confettiInterval = setInterval(() => {
+        confetti({
+          particleCount: 7,
+          angle: 90,
+          spread: 90,
+          origin: { x: Math.random(), y: 0 },
+          colors: ['#81D8D0', '#00ffcc', '#00ff66', '#fff', '#f7e017']
+        });
+      }, 200);
+
+      // Салют слева (firework)
+      const fireworkInterval = setInterval(() => {
+        confetti({
+          particleCount: 30,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0.1, y: 0.7 },
+          startVelocity: 45,
+          colors: ['#81D8D0', '#ff2a2a', '#f7e017', '#fff']
+        });
+      }, 1200);
+
+      // Остановить через duration
+      setTimeout(() => {
+        clearInterval(confettiInterval);
+        clearInterval(fireworkInterval);
+        canvas.style.display = 'none';
+        confetti.reset();
+      }, duration);
+    }
+
+    // Обновлённая функция пасхалки-анекдота
     async function showJoke() {
       const joke = `
 They asked a mathematician:
@@ -2238,21 +2279,24 @@ The trader replied instantly:
       const jokeElement = document.createElement('div');
       jokeElement.className = 'terminal-joke';
       jokeElement.textContent = joke;
-      
+
       // Очищаем предыдущий контент
       terminalContent.innerHTML = '';
       terminalContent.appendChild(jokeElement);
-      
+
+      // Запускаем анимацию конфетти и салюта
+      startConfettiAndFirework(12000);
+
       // Показываем анекдот с анимацией
       setTimeout(() => {
         jokeElement.classList.add('visible');
       }, 100);
 
-      // Через 15 секунд возвращаем терминал в исходное состояние
+      // Через 12 секунд возвращаем терминал в исходное состояние
       setTimeout(() => {
         terminalContent.innerHTML = '';
         activateTerminal();
-      }, 15000);
+      }, 12000);
     }
 
     // Функция для показа страшной ошибки

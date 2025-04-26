@@ -1534,6 +1534,9 @@
     .terminal-content.error {
       color: #FF0000;
       animation: terminalShake 0.2s ease-in-out infinite;
+      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
+      line-height: 1.6;
+      white-space: pre-line;
     }
 
     @keyframes terminalShake {
@@ -2268,6 +2271,12 @@ The trader replied instantly:
       setTimeout(() => {
         jokeElement.classList.add('visible');
       }, 100);
+
+      // Через 15 секунд возвращаем терминал в исходное состояние
+      setTimeout(() => {
+        terminalContent.innerHTML = '';
+        activateTerminal();
+      }, 15000);
     }
 
     // Функция для показа ошибки
@@ -2279,8 +2288,13 @@ The trader replied instantly:
       terminalContent.classList.add('error');
       errorOverlay.classList.add('active');
       
-      // Очищаем контент терминала
-      terminalContent.innerHTML = '';
+      // Очищаем контент терминала и добавляем текст ошибки
+      terminalContent.innerHTML = `
+[FATAL ERROR] - Security breach detected.
+[WARNING] - Unauthorized neural interference.
+[ALERT] - Sleepman consciousness interference detected.
+[DANGER] - Dream corruption at 89%.
+      `;
       
       // Убираем эффекты через 2.5 секунды
       setTimeout(() => {

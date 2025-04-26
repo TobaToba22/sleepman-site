@@ -1019,6 +1019,23 @@
         -2px -2px #00ff00;
     }
 
+    #wallet-select-modal .disclaimer {
+      color: #00ffcc;
+      font-size: 12px;
+      opacity: 0.8;
+      margin-bottom: 1.5rem;
+      text-align: left;
+      line-height: 1.4;
+      font-family: 'VT323', monospace;
+    }
+
+    #wallet-select-modal .disclaimer strong {
+      color: #00ff00;
+      font-size: 14px;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
     #connect-metamask {
       background: rgba(0, 0, 0, 0.7);
       border: 2px solid #00ffcc;
@@ -1673,6 +1690,14 @@ Welcome to the mechanism.
     <div class="modal-content">
       <button class="close-wallet-modal" onclick="closeWalletModal()">×</button>
       <h2 class="modal-title">Connect Wallet</h2>
+      <div class="disclaimer">
+        <strong>Important Notice:</strong>
+        To ensure correct wallet connection, please disable any additional wallet extensions (such as Phantom, TokenPocket, or Rabby) before proceeding.
+        <br><br>
+        Sleepman supports MetaMask only — the NFT operates on the Base network (an Ethereum-compatible chain), and using other wallet extensions may result in connection conflicts or false addresses.
+        <br><br>
+        If MetaMask is installed and no other wallets are active, click "Connect MetaMask" below.
+      </div>
       <button id="connect-metamask" data-text="CONNECT METAMASK" onclick="connectMetaMask()">CONNECT METAMASK</button>
     </div>
   </div>
@@ -1776,6 +1801,105 @@ Welcome to the mechanism.
     const NFT_TOKEN_ID = 0;
     let isWalletConnected = false;
 
+    // Initialize only quotes on load - no wallet connection
+    window.addEventListener('load', () => {
+      rotateQuotes();
+    });
+
+    // Wallet Connection Function - only called by button click
+    async function connectMetaMask() {
+      if (typeof window.ethereum === "undefined") {
+        alert("MetaMask not detected");
+        return;
+      }
+
+      if (typeof window.ethers === "undefined") {
+        alert("Ethers.js not loaded");
+        return;
+      }
+
+      try {
+        // Reset connection state
+        userAddress = null;
+        isWalletConnected = false;
+
+        // First, request permissions to reset any cached connections
+        await window.ethereum.request({
+          method: 'wallet_requestPermissions',
+          params: [{ eth_accounts: {} }]
+        });
+
+        // Then request accounts - this will open MetaMask
+        const accounts = await window.ethereum.request({ 
+          method: "eth_requestAccounts" 
+        });
+        
+        const selectedAddress = accounts[0];
+        if (!selectedAddress) {
+          alert("No wallet connected");
+          return;
+        }
+
+        // Store the explicitly selected address
+        userAddress = selectedAddress;
+        console.log("✅ Connected wallet:", userAddress);
+
+        // Switch to Base network
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x2105' }]
+          });
+          console.log("Switched to Base network");
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            try {
+              await window.ethereum.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                  chainId: '0x2105',
+                  chainName: 'Base',
+                  nativeCurrency: {
+                    name: 'ETH',
+                    symbol: 'ETH',
+                    decimals: 18
+                  },
+                  rpcUrls: ['https://mainnet.base.org'],
+                  blockExplorerUrls: ['https://basescan.org']
+                }]
+              });
+            } catch (addError) {
+              console.error("Error adding Base network:", addError);
+              throw addError;
+            }
+          } else {
+            console.error("Error switching to Base network:", switchError);
+            throw switchError;
+          }
+        }
+
+        // Update connection state
+        isWalletConnected = true;
+
+        // Update UI with the explicitly selected address
+        const shortenedAddress = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+        document.getElementById("walletAddress").innerText = shortenedAddress;
+        document.getElementById("connectWallet").style.display = "none";
+        document.getElementById("walletAddress").style.display = "block";
+        closeWalletModal();
+
+        // Check NFT ownership with the explicitly selected address
+        console.log("Checking NFT ownership for address:", userAddress);
+        await checkNFTOwnership();
+
+      } catch (error) {
+        console.error("Error connecting wallet:", error);
+        userAddress = null;
+        isWalletConnected = false;
+        alert("Error connecting wallet. Please try again.");
+      }
+    }
+
     // Check NFT Ownership
     async function checkNFTOwnership() {
       try {
@@ -1810,6 +1934,28 @@ Welcome to the mechanism.
         console.error("Error checking NFT ownership:", error);
         return false;
       }
+    }
+
+    // MetaMask Event Listeners - only reset state, no auto-connection
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', () => {
+        // Reset state and UI - require manual reconnect
+        userAddress = null;
+        isWalletConnected = false;
+        document.getElementById("connectWallet").style.display = "block";
+        document.getElementById("walletAddress").style.display = "none";
+      });
+
+      window.ethereum.on('chainChanged', () => {
+        window.location.reload();
+      });
+
+      window.ethereum.on('disconnect', () => {
+        userAddress = null;
+        isWalletConnected = false;
+        document.getElementById("connectWallet").style.display = "block";
+        document.getElementById("walletAddress").style.display = "none";
+      });
     }
 
     async function displayTerminalContent(content, delay = 50) {
@@ -2236,11 +2382,6 @@ Welcome to the mechanism.
       // Rotate quotes every 25 seconds
       setInterval(updateQuote, 25000);
     }
-
-    // Initialize everything on page load
-    window.addEventListener('load', () => {
-      rotateQuotes();
-    });
   </script>
 </body>
 </html>

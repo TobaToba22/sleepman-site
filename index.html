@@ -1473,7 +1473,6 @@
       }
     }
 
-    /* 1. Глобальный красный градиент для ошибки */
     .global-error-glow {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -1488,8 +1487,6 @@
       0% { filter: blur(0px); }
       100% { filter: blur(4px); }
     }
-
-    /* 2. Пасхалка: стиль для анекдота */
     .terminal-easter-egg-line {
       color: #81D8D0 !important;
       text-shadow: 0 0 12px #81D8D0, 0 0 24px #81D8D0;
@@ -1504,8 +1501,6 @@
       opacity: 1;
       transform: translateY(0);
     }
-
-    /* 3. Ошибка: shake + красный текст */
     .terminal.error, .terminal-content.error {
       animation: terminalShake 0.15s infinite;
     }
@@ -1777,6 +1772,9 @@ Welcome to the mechanism.
     </div>
     <div class="rotating-quote"></div>
   </div>
+
+  <!-- 1. Вставить после <body>: -->
+  <div class="global-error-glow"></div>
 
   <script>
     // Check if intro has been shown before
@@ -2453,6 +2451,7 @@ Welcome to the mechanism.
       setInterval(updateQuote, 25000);
     }
 
+    // 2. В <script> добавить:
     const easterEggJokeLines = [
       'They asked a mathematician:',
       '— What are the chances that if you walk outside right now, you\'ll meet Napoleon?',
@@ -2512,11 +2511,20 @@ Welcome to the mechanism.
           terminalContent.classList.remove('error');
           terminalContent.innerHTML = originalContent;
           isErrorActive = false;
-        }, 5000);
+        }, 2500);
         return;
       }
       // ... остальная обработка ...
     }
+
+    // 3. Обновить обработчик ввода:
+    terminalInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        const command = this.value;
+        this.value = '';
+        processCommand(command);
+      }
+    });
   </script>
 </body>
 </html>

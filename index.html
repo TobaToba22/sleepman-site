@@ -4,8 +4,12 @@
   <meta charset="UTF-8">
   <title>$SLEEPMAN — Enter the Dream</title>
   <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-  <!-- Remove the old ethers.js script -->
-  <script src="https://cdn.ethers.io/lib/ethers-5.7.2.umd.min.js" type="text/javascript"></script>
+  <!-- Load ethers.js as ES module first -->
+  <script type="module">
+    import { ethers } from 'https://cdn.jsdelivr.net/npm/ethers@5.7.2/+esm';
+    window.ethers = ethers;
+    console.log("✅ ethers.js loaded as ES module");
+  </script>
   <script src="https://unpkg.com/@thirdweb-dev/sdk@3"></script>
   <style>
     html, body {
@@ -1759,15 +1763,20 @@ Welcome to the mechanism.
     const NFT_CONTRACT_ADDRESS = "0x2785b77adC320846497B894424977028a5CEef0d";
     const NFT_TOKEN_ID = 0;
 
-    // Remove automatic connection check
-    window.addEventListener('load', async () => {
+    // Initialize only quotes on load, no wallet connection
+    window.addEventListener('load', () => {
       rotateQuotes();
     });
 
-    // Wallet Connection Function
+    // Wallet Connection Function - only called by button click
     async function connectMetaMask() {
-      if (!window.ethereum) {
-        alert("Please install MetaMask!");
+      if (typeof window.ethereum === "undefined") {
+        alert("MetaMask is not installed.");
+        return;
+      }
+
+      if (typeof window.ethers === "undefined") {
+        alert("Ethers.js not loaded. Please refresh the page.");
         return;
       }
 
@@ -1776,21 +1785,12 @@ Welcome to the mechanism.
         userAddress = null;
         isWalletConnected = false;
 
-        // Force MetaMask popup
-        const accounts = await window.ethereum.request({
-          method: "eth_requestAccounts"
-        });
-
-        if (!accounts || accounts.length === 0) {
-          throw new Error("No accounts selected");
-        }
+        // Request accounts - this will open MetaMask
+        console.log("Requesting MetaMask account selection...");
+        await window.ethereum.request({ method: "eth_requestAccounts" });
 
         // Create new provider instance
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        
-        // Force MetaMask popup again to ensure user interaction
-        await provider.send("eth_requestAccounts", []);
-        
+        const provider = new window.ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         userAddress = await signer.getAddress();
 
@@ -1840,10 +1840,12 @@ Welcome to the mechanism.
         document.getElementById("walletAddress").style.display = "block";
         closeWalletModal();
 
-        // Check NFT ownership
-        console.log("Checking NFT ownership for address:", userAddress);
-        const hasNFT = await checkNFTOwnership();
-        console.log("NFT ownership check result:", hasNFT);
+        // Check NFT ownership only after successful connection
+        if (typeof window.ethers !== "undefined") {
+          console.log("Checking NFT ownership for address:", userAddress);
+          const hasNFT = await checkNFTOwnership();
+          console.log("NFT ownership check result:", hasNFT);
+        }
 
       } catch (error) {
         console.error("Error connecting wallet:", error);
@@ -1853,46 +1855,11 @@ Welcome to the mechanism.
       }
     }
 
-    // Event Listeners for MetaMask
-    if (window.ethereum) {
-      window.ethereum.on('accountsChanged', () => {
-        // Reset state and UI on account change
-        userAddress = null;
-        isWalletConnected = false;
-        document.getElementById("connectWallet").style.display = "block";
-        document.getElementById("walletAddress").style.display = "none";
-      });
-
-      window.ethereum.on('chainChanged', () => {
-        // Reload page on network change
-        window.location.reload();
-      });
-
-      window.ethereum.on('disconnect', () => {
-        // Reset state and UI on disconnect
-        userAddress = null;
-        isWalletConnected = false;
-        document.getElementById("connectWallet").style.display = "block";
-        document.getElementById("walletAddress").style.display = "none";
-      });
-    }
-
-    // Initialize on page load - only check previous connection
-    window.addEventListener('load', async () => {
-      await checkPreviousConnection();
-      rotateQuotes();
-    });
-
-    // Check NFT Ownership
+    // Check NFT Ownership - with ethers check
     async function checkNFTOwnership() {
       try {
-        if (!isWalletConnected || !userAddress) {
-          console.log("Wallet not connected, cannot check NFT");
-          return false;
-        }
-
-        if (!window.ethers) {
-          console.log("ethers.js not loaded yet");
+        if (!isWalletConnected || !userAddress || typeof window.ethers === "undefined") {
+          console.log("Cannot check NFT: wallet not connected or ethers not loaded");
           return false;
         }
 
@@ -1917,6 +1884,28 @@ Welcome to the mechanism.
         console.error("Error checking NFT ownership:", error);
         return false;
       }
+    }
+
+    // MetaMask Event Listeners - only reset state, no auto-connection
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', () => {
+        // Reset state and UI
+        userAddress = null;
+        isWalletConnected = false;
+        document.getElementById("connectWallet").style.display = "block";
+        document.getElementById("walletAddress").style.display = "none";
+      });
+
+      window.ethereum.on('chainChanged', () => {
+        window.location.reload();
+      });
+
+      window.ethereum.on('disconnect', () => {
+        userAddress = null;
+        isWalletConnected = false;
+        document.getElementById("connectWallet").style.display = "block";
+        document.getElementById("walletAddress").style.display = "none";
+      });
     }
 
     async function displayTerminalContent(content, delay = 50) {

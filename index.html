@@ -672,7 +672,12 @@
       background: transparent;
       padding: 15px;
       border-top: 1px solid rgba(0, 255, 102, 0.3);
-      z-index: 1000;
+    }
+
+    .terminal-prompt {
+      color: #00ff66;
+      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
+      font-size: 16px;
     }
 
     .terminal-input {
@@ -684,68 +689,10 @@
       font-size: 16px;
       outline: none;
       caret-color: #00ff66;
-      transition: color 0.3s ease;
     }
 
-    .terminal-input.error {
-      color: #ff2a2a !important;
-      text-shadow: 0 0 5px rgba(255, 42, 42, 0.5);
-    }
-
-    .terminal-content {
-      transition: color 0.3s ease;
-    }
-
-    .terminal-error-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      background: linear-gradient(
-        90deg,
-        rgba(255, 42, 42, 0.2) 0%,
-        transparent 15%,
-        transparent 85%,
-        rgba(255, 42, 42, 0.2) 100%
-      );
-      z-index: 998;
-    }
-
-    .terminal-error-overlay.active {
-      opacity: 1;
-    }
-
-    @keyframes terminalShake {
-      0%, 100% { transform: translate(-50%, -50%); }
-      10%, 30%, 50%, 70%, 90% { transform: translate(-51%, -50%); }
-      20%, 40%, 60%, 80% { transform: translate(-49%, -50%); }
-    }
-
-    .terminal.error {
-      animation: terminalShake 0.5s ease-in-out;
-    }
-
-    .terminal-line.error-message {
-      color: #ff2a2a;
-      text-shadow: 0 0 5px rgba(255, 42, 42, 0.5);
-      opacity: 0;
-      transform: translateY(5px);
-      transition: all 0.3s ease;
-    }
-
-    .terminal-line.error-message.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .terminal-prompt {
-      color: #00ff66;
-      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
-      font-size: 16px;
+    .terminal-input::placeholder {
+      color: rgba(0, 255, 102, 0.5);
     }
 
     .terminal-indicator {
@@ -1526,1218 +1473,52 @@
       }
     }
 
-    /* Confetti Animation Styles */
-    .confetti-container {
+    /* 1. Глобальный красный градиент для ошибки */
+    .global-error-glow {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0; right: 0; bottom: 0;
       pointer-events: none;
-      z-index: 9999;
-    }
-
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #00ffcc;
-      opacity: 0.8;
-      animation: confetti-fall 3s ease-in-out forwards;
-    }
-
-    @keyframes confetti-fall {
-      0% {
-        transform: translateY(-100vh) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0;
-      }
-    }
-
-    /* Joke Modal Styles */
-    #joke-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.98);
-      z-index: 10000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    #joke-modal.active {
-      opacity: 1;
-    }
-
-    #joke-modal .modal-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.95);
-      padding: 2rem;
-      border-radius: 5px;
-      border: 2px solid #00ffcc;
-      text-align: center;
-      max-width: 600px;
-      width: 90%;
-      box-shadow: 
-        0 0 20px rgba(0, 255, 204, 0.5),
-        inset 0 0 20px rgba(0, 255, 204, 0.5);
-    }
-
-    #joke-modal .joke-text {
-      color: #00ffcc;
-      font-family: 'VT323', monospace;
-      font-size: 18px;
-      line-height: 1.6;
-      text-align: left;
-      white-space: pre-line;
-    }
-
-    #joke-modal .close-modal {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      color: #00ffcc;
-      font-size: 28px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      text-shadow: 0 0 5px #00ffcc;
-      padding: 5px 10px;
-    }
-
-    /* Terminal Error Animation Styles */
-    @keyframes glitchText {
-      0% { transform: translate(0); }
-      20% { transform: translate(-2px); filter: brightness(150%); }
-      40% { transform: translate(2px); filter: brightness(100%); }
-      60% { transform: translate(-1px); filter: brightness(200%); }
-      80% { transform: translate(1px); filter: brightness(150%); }
-    }
-
-    .terminal-error-text {
-      color: #ff2a2a;
-      text-shadow: 0 0 5px rgba(255, 42, 42, 0.8);
-      animation: glitchText 0.3s infinite;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .terminal-error-text.visible {
-      opacity: 1;
-    }
-
-    @keyframes terminalShake {
-      0%, 100% { transform: translate(-50%, -50%); }
-      10% { transform: translate(-51%, -49%); }
-      20% { transform: translate(-49%, -51%); }
-      30% { transform: translate(-51%, -51%); }
-      40% { transform: translate(-49%, -49%); }
-      50% { transform: translate(-51%, -50%); }
-      60% { transform: translate(-49%, -50%); }
-      70% { transform: translate(-50%, -51%); }
-      80% { transform: translate(-50%, -49%); }
-      90% { transform: translate(-51%, -50%); }
-    }
-
-    .terminal.error {
-      animation: terminalShake 0.5s infinite;
-    }
-
-    .terminal-line.error-message {
-      color: #ff2a2a;
-      text-shadow: 0 0 5px rgba(255, 42, 42, 0.5);
-      opacity: 0;
-      transform: translateY(5px);
-      transition: all 0.3s ease;
-    }
-
-    .terminal-line.error-message.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    .terminal-prompt {
-      color: #00ff66;
-      font-family: 'VT323', 'Share Tech Mono', 'Courier New', monospace;
-      font-size: 16px;
-    }
-
-    .terminal-indicator {
-      width: 8px;
-      height: 8px;
-      background: #00ff66;
-      border-radius: 50%;
-      margin-left: 10px;
-      box-shadow: 0 0 5px #00ff66;
-      animation: blink 1s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-
-    .terminal-line {
-      opacity: 0;
-      transform: translateY(5px);
-      transition: all 0.3s ease;
-      margin-bottom: 5px;
-    }
-
-    .terminal-line.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* Overlay for terminal background */
-    .terminal-overlay {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
-      z-index: 998;
-    }
-
-    /* Добавляем анимацию тряски */
-    @keyframes terminalShake {
-      0%, 100% { transform: translate(-50%, -50%); }
-      25% { transform: translate(-52%, -50%); }
-      50% { transform: translate(-50%, -51%); }
-      75% { transform: translate(-48%, -50%); }
-    }
-
-    .terminal-content.error {
-      color: #ff2a2a;
-      animation: terminalShake 0.2s ease-in-out infinite;
-    }
-
-    /* Добавляем анимации и стили для ошибок */
-    @keyframes textShake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-2px); }
-      50% { transform: translateX(2px); }
-      75% { transform: translateX(-1px); }
-    }
-
-    @keyframes alertBlink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    .terminal-line {
-      transition: color 0.3s ease, transform 0.2s ease;
-    }
-
-    .terminal-content.error .terminal-line {
-      color: #ff2a2a;
-      animation: textShake 0.2s ease-in-out infinite;
-    }
-
-    /* Стили для системного алерта */
-    .system-alert {
-      display: none;
-      position: fixed;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.9);
-      border: 2px solid #ff2a2a;
-      padding: 15px 30px;
-      color: #ff2a2a;
-      font-family: 'VT323', monospace;
-      font-size: 24px;
-      z-index: 9999;
-      box-shadow: 0 0 20px rgba(255, 42, 42, 0.3);
-      animation: alertBlink 1s infinite;
-    }
-
-    .system-alert::after {
-      content: '_';
-      animation: alertBlink 0.8s infinite;
-    }
-
-    /* Красное свечение по краям */
-    .error-glow {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      pointer-events: none;
-      z-index: 9998;
-      background: 
-        linear-gradient(90deg, 
-          rgba(255, 42, 42, 0.2) 0%,
-          transparent 15%,
-          transparent 85%,
-          rgba(255, 42, 42, 0.2) 100%
-        );
-    }
-
-    /* Добавляем стили для фейерверков */
-    @keyframes firework {
-      0% { 
-        transform: translate(0, 0);
-        opacity: 1;
-        width: 4px;
-        height: 4px;
-      }
-      100% { 
-        transform: translate(var(--x), var(--y));
-        opacity: 0;
-        width: 2px;
-        height: 2px;
-      }
-    }
-
-    .firework-container {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9997;
-    }
-
-    .firework {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      border-radius: 50%;
-      animation: firework 0.8s ease-out forwards;
-    }
-
-    .firework-left {
-      left: 0;
-    }
-
-    .firework-right {
-      right: 0;
-    }
-
-    /* NFT Claim Modal Styles */
-    #nft-claim-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.98);
-      z-index: 2000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    #nft-claim-modal.active {
-      opacity: 1;
-    }
-
-    #nft-claim-modal .modal-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.95);
-      padding: 2rem;
-      border-radius: 5px;
-      border: 2px solid #00ff00;
-      text-align: center;
-      max-width: 600px;
-      width: 90%;
-      animation: borderPulse 2s infinite;
-      box-shadow: 
-        0 0 20px rgba(0, 255, 0, 0.5),
-        inset 0 0 20px rgba(0, 255, 0, 0.5);
-      overflow: hidden;
-    }
-
-    #nft-claim-modal .modal-title {
-      color: #00ff00;
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
-      text-transform: uppercase;
-      font-family: 'VT323', monospace;
-      letter-spacing: 2px;
-      animation: glitchText 0.4s infinite;
-      position: relative;
-      text-shadow: 
-        2px 2px #003300,
-        -2px -2px #00ff00;
-    }
-
-    #nft-claim-modal .nft-claim-content {
-      color: #00ff00;
-      font-family: 'VT323', monospace;
-      font-size: 1.2rem;
-      line-height: 1.6;
-      text-align: left;
-      white-space: pre-line;
-      margin-bottom: 2rem;
-    }
-
-    #nft-claim-modal .nft-claim-button {
-      background: transparent;
-      border: 2px solid #00ff00;
-      padding: 12px 40px;
-      font-size: 24px;
-      cursor: pointer;
-      color: #00ff00;
-      text-transform: uppercase;
-      margin-top: 2rem;
-      font-family: 'VT323', monospace;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-
-    #nft-claim-modal .nft-claim-button::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(0, 255, 0, 0.2),
-        transparent
-      );
-      animation: buttonGlow 3s infinite;
-    }
-
-    #nft-claim-modal .nft-claim-button:hover {
-      animation: buttonGlitch 0.3s infinite;
-      background: rgba(0, 255, 0, 0.1);
-      text-shadow: 0 0 8px #00ff00;
-    }
-
-    #nft-claim-modal .close-modal {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      color: #00ff00;
-      font-size: 28px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      text-shadow: 0 0 5px #00ff00;
-      padding: 5px 10px;
-      animation: glitchText 1s infinite;
-    }
-
-    #nft-claim-modal .close-modal:hover {
-      animation: glitchText 0.2s infinite;
-    }
-
-    /* Wallet Selection Modal Styles */
-    #wallet-select-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.98);
-      z-index: 2000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    #wallet-select-modal.active {
-      opacity: 1;
-    }
-
-    #wallet-select-modal .modal-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.95);
-      padding: 2rem;
-      border-radius: 5px;
-      border: 2px solid #00ff00;
-      text-align: center;
-      max-width: 400px;
-      width: 90%;
-      box-shadow: 
-        0 0 20px rgba(0, 255, 0, 0.5),
-        inset 0 0 20px rgba(0, 255, 0, 0.5);
-    }
-
-    #wallet-select-modal .modal-title {
-      color: #00ff00;
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
-      text-transform: uppercase;
-      font-family: 'VT323', monospace;
-      letter-spacing: 2px;
-      animation: glitchText 0.4s infinite;
-      position: relative;
-      text-shadow: 
-        2px 2px #003300,
-        -2px -2px #00ff00;
-    }
-
-    #wallet-select-modal .disclaimer {
-      color: #00ffcc;
-      font-size: 12px;
-      opacity: 0.8;
-      margin-bottom: 1.5rem;
-      text-align: left;
-      line-height: 1.4;
-      font-family: 'VT323', monospace;
-    }
-
-    #wallet-select-modal .disclaimer strong {
-      color: #00ff00;
-      font-size: 14px;
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-
-    #connect-metamask {
-      background: rgba(0, 0, 0, 0.7);
-      border: 2px solid #00ffcc;
-      padding: 10px 20px;
-      font-size: 24px;
-      cursor: pointer;
-      text-align: center;
-      width: 280px;
-      text-transform: uppercase;
-      color: #00ffcc;
-      box-shadow: 0 0 10px #00ffcc;
-      text-shadow: 0 0 5px #00ffcc;
-      position: relative;
-      transition: all 0.3s ease-in-out;
-      border-radius: 5px;
-      margin: 1rem auto;
-      display: block;
-      font-family: 'VT323', monospace;
-    }
-
-    #connect-metamask::before {
-      content: attr(data-text);
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      color: #00ffcc;
-      filter: blur(1px);
-      transform: scale(1.1);
-      pointer-events: none;
-    }
-
-    #connect-metamask:hover {
-      animation: buttonGlitch 0.2s infinite;
-      box-shadow: 
-        0 0 10px #00ffcc,
-        0 0 20px #00ffcc,
-        0 0 30px #00ffcc;
-      text-shadow: 
-        0 0 5px #00ffcc,
-        0 0 10px #00ffcc,
-        0 0 15px #00ffcc;
-      letter-spacing: 1px;
-      transform: scale(1.05);
-    }
-
-    #connect-metamask:hover::before {
-      animation: textGlitch 0.3s infinite;
-      opacity: 0.8;
-    }
-
-    #connect-metamask {
-      border-color: #f6851b;
-      box-shadow: 0 0 10px #f6851b;
-      text-shadow: 0 0 5px #f6851b;
-    }
-
-    #connect-metamask:hover {
-      box-shadow: 
-        0 0 10px #f6851b,
-        0 0 20px #f6851b,
-        0 0 30px #f6851b;
-      text-shadow: 
-        0 0 5px #f6851b,
-        0 0 10px #f6851b,
-        0 0 15px #f6851b;
-    }
-
-    /* Social Media Blocks Styles */
-    .social-blocks {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 2rem 0;
-    }
-
-    .social-block {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      background: rgba(0, 0, 0, 0.5);
-      border: 2px solid transparent;
-    }
-
-    .social-block::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      border-radius: 50%;
-      background: linear-gradient(45deg, transparent, rgba(0, 255, 0, 0.2), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .social-block:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-    }
-
-    .social-block:hover::before {
-      opacity: 1;
-    }
-
-    .social-block svg {
-      width: 40px;
-      height: 40px;
-      transition: all 0.3s ease;
-    }
-
-    .social-block:hover svg {
-      filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.5));
-    }
-
-    .telegram-block svg {
-      fill: #0088cc;
-    }
-
-    .twitter-block svg {
-      fill: #1DA1F2;
-    }
-
-    @media (max-width: 480px) {
-      .social-blocks {
-        flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
-      }
-    }
-
-    /* Cult Modal Styles */
-    #cult-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.98);
-      z-index: 2000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    #cult-modal.active {
-      opacity: 1;
-    }
-
-    #cult-modal .modal-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.95);
-      padding: 2rem;
-      border-radius: 5px;
-      border: 2px solid #00ff00;
-      text-align: center;
-      max-width: 600px;
-      width: 90%;
-      box-shadow: 
-        0 0 20px rgba(0, 255, 0, 0.5),
-        inset 0 0 20px rgba(0, 255, 0, 0.5);
-    }
-
-    #cult-modal .modal-title {
-      color: #00ff00;
-      font-size: 2.5rem;
-      margin-bottom: 2rem;
-      text-transform: uppercase;
-      font-family: 'VT323', monospace;
-      letter-spacing: 2px;
-      animation: glitchText 0.4s infinite;
-      position: relative;
-      text-shadow: 
-        2px 2px #003300,
-        -2px -2px #00ff00;
-    }
-
-    .social-buttons {
-      display: flex;
-      justify-content: center;
-      gap: 2rem;
-      margin: 2rem 0;
-    }
-
-    .social-button {
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: all 0.3s ease-in-out;
-      position: relative;
-      background: rgba(0, 0, 0, 0.5);
-      border: 2px solid transparent;
-    }
-
-    .social-button::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      border-radius: 50%;
-      background: linear-gradient(45deg, transparent, rgba(0, 255, 0, 0.2), transparent);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    .social-button:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
-    }
-
-    .social-button:hover::before {
-      opacity: 1;
-    }
-
-    .social-button svg {
-      width: 40px;
-      height: 40px;
-      transition: all 0.3s ease;
-    }
-
-    .social-button:hover svg {
-      filter: drop-shadow(0 0 5px rgba(0, 255, 0, 0.5));
-    }
-
-    .telegram-button svg {
-      fill: #0088cc;
-    }
-
-    .twitter-button svg {
-      fill: #1DA1F2;
-    }
-
-    #cult-modal .close-modal {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      color: #00ff00;
-      font-size: 28px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      text-shadow: 0 0 5px #00ff00;
-      padding: 5px 10px;
-      animation: glitchText 1s infinite;
-    }
-
-    #cult-modal .close-modal:hover {
-      animation: glitchText 0.2s infinite;
-    }
-
-    @media (max-width: 480px) {
-      .social-buttons {
-        flex-direction: column;
-        align-items: center;
-        gap: 1.5rem;
-      }
-    }
-
-    /* NFT Counter Modal Styles */
-    #nft-counter {
-      position: fixed;
-      top: 24px;
-      left: 50%;
-      transform: translateX(-50%) scale(0.95);
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
-      padding: 1rem 2rem;
-      border-radius: 8px;
-      border: 2px solid #00ffcc;
-      box-shadow: 
-        0 0 20px rgba(0, 255, 204, 0.3),
-        inset 0 0 20px rgba(0, 255, 204, 0.1);
-      z-index: 1000;
-      text-align: center;
-      font-family: 'VT323', monospace;
-      color: #00ffcc;
-      min-width: 300px;
-      opacity: 0;
-      animation: counterAppear 1s ease forwards 10s;
-    }
-
-    @keyframes counterAppear {
-      0% {
-        opacity: 0;
-        transform: translateX(-50%) scale(0.95);
-      }
-      100% {
-        opacity: 1;
-        transform: translateX(-50%) scale(1);
-      }
-    }
-
-    #nft-counter::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      border-radius: 10px;
-      background: linear-gradient(
-        45deg,
-        transparent,
-        rgba(0, 255, 204, 0.1),
-        transparent
-      );
-      animation: borderGlow 3s infinite, shadowPulse 2s infinite;
-      z-index: -1;
-    }
-
-    @keyframes shadowPulse {
-      0%, 100% {
-        box-shadow: 
-          0 0 20px rgba(0, 255, 204, 0.3),
-          inset 0 0 20px rgba(0, 255, 204, 0.1);
-      }
-      50% {
-        box-shadow: 
-          0 0 30px rgba(0, 255, 204, 0.5),
-          inset 0 0 30px rgba(0, 255, 204, 0.2);
-      }
-    }
-
-    @keyframes borderGlow {
-      0%, 100% {
-        opacity: 0.5;
-        box-shadow: 
-          0 0 20px rgba(0, 255, 204, 0.3),
-          inset 0 0 20px rgba(0, 255, 204, 0.1);
-      }
-      50% {
-        opacity: 1;
-        box-shadow: 
-          0 0 30px rgba(0, 255, 204, 0.5),
-          inset 0 0 30px rgba(0, 255, 204, 0.2);
-      }
-    }
-
-    .nft-counter {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-      text-shadow: 0 0 10px #00ffcc;
-    }
-
-    .nft-counter span {
-      display: inline-block;
-      animation: digitPulse 2s infinite;
-    }
-
-    .nft-counter span:nth-child(odd) {
-      animation-delay: 0.1s;
-    }
-
-    .nft-counter span:nth-child(even) {
-      animation-delay: 0.2s;
-    }
-
-    .rotating-quote {
-      font-size: 14px;
-      color: #00fff7;
-      text-align: center;
-      opacity: 1;
-      transition: opacity 0.5s ease-in-out;
-      font-family: 'Orbitron', monospace;
-      text-shadow: 0 0 4px rgba(0,255,255,0.5), 0 0 8px rgba(0,255,255,0.2);
-      min-height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    @keyframes digitPulse {
-      0%, 100% {
-        transform: translateY(0);
-        text-shadow: 0 0 10px #00ffcc;
-      }
-      25% {
-        transform: translateY(-2px);
-        text-shadow: 0 0 15px #00ffcc;
-      }
-      50% {
-        transform: translateY(0);
-        text-shadow: 0 0 10px #00ffcc;
-      }
-      75% {
-        transform: translateY(2px);
-        text-shadow: 0 0 15px #00ffcc;
-      }
-    }
-
-    @keyframes textFlicker {
-      0%, 100% {
-        opacity: 0.9;
-        text-shadow: 0 0 5px #00ffcc;
-      }
-      50% {
-        opacity: 1;
-        text-shadow: 0 0 8px #00ffcc;
-      }
-    }
-
-    .green-glow {
-      color: #00ff00;
-      text-shadow: 0 0 10px #00ff00;
-      animation: glow 2s ease-in-out infinite alternate;
-    }
-    
-    @keyframes glow {
-      from {
-        text-shadow: 0 0 10px #00ff00;
-      }
-      to {
-        text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00;
-      }
-    }
-
-    /* Confetti Animation Styles */
-    .confetti-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 9999;
-    }
-
-    .confetti {
-      position: absolute;
-      width: 10px;
-      height: 10px;
-      background: #00ffcc;
-      opacity: 0.8;
-      animation: confetti-fall 3s ease-in-out forwards;
-    }
-
-    @keyframes confetti-fall {
-      0% {
-        transform: translateY(-100vh) rotate(0deg);
-        opacity: 1;
-      }
-      100% {
-        transform: translateY(100vh) rotate(360deg);
-        opacity: 0;
-      }
-    }
-
-    /* Joke Modal Styles */
-    #joke-modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.98);
-      z-index: 10000;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-
-    #joke-modal.active {
-      opacity: 1;
-    }
-
-    #joke-modal .modal-content {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(0, 0, 0, 0.95);
-      padding: 2rem;
-      border-radius: 5px;
-      border: 2px solid #00ffcc;
-      text-align: center;
-      max-width: 600px;
-      width: 90%;
-      box-shadow: 
-        0 0 20px rgba(0, 255, 204, 0.5),
-        inset 0 0 20px rgba(0, 255, 204, 0.5);
-    }
-
-    #joke-modal .joke-text {
-      color: #00ffcc;
-      font-family: 'VT323', monospace;
-      font-size: 18px;
-      line-height: 1.6;
-      text-align: left;
-      white-space: pre-line;
-    }
-
-    #joke-modal .close-modal {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      color: #00ffcc;
-      font-size: 28px;
-      cursor: pointer;
-      background: none;
-      border: none;
-      text-shadow: 0 0 5px #00ffcc;
-      padding: 5px 10px;
-    }
-
-    /* Terminal Error Animation Styles */
-    .terminal-error-glow {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(
-        90deg,
-        rgba(255, 42, 42, 0.2) 0%,
-        transparent 15%,
-        transparent 85%,
-        rgba(255, 42, 42, 0.2) 100%
-      );
-      animation: errorGlow 2s ease-in-out;
-      pointer-events: none;
-      z-index: 999;
-    }
-
-    @keyframes errorGlow {
-      0%, 100% { opacity: 0; }
-      25% { opacity: 0.5; }
-      50% { opacity: 0.8; }
-      75% { opacity: 0.5; }
-    }
-
-    .terminal-shake {
-      animation: terminalShake 0.5s ease-in-out;
-    }
-
-    @keyframes terminalShake {
-      0%, 100% { transform: translate(-50%, -50%); }
-      10%, 30%, 50%, 70%, 90% { transform: translate(-51%, -50%); }
-      20%, 40%, 60%, 80% { transform: translate(-49%, -50%); }
-    }
-
-    .terminal-input.error {
-      color: #ff2a2a;
-      text-shadow: 0 0 5px rgba(255, 42, 42, 0.5);
-    }
-
-    .terminal-content.error {
-      color: #ff2a2a;
-      animation: textShake 0.5s ease-in-out;
-    }
-
-    @keyframes textShake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-2px); }
-      50% { transform: translateX(2px); }
-      75% { transform: translateX(-1px); }
-    }
-
-    .error-message {
-      color: #ff2a2a;
-      text-shadow: 0 0 5px rgba(255, 42, 42, 0.5);
-      animation: errorBlink 1s infinite;
-    }
-
-    @keyframes errorBlink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    /* Add these styles to your existing CSS */
-    .glitch-effect .terminal-line {
-      opacity: 0;
-      transform: translateY(20px);
-      transition: all 0.3s ease;
-    }
-
-    @keyframes glitchLine {
-      0% { transform: translateX(0); }
-      10% { transform: translateX(-2px); }
-      20% { transform: translateX(2px); }
-      30% { transform: translateX(-1px); }
-      40% { transform: translateX(1px); }
-      50% { transform: translateX(-2px); }
-      60% { transform: translateX(2px); }
-      70% { transform: translateX(-1px); }
-      80% { transform: translateX(1px); }
-      90% { transform: translateX(-2px); }
-      100% { transform: translateX(0); }
-    }
-
-    .glitch-effect .terminal-line {
-      animation: glitchLine 0.2s infinite;
-    }
-
-    /** Добавим универсальный градиент для терминала */
-    .terminal-glow {
-      position: absolute;
-      top: 0; left: 0; bottom: 0; right: 0;
-      pointer-events: none;
-      z-index: 10;
+      z-index: 99999;
       opacity: 0;
       transition: opacity 0.3s;
+      background: linear-gradient(120deg, rgba(255,0,0,0.25) 0%, rgba(255,0,0,0.5) 50%, rgba(255,0,0,0.25) 100%);
+      animation: globalErrorPulse 1.2s infinite alternate;
     }
-    .terminal-glow.active {
-      opacity: 1;
-    }
-    .terminal-glow.red {
-      background: linear-gradient(90deg, rgba(255,42,42,0.35) 0%, transparent 15%, transparent 85%, rgba(255,42,42,0.35) 100%);
-      box-shadow: 0 0 40px 10px #ff2a2a, 0 0 80px 0 #ff2a2a inset;
-    }
-    .terminal-glow.tiffany {
-      background: linear-gradient(90deg, rgba(0,255,204,0.35) 0%, transparent 15%, transparent 85%, rgba(0,255,247,0.35) 100%);
-      box-shadow: 0 0 40px 10px #00fff7, 0 0 80px 0 #00fff7 inset;
+    @keyframes globalErrorPulse {
+      0% { filter: blur(0px); }
+      100% { filter: blur(4px); }
     }
 
-    /* Пасхалка: стиль для текста анекдота */
+    /* 2. Пасхалка: стиль для анекдота */
     .terminal-easter-egg-line {
-      color: #00fff7 !important;
-      text-shadow: 0 0 12px #00fff7, 0 0 24px #00fff7;
+      color: #81D8D0 !important;
+      text-shadow: 0 0 12px #81D8D0, 0 0 24px #81D8D0;
       font-size: 18px;
       opacity: 0;
       transform: translateY(20px);
       transition: all 0.4s cubic-bezier(.77,0,.18,1);
       font-family: 'VT323', monospace;
       letter-spacing: 1px;
-      animation: glitchLineTiffany 0.3s infinite alternate;
     }
-    @keyframes glitchLineTiffany {
-      0% { filter: brightness(1.2); }
-      50% { filter: brightness(2.2) blur(1px); }
-      100% { filter: brightness(1.2); }
+    .terminal-easter-egg-line.visible {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    // ... existing code ...
-
-    <div id="terminal" style="position:relative;">
-      <div class="terminal-glow"></div>
-      <div class="terminal-content">
-        ...
-      </div>
-      ...
-    </div>
-
-    // ... existing code ...
-
-    // Easter egg joke lines
-    const easterEggJokeLines = [
-      'They asked a mathematician:',
-      '— What are the chances that if you walk outside right now, you\'ll meet Napoleon?',
-      'The mathematician locked himself in a room for three days with books, calculators, and computers, then came back with the answer:',
-      '— Approximately 0.000001 percent.',
-      '',
-      'They asked the same question to an experienced trader.',
-      'The trader replied instantly:',
-      '— 50/50. Either I meet him, or I don\'t.'
-    ];
-
-    async function processCommand(command) {
-      if (isProcessingCommand) return;
-      isProcessingCommand = true;
-      const normalizedCommand = command.trim();
-      if (!normalizedCommand) { isProcessingCommand = false; return; }
-
-      // Easter egg
-      if (["sleepman","SLEEPMAN","$SLEEPMAN"].includes(normalizedCommand)) {
-        const originalContent = terminalContent.innerHTML;
-        const glow = terminal.querySelector('.terminal-glow');
-        glow.classList.remove('red');
-        glow.classList.add('tiffany','active');
-        terminalContent.innerHTML = '';
-        terminal.classList.add('glitch-effect');
-        // Построчно выводим анекдот
-        for (let i = 0; i < easterEggJokeLines.length; i++) {
-          const line = document.createElement('div');
-          line.className = 'terminal-line terminal-easter-egg-line';
-          line.textContent = easterEggJokeLines[i];
-          terminalContent.appendChild(line);
-          await new Promise(r => setTimeout(r, 350));
-          line.style.opacity = '1';
-          line.style.transform = 'translateY(0)';
-        }
-        createConfetti();
-        setTimeout(() => {
-          glow.classList.remove('tiffany','active');
-          terminal.classList.remove('glitch-effect');
-          terminalContent.innerHTML = originalContent;
-          isProcessingCommand = false;
-        }, 13000);
-        return;
-      }
-
-      // Ошибка
-      if (!VALID_COMMANDS.includes(normalizedCommand)) {
-        const originalContent = terminalContent.innerHTML;
-        const glow = terminal.querySelector('.terminal-glow');
-        glow.classList.remove('tiffany');
-        glow.classList.add('red','active');
-        // ... остальной код ошибки ...
-        setTimeout(() => {
-          glow.classList.remove('red','active');
-          terminalContent.innerHTML = originalContent;
-          isProcessingCommand = false;
-        }, 5000);
-        return;
-      }
-      // ... остальная обработка ...
+    /* 3. Ошибка: shake + красный текст */
+    .terminal.error, .terminal-content.error {
+      animation: terminalShake 0.15s infinite;
+    }
+    .terminal-content.error .terminal-line, .terminal-content.error .terminal-line.error-message {
+      color: #FF0000 !important;
+      text-shadow: 0 0 10px #FF0000;
+    }
+    @keyframes terminalShake {
+      0%, 100% { transform: translate(-50%, -50%); }
+      20% { transform: translate(-52%, -50%); }
+      40% { transform: translate(-50%, -51%); }
+      60% { transform: translate(-48%, -50%); }
+      80% { transform: translate(-50%, -49%); }
     }
   </style>
 </head>
@@ -2865,8 +1646,8 @@ But if you stay — you won't walk away the same.
     <div id="secretLampBtn" onclick="activateTerminal()"></div>
 
     <!-- Терминал -->
-    <div id="terminal" style="position:relative;">
-      <div class="terminal-glow"></div>
+    <div class="terminal-overlay"></div>
+    <div id="terminal">
       <div class="terminal-content">
         <div class="terminal-line">[LOG-██/██/██] // SLEEP ENTITY FILE - SCP-Δ777</div>
         <div class="terminal-line">&nbsp;</div>
@@ -2995,23 +1776,6 @@ Welcome to the mechanism.
       <span>9</span><span>8</span><span>2</span><span>3</span> / <span>1</span><span>0</span><span>0</span><span>0</span><span>0</span>
     </div>
     <div class="rotating-quote"></div>
-  </div>
-
-  <!-- Joke Modal -->
-  <div id="joke-modal" class="modal">
-    <div class="modal-content">
-      <button class="close-modal" onclick="closeJokeModal()">×</button>
-      <div class="joke-text">
-They asked a mathematician:  
-— What are the chances that if you walk outside right now, you'll meet Napoleon?  
-The mathematician locked himself in a room for three days with books, calculators, and computers, then came back with the answer:  
-— Approximately 0.000001 percent.  
-
-They asked the same question to an experienced trader.  
-The trader replied instantly:  
-— 50/50. Either I meet him, or I don't.
-      </div>
-    </div>
   </div>
 
   <script>
@@ -3455,28 +2219,12 @@ The trader replied instantly:
       }
     }
 
-    // Track if Easter egg has been triggered in this session
-    let easterEggTriggered = false;
-
     // Terminal input handler
     document.querySelector('.terminal-input').addEventListener('keypress', async function(e) {
       if (e.key === 'Enter') {
         const command = this.value.trim();
         this.value = '';
 
-        // Check for sleepman commands (Easter egg)
-        if (!easterEggTriggered && (
-            command.toLowerCase() === 'sleepman' || 
-            command === 'SLEEPMAN' || 
-            command === '$SLEEPMAN'
-        )) {
-          easterEggTriggered = true;
-          createConfetti();
-          showJokeModal();
-          return;
-        }
-
-        // Check for valid commands
         if (command.toUpperCase() === '71SEDT') {
           if (!isWalletConnected) {
             await displayTerminalContent([
@@ -3545,45 +2293,8 @@ The trader replied instantly:
             ]);
           }
         }
-
-        // Handle invalid command
-        if (command) {
-          showTerminalError();
-        }
       }
     });
-
-    // Terminal error animation
-    function showTerminalError() {
-      const terminal = document.getElementById('terminal');
-      const input = document.querySelector('.terminal-input');
-      const content = document.querySelector('.terminal-content');
-      
-      // Add error glow
-      const errorGlow = document.createElement('div');
-      errorGlow.className = 'terminal-error-glow';
-      terminal.appendChild(errorGlow);
-      
-      // Add error classes
-      terminal.classList.add('terminal-shake');
-      input.classList.add('error');
-      content.classList.add('error');
-      
-      // Display error message
-      const errorLine = document.createElement('div');
-      errorLine.className = 'terminal-line error-message';
-      errorLine.textContent = '!! INVALID COMMAND. TRY AGAIN.';
-      content.appendChild(errorLine);
-      
-      // Reset after animation
-      setTimeout(() => {
-        terminal.classList.remove('terminal-shake');
-        input.classList.remove('error');
-        content.classList.remove('error');
-        errorGlow.remove();
-        errorLine.remove();
-      }, 2000);
-    }
 
     // Info Modal Functions
     function showInfoModal() {
@@ -3742,253 +2453,70 @@ The trader replied instantly:
       setInterval(updateQuote, 25000);
     }
 
-    // Confetti Animation
-    function createConfetti() {
-      const container = document.createElement('div');
-      container.className = 'confetti-container';
-      document.body.appendChild(container);
-
-      for (let i = 0; i < 100; i++) {
-        const confetti = document.createElement('div');
-        confetti.className = 'confetti';
-        confetti.style.left = Math.random() * 100 + 'vw';
-        confetti.style.animationDelay = Math.random() * 2 + 's';
-        container.appendChild(confetti);
-      }
-
-      setTimeout(() => {
-        container.remove();
-      }, 3000);
-    }
-
-    // Joke Modal Functions
-    function showJokeModal() {
-      const modal = document.getElementById('joke-modal');
-      modal.style.display = 'block';
-      modal.offsetHeight; // Trigger reflow
-      modal.classList.add('active');
-    }
-
-    function closeJokeModal() {
-      const modal = document.getElementById('joke-modal');
-      modal.classList.remove('active');
-      setTimeout(() => {
-        modal.style.display = 'none';
-      }, 300);
-    }
-
-    // Terminal command processing
-    const terminal = document.getElementById('terminal');
-    const terminalContent = document.querySelector('.terminal-content');
-    const terminalInput = document.querySelector('.terminal-input');
-    const errorOverlay = document.querySelector('.terminal-error-overlay');
-    let isProcessingCommand = false;
-
-    // Easter egg content
-    const easterEggContent = `
-      <div class="terminal-line" style="color: #00ff66;">
-        [DREAM_LOG] - Unexpected consciousness detected
-      </div>
-      <div class="terminal-line" style="color: #00ff66;">
-        [STATUS] - Reality buffer overflow
-      </div>
-      <div class="terminal-line" style="color: #00ff66;">
-        &nbsp;
-      </div>
-      <div class="terminal-line" style="color: #00ff66;">
-        >> ANALYZING DREAM PATTERNS...
-      </div>
-      <div class="terminal-line" style="color: #00ff66;">
-        >> NEURAL LINK ESTABLISHED...
-      </div>
-      <div class="terminal-line" style="color: #00ff66;">
-        &nbsp;
-      </div>
-      <div class="terminal-line" style="color: #00ff66; text-shadow: 0 0 10px #00ff66;">
-        He dreams of numbers...
-      </div>
-      <div class="terminal-line" style="color: #00ff66; text-shadow: 0 0 10px #00ff66;">
-        In his sleep, he trades...
-      </div>
-      <div class="terminal-line" style="color: #00ff66; text-shadow: 0 0 10px #00ff66;">
-        The charts follow him into the void...
-      </div>
-      <div class="terminal-line" style="color: #00ff66;">
-        &nbsp;
-      </div>
-      <div class="terminal-line" style="color: #00ff66;">
-        [ALERT] Dream depth: Level 7
-      </div>
-      <div class="terminal-line" style="color: #00ff66;">
-        [ALERT] Memory fragmentation detected
-      </div>
-      <div class="terminal-line" style="color: #00ff66;">
-        [ALERT] Reality anchors: unstable
-      </div>
-      <div class="terminal-line" style="color: #00ff66;">
-        &nbsp;
-      </div>
-      <div class="terminal-line" style="color: #00ff66; text-shadow: 0 0 15px #00ff66;">
-        "In dreams, we see the truth..."
-      </div>
-      <div class="terminal-line" style="color: #00ff66; text-shadow: 0 0 15px #00ff66;">
-        "In sleep, we understand..."
-      </div>
-      <div class="terminal-line" style="color: #00ff66; text-shadow: 0 0 15px #00ff66;">
-        "In the void, we trade..."
-      </div>
-    `;
+    const easterEggJokeLines = [
+      'They asked a mathematician:',
+      '— What are the chances that if you walk outside right now, you\'ll meet Napoleon?',
+      'The mathematician locked himself in a room for three days with books, calculators, and computers, then came back with the answer:',
+      '— Approximately 0.000001 percent.',
+      '',
+      'They asked the same question to an experienced trader.',
+      'The trader replied instantly:',
+      '— 50/50. Either I meet him, or I don\'t.'
+    ];
+    let isEasterEggActive = false;
+    let isErrorActive = false;
 
     async function processCommand(command) {
-      if (isProcessingCommand) return;
-      isProcessingCommand = true;
-
-      // Normalize command
+      if (isEasterEggActive || isErrorActive) return;
       const normalizedCommand = command.trim();
+      if (!normalizedCommand) return;
 
-      // Check if command is empty
-      if (!normalizedCommand) {
-        isProcessingCommand = false;
-        return;
-      }
-
-      // Check for Easter egg commands
-      if (['sleepman', 'SLEEPMAN', '$SLEEPMAN'].includes(normalizedCommand)) {
-        // Store original content
+      // Пасхалка
+      if (["sleepman","SLEEPMAN","$SLEEPMAN"].includes(normalizedCommand)) {
+        isEasterEggActive = true;
         const originalContent = terminalContent.innerHTML;
-
-        // Add glitch effect class
-        terminal.classList.add('glitch-effect');
-
-        // Change terminal content with fade effect
-        terminalContent.style.opacity = '0';
-        setTimeout(() => {
-          terminalContent.innerHTML = easterEggContent;
-          // Make each line appear with delay
-          const lines = terminalContent.querySelectorAll('.terminal-line');
-          lines.forEach((line, index) => {
-            setTimeout(() => {
-              line.style.opacity = '1';
-              line.style.transform = 'translateY(0)';
-            }, index * 100);
-          });
-          terminalContent.style.opacity = '1';
-        }, 300);
-
-        // Start confetti animation
-        createConfetti();
-        // Show joke modal
-        showJokeModal();
-
-        // Return to original content after 13 seconds
-        setTimeout(() => {
-          terminalContent.style.opacity = '0';
-          setTimeout(() => {
-            terminal.classList.remove('glitch-effect');
-            terminalContent.innerHTML = originalContent;
-            terminalContent.style.opacity = '1';
-          }, 300);
-        }, 13000);
-
-        isProcessingCommand = false;
-        return;
-      }
-
-      // Check for 71SEDT command
-      if (normalizedCommand === '71SEDT') {
-        if (!isWalletConnected) {
-          showTerminalError('!! CONNECT WALLET FIRST TO ACCESS THIS COMMAND.');
-          isProcessingCommand = false;
-          return;
+        terminalContent.innerHTML = '';
+        for (let i = 0; i < easterEggJokeLines.length; i++) {
+          const line = document.createElement('div');
+          line.className = 'terminal-line terminal-easter-egg-line';
+          line.textContent = easterEggJokeLines[i];
+          terminalContent.appendChild(line);
+          await new Promise(r => setTimeout(r, 350));
+          line.classList.add('visible');
         }
-
-        const hasNFT = await checkNFTOwnership();
-        if (!hasNFT) {
-          showTerminalError('!! ACCESS DENIED. NFT VERIFICATION FAILED.');
-          isProcessingCommand = false;
-          return;
-        }
-
-        // Process 71SEDT command (existing code)
-        // ... 71SEDT processing code ...
-        isProcessingCommand = false;
-        return;
-      }
-
-      // Invalid command
-      showTerminalError('!! INVALID COMMAND. TRY AGAIN.');
-      isProcessingCommand = false;
-    }
-
-    function showTerminalError(message) {
-      // Add error classes
-      terminal.classList.add('error');
-      terminalInput.classList.add('error');
-      errorOverlay.classList.add('active');
-
-      // Store original content
-      const originalContent = terminalContent.innerHTML;
-
-      // Create error content
-      const errorContent = `
-        <div class="terminal-line terminal-error-text">
-          [FATAL ERROR] - SECURITY BREACH DETECTED
-        </div>
-        <div class="terminal-line terminal-error-text">
-          [WARNING] - UNAUTHORIZED NEURAL PATTERN DETECTED
-        </div>
-        <div class="terminal-line terminal-error-text">
-          [ALERT] - SLEEPMAN CONSCIOUSNESS INTERFERENCE
-        </div>
-        <div class="terminal-line terminal-error-text">
-          [SYSTEM] - DREAM CORRUPTION AT 89%
-        </div>
-        <div class="terminal-line terminal-error-text">
-          [DANGER] - "he's watching through your screen..."
-        </div>
-        <div class="terminal-line terminal-error-text">
-          >> ${message}
-        </div>
-      `;
-
-      // Replace content with error message
-      terminalContent.innerHTML = errorContent;
-
-      // Make error text visible with delay
-      setTimeout(() => {
-        const errorTexts = document.querySelectorAll('.terminal-error-text');
-        errorTexts.forEach((text, index) => {
-          setTimeout(() => {
-            text.classList.add('visible');
-          }, index * 200);
-        });
-      }, 100);
-
-      // Reset after delay
-      setTimeout(() => {
-        // Fade out error text
-        const errorTexts = document.querySelectorAll('.terminal-error-text');
-        errorTexts.forEach(text => {
-          text.classList.remove('visible');
-        });
-
         setTimeout(() => {
-          terminal.classList.remove('error');
-          terminalInput.classList.remove('error');
-          errorOverlay.classList.remove('active');
           terminalContent.innerHTML = originalContent;
-        }, 300);
-      }, 5000);
-    }
-
-    // Terminal input handler
-    terminalInput.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        const command = this.value;
-        this.value = '';
-        processCommand(command);
+          isEasterEggActive = false;
+        }, 13000);
+        return;
       }
-    });
+
+      // Ошибка
+      if (!['71SEDT','sleepman','SLEEPMAN','$SLEEPMAN'].includes(normalizedCommand)) {
+        isErrorActive = true;
+        const globalGlow = document.querySelector('.global-error-glow');
+        const originalContent = terminalContent.innerHTML;
+        globalGlow.style.opacity = '1';
+        terminal.classList.add('error');
+        terminalContent.classList.add('error');
+        terminalContent.innerHTML = `
+          <div class="terminal-line error-message">[SYSTEM BREACH]</div>
+          <div class="terminal-line error-message">Unauthorized command detected.</div>
+          <div class="terminal-line error-message">Dream protocol integrity compromised.</div>
+          <div class="terminal-line error-message">SLEEPMAN is waking up...</div>
+          <div class="terminal-line error-message">[DANGER] \"He sees you now.\"</div>
+        `;
+        setTimeout(() => {
+          globalGlow.style.opacity = '0';
+          terminal.classList.remove('error');
+          terminalContent.classList.remove('error');
+          terminalContent.innerHTML = originalContent;
+          isErrorActive = false;
+        }, 5000);
+        return;
+      }
+      // ... остальная обработка ...
+    }
   </script>
 </body>
 </html>

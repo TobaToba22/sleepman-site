@@ -1522,6 +1522,83 @@
       60% { transform: translate(-51%, -50%); }
       80% { transform: translate(-49%, -52%); }
     }
+
+    .airdrop-modal-content {
+      font-family: 'VT323', monospace;
+      font-size: 1.25rem;
+      line-height: 1.5;
+      color: #00ffcc;
+      animation: fadeInAirdrop 1.2s cubic-bezier(.4,0,.2,1);
+      background: rgba(0,0,0,0.97);
+    }
+    .airdrop-title {
+      font-size: 2.2rem;
+      color: #81D8D0;
+      margin-bottom: 1.2rem;
+      font-family: 'VT323', monospace;
+      text-align: center;
+      letter-spacing: 1px;
+      text-shadow: 0 0 8px #81D8D0, 0 0 2px #00ffcc;
+      animation: fadeInAirdrop 1.2s cubic-bezier(.4,0,.2,1);
+    }
+    .airdrop-text {
+      margin-bottom: 2.2rem;
+      font-size: 1.25rem;
+      color: #00ffcc;
+      font-family: 'VT323', monospace;
+      line-height: 1.5;
+      opacity: 0;
+      animation: fadeInAirdrop 1.2s 0.2s forwards;
+      text-shadow: 0 0 4px #00ffcc;
+    }
+    .airdrop-link {
+      display: inline-block;
+      margin: 0 auto;
+      background: transparent;
+      border: 2px solid #81D8D0;
+      color: #81D8D0;
+      font-family: 'VT323', monospace;
+      font-size: 1.3rem;
+      padding: 12px 40px;
+      border-radius: 5px;
+      text-transform: uppercase;
+      text-align: center;
+      text-decoration: none;
+      box-shadow: 0 0 10px #81D8D0;
+      text-shadow: 0 0 5px #81D8D0;
+      transition: all 0.2s;
+      margin-bottom: 1rem;
+    }
+    .airdrop-link:hover {
+      background: rgba(129,216,208,0.08);
+      box-shadow: 0 0 20px #81D8D0;
+      text-shadow: 0 0 10px #81D8D0;
+      letter-spacing: 1px;
+    }
+    @keyframes fadeInAirdrop {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .scroll-container {
+      max-height: 80vh;
+      overflow-y: scroll;
+      padding: 10px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid #00ff00;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      box-sizing: border-box;
+    }
+    .scroll-container::-webkit-scrollbar {
+      width: 8px;
+      background: rgba(0,255,0,0.08);
+    }
+    .scroll-container::-webkit-scrollbar-thumb {
+      background: #00ff00;
+      border-radius: 4px;
+      box-shadow: 0 0 6px #00ff00;
+    }
   </style>
 </head>
 <body>
@@ -1644,6 +1721,7 @@ But if you stay — you won't walk away the same.
       <div class="button" data-text="BUY $SLEEPMAN" data-sound="buzz" onclick="showTokenomics()">BUY $SLEEPMAN</div>
       <div class="button" data-text="CLAIM NFT" data-sound="buzz">CLAIM NFT</div>
       <div class="button" data-text="JOIN CULT" data-sound="buzz">JOIN CULT</div>
+      <div class="button" data-text="CLAIM AIRDROP" data-sound="buzz" onclick="showAirdropModal()">CLAIM AIRDROP</div>
     </div>
 
     <!-- Секретная кнопка по лампе -->
@@ -1780,6 +1858,66 @@ Welcome to the mechanism.
       <span>9</span><span>8</span><span>2</span><span>3</span> / <span>1</span><span>0</span><span>0</span><span>0</span><span>0</span>
     </div>
     <div class="rotating-quote"></div>
+  </div>
+
+  <!-- AIRDROP MODAL -->
+  <div id="airdrop-modal" class="modal">
+    <div class="modal-content airdrop-modal-content">
+      <button class="close-modal" onclick="closeAirdropModal()">×</button>
+      <div class="airdrop-title">🌙 Sleepman Cult Airdrop</div>
+      <div class="scroll-container"><div class="airdrop-text">
+        Hey you.<br>
+        Yes, you — the one who hasn't sold your soul to scam tokens and dead-end projects yet.<br><br>
+        $SLEEPMAN is not just another coin.<br>
+        It's the first spark of a new movement.<br><br>
+        <b>What's happening here?</b><br><br>
+        It's simple:<br><br>
+        Built on real community, not fake hype.<br>
+        No smoke, no mirrors. Only real momentum.<br><br>
+        <b>Why does it matter?</b><br><br>
+        The more activity, the more power the cult gathers.<br>
+        You are part of the rise — and you benefit directly.<br><br>
+        Share a post → earn tokens.<br>
+        Create a meme → earn even more.<br>
+        Drop a video → carve your way to the top.<br>
+        No fakery.<br>
+        You're not a marketer.<br>
+        You are a builder of the new reality.<br><br>
+        To make it easier:<br><br>
+        Ready-to-use memes, images, and content are waiting for you in the Telegram Bot.<br>
+        Want to stand out?<br>
+        Create your own art, memes, or videos — and earn 2x more rewards.<br>
+        Your choice.<br>
+        Step by step, we are building a new world.<br><br>
+        <b>Token Allocation:</b><br><br>
+        30% — Liquidity Pool<br>
+        (So everyone can buy and sell freely.)<br>
+        20% — Viral Airdrops<br>
+        (Rewards for the active believers.)<br>
+        20% — Cult Treasury<br>
+        (To reinvest into liquidity and support price growth as the market cap rises.)<br>
+        10% — Team Allocation<br>
+        (To fuel development and innovation.)<br>
+        20% — Marketing & Expansion Fund<br>
+        (For scaling, partnerships, and global exposure.)<br><br>
+        <b>Why now?</b><br><br>
+        The cult is just awakening.<br>
+        Every active member today lays the foundation for the future.<br><br>
+        When everyone else catches up — you'll already be miles ahead.<br><br>
+        You're not just clicking a button.<br>
+        You're stepping into a new reality.<br><br>
+        <b>How to participate:</b><br><br>
+        Click CLAIM AIRDROP.<br>
+        Enter the Telegram Bot.<br>
+        Complete tasks → receive $SLEEPMAN tokens.<br>
+        The more you move the cult forward — the bigger your prize.<br><br>
+        Sleepman is still asleep.<br>
+        But the cult is awakening.<br>
+        With you — or without you.<br>
+        Decide.
+      </div></div>
+      <a href="#" class="airdrop-link">Go to Telegram Bot</a>
+    </div>
   </div>
 
   <script>
@@ -2563,6 +2701,35 @@ The trader replied instantly:
         else {
           showError();
         }
+      }
+    });
+
+    function showAirdropModal() {
+      const modal = document.getElementById('airdrop-modal');
+      modal.style.display = 'block';
+      modal.offsetHeight;
+      modal.classList.add('active');
+      // Сброс анимации текста
+      const text = modal.querySelector('.airdrop-text');
+      text.style.opacity = 0;
+      text.style.animation = 'none';
+      setTimeout(() => {
+        text.style.animation = '';
+        text.style.opacity = 1;
+      }, 10);
+    }
+    function closeAirdropModal() {
+      const modal = document.getElementById('airdrop-modal');
+      modal.classList.remove('active');
+      setTimeout(() => {
+        modal.style.display = 'none';
+      }, 300);
+    }
+    // Закрытие по клику вне окна
+    window.addEventListener('click', function(event) {
+      const modal = document.getElementById('airdrop-modal');
+      if (event.target === modal) {
+        closeAirdropModal();
       }
     });
   </script>

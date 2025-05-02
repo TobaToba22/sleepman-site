@@ -1638,8 +1638,543 @@
       border-radius: 4px;
       box-shadow: 0 0 6px #00ff00;
     }
+
+    .countdown-container {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    .countdown-image {
+      flex: 0 0 40%;
+      position: relative;
+    }
+
+    .token-image {
+      width: 100%;
+      height: auto;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 20px rgba(0, 255, 0, 0.3));
+      animation: tokenGlow 3s ease-in-out infinite;
+    }
+
+    @keyframes tokenGlow {
+      0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(0, 255, 0, 0.3));
+      }
+      50% {
+        filter: drop-shadow(0 0 30px rgba(0, 255, 0, 0.5));
+      }
+    }
+
+    .countdown-content {
+      flex: 1;
+    }
+
+    .countdown-title {
+      font-size: 2.5rem;
+      margin-bottom: 2rem;
+      text-transform: uppercase;
+      color: #00ff00;
+      text-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+      animation: glitchText 0.4s infinite;
+    }
+
+    .countdown-timer {
+      font-family: 'VT323', monospace;
+      font-size: 3rem;
+      color: #00ff00;
+      text-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+      margin-bottom: 2rem;
+      animation: timerPulse 2s infinite;
+    }
+
+    @keyframes timerPulse {
+      0%, 100% {
+        opacity: 1;
+        text-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+      }
+      50% {
+        opacity: 0.8;
+        text-shadow: 0 0 25px rgba(0, 255, 0, 0.9);
+      }
+    }
+
+    .countdown-info {
+      font-family: 'VT323', monospace;
+      font-size: 1.4rem;
+      color: #00ff00;
+      line-height: 1.6;
+    }
+
+    .countdown-info p {
+      margin: 0.8rem 0;
+    }
+
+    .glow-link {
+      color: #00ff00;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .glow-link:hover {
+      text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .countdown-container {
+        flex-direction: column;
+      }
+
+      .countdown-image {
+        flex: 0 0 200px;
+        margin-bottom: 2rem;
+      }
+
+      .countdown-timer {
+        font-size: 2rem;
+      }
+    }
+
+    .countdown-container {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      padding: 2rem;
+    }
+
+    .countdown-image {
+      flex: 0 0 40%;
+      position: relative;
+    }
+
+    .token-image {
+      width: 100%;
+      height: auto;
+      border-radius: 50%;
+      filter: drop-shadow(0 0 20px rgba(0, 255, 0, 0.3));
+      animation: tokenGlow 3s ease-in-out infinite;
+    }
+
+    .countdown-content {
+      flex: 1;
+      text-align: center;
+    }
+
+    .launch-date {
+      font-family: 'VT323', monospace;
+      font-size: 1.8rem;
+      color: #00ff00;
+      text-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+      margin: 1rem 0;
+      animation: glowPulse 2s infinite;
+    }
+
+    .time-zones {
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+      color: #00ff00;
+      margin: 1.5rem 0;
+      text-align: left;
+      display: inline-block;
+    }
+
+    .time-zone {
+      margin: 0.6rem 0;
+      padding: 0.4rem 0.8rem;
+      background: rgba(0, 255, 0, 0.05);
+      border: 1px solid rgba(0, 255, 0, 0.1);
+      border-radius: 4px;
+      transition: all 0.3s ease;
+    }
+
+    .time-zone:hover {
+      background: rgba(0, 255, 0, 0.1);
+      transform: translateX(5px);
+      box-shadow: 0 0 10px rgba(0, 255, 0, 0.2);
+    }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        text-shadow: 0 0 15px rgba(0, 255, 0, 0.7);
+      }
+      50% {
+        text-shadow: 0 0 25px rgba(0, 255, 0, 0.9);
+      }
+    }
+
+    .countdown-info {
+      font-family: 'VT323', monospace;
+      font-size: 1rem;
+      color: #00ff00;
+      line-height: 1.6;
+      margin-top: 1.5rem;
+      text-align: left;
+    }
+
+    @media (max-width: 768px) {
+      .countdown-container {
+        flex-direction: column;
+      }
+
+      .countdown-image {
+        flex: 0 0 150px;
+        margin-bottom: 1.5rem;
+      }
+
+      .time-zones {
+        font-size: 1.1rem;
+      }
+
+      .launch-date {
+        font-size: 1.6rem;
+      }
+
+      .countdown-info {
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Blood Effects */
+    .blood-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9998;
+      background: rgba(102, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .blood-stream {
+      position: absolute;
+      background: linear-gradient(to bottom, 
+        #8b0000,
+        #660000
+      );
+      opacity: 0;
+      filter: blur(3px);
+      transform-origin: top center;
+      box-shadow: 0 0 20px rgba(139, 0, 0, 0.6);
+    }
+
+    .blood-stream.animate {
+      animation: bloodFlow 14s ease-out forwards;
+    }
+
+    .top-left, .top-right {
+      top: -50px;
+      height: 200vh;
+      width: 100vw;
+      transform-origin: top center;
+    }
+
+    .top-left {
+      left: -50%;
+      transform: rotate(45deg);
+    }
+
+    .top-right {
+      right: -50%;
+      transform: rotate(-45deg);
+    }
+
+    .left, .right {
+      width: 200px;
+      height: 200vh;
+      top: -50%;
+    }
+
+    .left {
+      left: -100px;
+    }
+
+    .right {
+      right: -100px;
+    }
+
+    @keyframes bloodFlow {
+      0% {
+        opacity: 0;
+        transform: scaleY(0);
+      }
+      20% {
+        opacity: 0.95;
+        transform: scaleY(1.2);
+      }
+      100% {
+        opacity: 0.9;
+        transform: scaleY(1);
+      }
+    }
+
+    .blood-drip {
+      position: absolute;
+      background: #8b0000;
+      width: 8px;
+      height: 20px;
+      border-radius: 50% 50% 0 0;
+      opacity: 0;
+      filter: blur(2px);
+      box-shadow: 0 0 10px rgba(139, 0, 0, 0.8);
+    }
+
+    .blood-splash {
+      position: absolute;
+      background: radial-gradient(circle at center, #8b0000 30%, transparent 70%);
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      opacity: 0;
+      filter: blur(3px);
+      animation: splashFade 2s ease-out forwards;
+    }
+
+    @keyframes splashFade {
+      0% {
+        transform: scale(0.3);
+        opacity: 0.9;
+      }
+      100% {
+        transform: scale(2);
+        opacity: 0;
+      }
+    }
+
+    .token-image.bleeding::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at center, 
+        rgba(139, 0, 0, 0.9) 20%,
+        rgba(102, 0, 0, 0.8) 40%,
+        transparent 70%
+      );
+      opacity: 1;
+      animation: bloodPulse 5s ease-out infinite;
+      filter: blur(3px);
+      z-index: 1;
+    }
+
+    @keyframes bloodPulse {
+      0% {
+        transform: scale(1);
+        filter: brightness(1) saturate(1);
+      }
+      50% {
+        transform: scale(1.3);
+        filter: brightness(1.4) saturate(1.8);
+      }
+      100% {
+        transform: scale(1);
+        filter: brightness(1) saturate(1);
+      }
+    }
+
+    /* Screen distortion effect */
+    .screen-distortion {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9997;
+      opacity: 0;
+      mix-blend-mode: overlay;
+      background: radial-gradient(circle at center, rgba(255,0,0,0.1), transparent);
+      filter: url('#distortion-filter');
+    }
+
+    .screen-distortion.active {
+      animation: distortionPulse 14s ease-out;
+    }
+
+    @keyframes distortionPulse {
+      0% {
+        opacity: 0;
+        filter: url('#distortion-filter') blur(0);
+      }
+      50% {
+        opacity: 0.7;
+        filter: url('#distortion-filter') blur(2px);
+      }
+      100% {
+        opacity: 0.3;
+        filter: url('#distortion-filter') blur(1px);
+      }
+    }
+
+    /* Screen shake effect */
+    @keyframes screenShake {
+      0%, 100% { transform: translate(0, 0); }
+      10% { transform: translate(-5px, -5px); }
+      20% { transform: translate(5px, 5px); }
+      30% { transform: translate(-5px, 5px); }
+      40% { transform: translate(5px, -5px); }
+      50% { transform: translate(-5px, -5px); }
+      60% { transform: translate(5px, 5px); }
+      70% { transform: translate(-5px, 5px); }
+      80% { transform: translate(5px, -5px); }
+      90% { transform: translate(-5px, -5px); }
+    }
+
+    .screen-shake {
+      animation: screenShake 2s ease-in-out;
+    }
+
+    /* Blood gush effect */
+    .blood-gush {
+      position: absolute;
+      background: linear-gradient(to bottom, #8b0000, #660000);
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transform-origin: top;
+      animation: bloodGush 14s ease-out forwards;
+    }
+
+    @keyframes bloodGush {
+      0% {
+        opacity: 0;
+        transform: scaleY(0);
+      }
+      20% {
+        opacity: 0.95;
+        transform: scaleY(1.2);
+      }
+      100% {
+        opacity: 0.9;
+        transform: scaleY(1);
+      }
+    }
+
+    /* Blood splatter effect */
+    .blood-splatter {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, 
+        rgba(139, 0, 0, 0.9) 0%,
+        rgba(102, 0, 0, 0.8) 30%,
+        rgba(102, 0, 0, 0.6) 60%,
+        transparent 100%
+      );
+      opacity: 0;
+      animation: splatterFade 14s ease-out forwards;
+    }
+
+    @keyframes splatterFade {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      20% {
+        opacity: 0.95;
+        transform: scale(1.1);
+      }
+      100% {
+        opacity: 0.9;
+        transform: scale(1);
+      }
+    }
+
+    /* Add warning message styles */
+    .coin-warning {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #ff2a2a;
+      font-family: 'VT323', monospace;
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      text-shadow: 
+        0 0 5px #ff2a2a,
+        0 0 10px #ff2a2a,
+        0 0 20px #ff2a2a;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+      animation: warningPulse 2s infinite;
+      z-index: 1000;
+      white-space: nowrap;
+    }
+
+    .coin-warning.hidden {
+      opacity: 0;
+    }
+
+    @keyframes warningPulse {
+      0%, 100% {
+        text-shadow: 
+          0 0 5px #ff2a2a,
+          0 0 10px #ff2a2a,
+          0 0 20px #ff2a2a;
+        transform: translateX(-50%) scale(1);
+      }
+      50% {
+        text-shadow: 
+          0 0 10px #ff2a2a,
+          0 0 20px #ff2a2a,
+          0 0 30px #ff2a2a;
+        transform: translateX(-50%) scale(1.05);
+      }
+    }
+
+    @keyframes warningGlitch {
+      0% {
+        text-shadow: 
+          0 0 5px #ff2a2a,
+          0 0 10px #ff2a2a,
+          0 0 20px #ff2a2a;
+        transform: translateX(-50%) translate(0);
+      }
+      2% {
+        text-shadow: 
+          0 0 5px #ff2a2a,
+          0 0 10px #ff2a2a,
+          0 0 20px #ff2a2a;
+        transform: translateX(-50%) translate(-2px, 2px);
+      }
+      4% {
+        text-shadow: 
+          0 0 5px #ff2a2a,
+          0 0 10px #ff2a2a,
+          0 0 20px #ff2a2a;
+        transform: translateX(-50%) translate(2px, -2px);
+      }
+      6% {
+        text-shadow: 
+          0 0 5px #ff2a2a,
+          0 0 10px #ff2a2a,
+          0 0 20px #ff2a2a;
+        transform: translateX(-50%) translate(0);
+      }
+    }
+
+    .coin-warning.warning-glitch {
+      animation: warningGlitch 0.3s infinite;
+    }
   </style>
-</head>
+
+  <!-- SVG Filters for distortion -->
+  <svg style="display: none;">
+    <filter id="distortion-filter">
+      <feTurbulence type="turbulence" baseFrequency="0.01 0.01" numOctaves="2" seed="2" />
+      <feDisplacementMap in="SourceGraphic" scale="10" />
+    </filter>
+  </svg>
+
+  <div class="screen-distortion"></div>
+  </head>
 <body>
   <div class="error-overlay"></div>
   <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9998;display:none;"></canvas>
@@ -1799,32 +2334,30 @@ But if you stay — you won't walk away the same.
   <div id="tokenomicsModal" class="modal">
     <div class="modal-content">
       <button class="close-modal" onclick="closeModal()">×</button>
-      <h2 class="modal-title">Sleepman Cult Tokenomics</h2>
-      <div class="modal-image-container">
-        <div class="tokenomics-content">
-          <div class="tokenomics-item">
-            <span>CULT TREASURY</span>
-            <span>30%</span>
+      <div class="countdown-container">
+        <div class="countdown-image">
+          <div class="coin-warning">Do NOT click the coin!</div>
+          <img src="Монета с монстром и кровью.png" alt="Sleepman Token" class="token-image">
+        </div>
+        <div class="countdown-content">
+          <h2 class="modal-title countdown-title">⏳ Token Launch Time</h2>
+          <div class="launch-date">4 May 2025</div>
+          <div class="time-zones">
+            <div class="time-zone">🇨🇳 Shanghai (CST): 01:00 (5 May)</div>
+            <div class="time-zone">🗽 New York (EDT): 13:00</div>
+            <div class="time-zone">🏰 London (BST): 18:00</div>
+            <div class="time-zone">🏯 Tokyo (JST): 02:00 (5 May)</div>
+            <div class="time-zone">🌆 Dubai (GST): 21:00</div>
           </div>
-          <div class="tokenomics-item">
-            <span>VIRAL AIRDROPS</span>
-            <span>20%</span>
-          </div>
-          <div class="tokenomics-item">
-            <span>SLEEPMAN LIQUIDITY POOL</span>
-            <span>15%</span>
-          </div>
-          <div class="tokenomics-item">
-            <span>DEVS OF THE DREAM</span>
-            <span>10%</span>
-          </div>
-          <div class="tokenomics-item">
-            <span>GIFTS FOR THE CULT</span>
-            <span>25%</span>
+          <div class="countdown-info">
+            <p>🧠 The Sleepman token will be unleashed soon.</p>
+            <p>📢 All purchase instructions will appear in our official channels:</p>
+            <p>— Telegram: <a href="https://t.me/SleepmanCult" target="_blank" class="glow-link">@SleepmanCult</a></p>
+            <p>— Twitter: <a href="https://twitter.com/SleepmanToken" target="_blank" class="glow-link">@SleepmanToken</a></p>
+            <p>🌀 Token will be available to buy here via Jupiter.</p>
           </div>
         </div>
       </div>
-      <button class="modal-button" onclick="goToJupiter()">I'm in — Continue</button>
     </div>
   </div>
 
@@ -1957,6 +2490,14 @@ Welcome to the mechanism.
       </div></div>
       <a href="https://t.me/SleepManAirdrop" target="_blank" class="airdrop-link">Go to Telegram Bot</a>
     </div>
+  </div>
+
+  <!-- Add blood overlay container -->
+  <div id="blood-overlay" class="blood-overlay">
+    <div class="blood-stream top-left"></div>
+    <div class="blood-stream top-right"></div>
+    <div class="blood-stream left"></div>
+    <div class="blood-stream right"></div>
   </div>
 
   <script>
@@ -2771,6 +3312,174 @@ The trader replied instantly:
         closeAirdropModal();
       }
     });
+
+    // Countdown Timer Logic
+    function initializeCountdown() {
+        // Set the countdown duration to 58 hours in milliseconds
+        const countdownDuration = 58 * 60 * 60 * 1000;
+        const startTime = new Date().getTime();
+        const endTime = startTime + countdownDuration;
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const timeLeft = endTime - now;
+
+            if (timeLeft <= 0) {
+                document.getElementById('countdown-timer').innerHTML = "Token Launch Time!";
+                return;
+            }
+
+            // Calculate hours, minutes, and seconds
+            const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            // Format the time with leading zeros
+            const formattedHours = String(hours).padStart(2, '0');
+            const formattedMinutes = String(minutes).padStart(2, '0');
+            const formattedSeconds = String(seconds).padStart(2, '0');
+
+            // Update the display with glitch effect
+            const timerElement = document.getElementById('countdown-timer');
+            const newTime = `${formattedHours}h ${formattedMinutes}m ${formattedSeconds}s until token launch`;
+            
+            if (timerElement.innerHTML !== newTime) {
+                timerElement.style.animation = 'none';
+                timerElement.offsetHeight; // Trigger reflow
+                timerElement.style.animation = null;
+                timerElement.innerHTML = newTime;
+            }
+        }
+
+        // Update immediately and then every second
+        updateTimer();
+        setInterval(updateTimer, 1000);
+    }
+
+    // Add event listener to initialize countdown when modal opens
+    document.querySelector('.button[data-text="BUY $SLEEPMAN"]').addEventListener('click', function() {
+        setTimeout(initializeCountdown, 100); // Small delay to ensure modal is rendered
+    });
+
+    function createBloodDrip(x, y) {
+      const drip = document.createElement('div');
+      drip.className = 'blood-drip';
+      drip.style.left = x + 'px';
+      drip.style.top = y + 'px';
+      document.body.appendChild(drip);
+
+      const duration = 2 + Math.random() * 3;
+      const distance = 300 + Math.random() * 400;
+
+      drip.style.animation = `bloodDrip ${duration}s ease-in forwards`;
+      drip.style.transform = `translateY(${distance}px)`;
+
+      drip.addEventListener('animationend', () => {
+        createBloodSplash(x, y + distance);
+        drip.remove();
+      });
+    }
+
+    function createBloodSplash(x, y) {
+      const splash = document.createElement('div');
+      splash.className = 'blood-splash';
+      splash.style.left = x + 'px';
+      splash.style.top = y + 'px';
+      document.body.appendChild(splash);
+
+      setTimeout(() => splash.remove(), 2000);
+    }
+
+    function createCeilingDrips() {
+      const width = window.innerWidth;
+      for (let i = 0; i < 10; i++) {
+        const x = Math.random() * width;
+        createBloodDrip(x, -20);
+      }
+    }
+
+    function triggerBloodEffect(event) {
+      // Update warning message
+      const warning = document.querySelector('.coin-warning');
+      warning.textContent = "I warned you...";
+      warning.classList.add('warning-glitch');
+      
+      // Hide warning after 30 seconds
+      setTimeout(() => {
+        warning.classList.add('hidden');
+      }, 30000);
+
+      // Play scream sound
+      const scream = new Audio('corrupt-scream-312757.mp3');
+      scream.volume = 0.6;
+      scream.play().catch(error => console.error('Error playing sound:', error));
+
+      // Add screen shake
+      document.body.classList.add('screen-shake');
+      setTimeout(() => {
+        document.body.classList.remove('screen-shake');
+      }, 2000);
+
+      // Activate blood overlay
+      const bloodOverlay = document.getElementById('blood-overlay');
+      bloodOverlay.style.display = 'block';
+      bloodOverlay.classList.add('active');
+
+      // Create blood gush effect
+      const bloodGush = document.createElement('div');
+      bloodGush.className = 'blood-gush';
+      bloodOverlay.appendChild(bloodGush);
+
+      // Create blood splatter effect
+      const bloodSplatter = document.createElement('div');
+      bloodSplatter.className = 'blood-splatter';
+      bloodOverlay.appendChild(bloodSplatter);
+
+      // Activate screen distortion
+      const screenDistortion = document.querySelector('.screen-distortion');
+      screenDistortion.classList.add('active');
+
+      // Add bleeding effect to coin
+      const coin = event.currentTarget;
+      coin.classList.add('bleeding');
+
+      // Create intense blood drips from coin
+      const rect = coin.getBoundingClientRect();
+      const createCoinDrips = () => {
+        for (let i = 0; i < 12; i++) {
+          const x = rect.left + Math.random() * rect.width;
+          const y = rect.bottom;
+          createBloodDrip(x, y);
+        }
+      };
+
+      // Create ceiling drips
+      const createCeilingEffect = () => {
+        createCeilingDrips();
+      };
+
+      // Create continuous effects
+      const dripInterval = setInterval(createCoinDrips, 100);
+      const ceilingInterval = setInterval(createCeilingEffect, 200);
+
+      // Continue effects for 14 seconds
+      setTimeout(() => {
+        clearInterval(dripInterval);
+        clearInterval(ceilingInterval);
+      }, 14000);
+
+      // Reset effects after 14 seconds
+      setTimeout(() => {
+        bloodOverlay.classList.remove('active');
+        bloodOverlay.style.display = 'none';
+        bloodOverlay.innerHTML = '';
+        screenDistortion.classList.remove('active');
+        coin.classList.remove('bleeding');
+      }, 14000);
+    }
+
+    // Add click event listener to coin
+    document.querySelector('.token-image').addEventListener('click', triggerBloodEffect);
   </script>
 </body>
 </html>

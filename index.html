@@ -2163,6 +2163,130 @@
     .coin-warning.warning-glitch {
       animation: warningGlitch 0.3s infinite;
     }
+
+    /* CSS для новой referral-кнопки и модального окна */
+    #referral-main-btn {
+      margin-top: 0.5rem;
+    }
+    #main-referral-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0,0,0,0.97);
+      z-index: 3000;
+      justify-content: center;
+      align-items: center;
+    }
+    #main-referral-modal.active {
+      display: flex;
+    }
+    #main-referral-modal .modal-content.referral-modal-content {
+      position: relative;
+      top: 0;
+      left: 0;
+      transform: none;
+      margin: 0 auto;
+      background: #1a0000;
+      border: 2px solid #ff2a2a;
+      color: #fff;
+      max-width: 420px;
+      width: 95%;
+      margin: 0 auto;
+      border-radius: 10px;
+      box-shadow: 0 0 24px #ff2a2a44, 0 0 0 2px #330000 inset;
+      padding: 2rem 1.5rem 1.5rem 1.5rem;
+      position: relative;
+      font-family: 'VT323', monospace;
+      text-align: center;
+    }
+    #main-referral-modal .referral-headline {
+      color: #ff2a2a;
+      font-size: 1.2rem;
+      text-shadow: 0 0 8px #ff2a2a, 0 0 18px #fff1;
+      margin-bottom: 1.5rem;
+      letter-spacing: 0.5px;
+      line-height: 1.5;
+    }
+    #main-referral-modal .referral-blocks {
+      display: flex;
+      flex-direction: column;
+      gap: 2.2rem;
+    }
+    #main-referral-modal .referral-own-block h3,
+    #main-referral-modal .referral-enter-block h3 {
+      color: #00ffcc;
+      font-size: 1.3rem;
+      margin-bottom: 0.7rem;
+      text-shadow: 0 0 8px #00ffcc, 0 0 2px #fff1;
+    }
+    #main-referral-modal .referral-code-box {
+      font-size: 1.7rem;
+      color: #ff2a2a;
+      background: #220000;
+      border: 1px dashed #ff2a2a;
+      border-radius: 6px;
+      padding: 0.7rem 1.2rem;
+      margin: 1rem auto 0.5rem auto;
+      width: fit-content;
+      letter-spacing: 4px;
+      text-shadow: 0 0 8px #ff2a2a, 0 0 2px #fff1;
+    }
+    #main-referral-modal .referral-input {
+      width: 80%;
+      padding: 0.7rem 1rem;
+      border: 1px solid #ff2a2a;
+      border-radius: 6px;
+      background: #220000;
+      color: #fff;
+      font-family: 'VT323', monospace;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      outline: none;
+      text-align: center;
+      letter-spacing: 2px;
+    }
+    #main-referral-modal .referral-submit-btn {
+      background: #330000;
+      color: #ff2a2a;
+      border: 1px solid #ff2a2a;
+      border-radius: 6px;
+      font-family: 'VT323', monospace;
+      font-size: 1.1rem;
+      padding: 0.6rem 2rem;
+      margin-top: 0.2rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      text-shadow: 0 0 6px #ff2a2a, 0 0 2px #fff1;
+    }
+    #main-referral-modal .referral-submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #main-referral-modal .referral-submit-btn:hover:not(:disabled) {
+      background: #1a0000;
+      color: #fff;
+    }
+    #main-referral-modal .referral-enter-msg {
+      margin-top: 0.7rem;
+      font-size: 1rem;
+      color: #ff2a2a;
+      min-height: 1.2em;
+    }
+    @media (max-width: 600px) {
+      #main-referral-modal .modal-content.referral-modal-content {
+        padding: 1rem 0.2rem 1rem 0.2rem;
+        font-size: 1rem;
+      }
+      #main-referral-modal .referral-headline {
+        font-size: 1rem;
+      }
+      #main-referral-modal .referral-code-box {
+        font-size: 1.2rem;
+      }
+    }
   </style>
 
   <!-- SVG Filters for distortion -->
@@ -2296,6 +2420,7 @@ But if you stay — you won't walk away the same.
       <div class="button" data-text="CLAIM NFT" data-sound="buzz">CLAIM NFT</div>
       <div class="button" data-text="JOIN CULT" data-sound="buzz">JOIN CULT</div>
       <div class="button" data-text="CLAIM AIRDROP" data-sound="buzz" onclick="showAirdropModal()">CLAIM AIRDROP</div>
+      <div class="button" data-text="REFERRAL" data-sound="buzz" id="referral-main-btn" onclick="openMainReferralModal()">REFERRAL</div>
     </div>
 
     <!-- Секретная кнопка по лампе -->
@@ -2498,6 +2623,32 @@ Welcome to the mechanism.
     <div class="blood-stream top-right"></div>
     <div class="blood-stream left"></div>
     <div class="blood-stream right"></div>
+  </div>
+
+  <!-- Добавить модальное окно для рефералов в конец <body> -->
+  <div id="main-referral-modal" class="modal">
+    <div class="modal-content referral-modal-content">
+      <button class="close-modal" onclick="closeMainReferralModal()">×</button>
+      <div class="referral-headline">
+        Bring a friend — and get 175,000 tokens.<br>
+        Your friend gets 100,000 tokens instantly, and you'll earn 15% of their airdrop progress forever.<br><br>
+        Be the one who spreads the signal.<br>
+        This cult will grow like mushrooms in the dark.<br>
+        You'll be among the first when the world wakes up.
+      </div>
+      <div class="referral-blocks">
+        <div class="referral-own-block">
+          <h3>Your Referral Code</h3>
+          <div id="main-referral-code" class="referral-code-box">—</div>
+        </div>
+        <div class="referral-enter-block">
+          <h3>Enter a Referral Code</h3>
+          <input id="main-referral-input" class="referral-input" type="text" maxlength="5" placeholder="Enter 5-digit code" disabled>
+          <button id="main-referral-submit" class="referral-submit-btn" disabled>Submit</button>
+          <div id="main-referral-msg" class="referral-enter-msg"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -3480,6 +3631,100 @@ The trader replied instantly:
 
     // Add click event listener to coin
     document.querySelector('.token-image').addEventListener('click', triggerBloodEffect);
+
+    // JS-логика для работы с реферальным кодом и вводом
+    let mainReferralCode = null;
+    let enteredReferralCode = null;
+
+    function openMainReferralModal() {
+      const modal = document.getElementById('main-referral-modal');
+      modal.style.display = 'block';
+      modal.classList.add('active');
+      updateReferralModalUI();
+    }
+    function closeMainReferralModal() {
+      const modal = document.getElementById('main-referral-modal');
+      modal.classList.remove('active');
+      setTimeout(() => { modal.style.display = 'none'; }, 300);
+    }
+
+    function generate5DigitCode(address) {
+      // address — строка (например, адрес кошелька)
+      // генерируем 5-значный код на основе адреса (детерминированно)
+      let hash = 0;
+      for (let i = 0; i < address.length; i++) {
+        hash = ((hash << 5) - hash) + address.charCodeAt(i);
+        hash |= 0;
+      }
+      let code = Math.abs(hash % 100000).toString().padStart(5, '0');
+      return code;
+    }
+
+    function updateReferralModalUI() {
+      // Проверяем подключение кошелька
+      const isConnected = typeof userAddress === 'string' && userAddress.length > 0;
+      const codeBox = document.getElementById('main-referral-code');
+      const input = document.getElementById('main-referral-input');
+      const submitBtn = document.getElementById('main-referral-submit');
+      const msg = document.getElementById('main-referral-msg');
+
+      // Получаем/создаём свой код
+      if (isConnected) {
+        if (!mainReferralCode) {
+          // Пробуем из localStorage
+          mainReferralCode = localStorage.getItem('referral_code_' + userAddress);
+          if (!mainReferralCode) {
+            mainReferralCode = generate5DigitCode(userAddress);
+            localStorage.setItem('referral_code_' + userAddress, mainReferralCode);
+          }
+        }
+        codeBox.textContent = mainReferralCode;
+      } else {
+        codeBox.textContent = 'Connect wallet';
+      }
+
+      // Работа с вводом чужого кода
+      if (isConnected) {
+        input.disabled = false;
+        submitBtn.disabled = false;
+        // Проверяем, вводил ли уже код
+        enteredReferralCode = localStorage.getItem('entered_referral_code_' + userAddress);
+        if (enteredReferralCode) {
+          input.value = enteredReferralCode;
+          input.disabled = true;
+          submitBtn.disabled = true;
+          msg.textContent = 'You have already entered a code.';
+        } else {
+          input.value = '';
+          msg.textContent = '';
+        }
+      } else {
+        input.value = '';
+        input.disabled = true;
+        submitBtn.disabled = true;
+        msg.textContent = 'Connect your wallet to enter a code.';
+      }
+    }
+
+    document.getElementById('main-referral-submit').onclick = function() {
+      const isConnected = typeof userAddress === 'string' && userAddress.length > 0;
+      if (!isConnected) return;
+      const input = document.getElementById('main-referral-input');
+      const code = input.value.trim();
+      const msg = document.getElementById('main-referral-msg');
+      if (!/^[0-9]{5}$/.test(code)) {
+        msg.textContent = 'Enter a valid 5-digit code.';
+        return;
+      }
+      if (mainReferralCode && code === mainReferralCode) {
+        msg.textContent = 'You cannot enter your own code.';
+        return;
+      }
+      // Сохраняем введённый код
+      localStorage.setItem('entered_referral_code_' + userAddress, code);
+      updateReferralModalUI();
+      msg.textContent = 'Code accepted!';
+    };
   </script>
 </body>
 </html>

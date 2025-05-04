@@ -2513,14 +2513,15 @@ But if you stay — you won't walk away the same.
         </div>
         <div class="countdown-content">
           <h2 class="modal-title countdown-title">⏳ Token Launch Time</h2>
-          <div class="launch-date">5 May 2025</div>
+          <div class="launch-date">6 May 2025</div>
           <div class="time-zones">
-            <div class="time-zone">🇷🇺 Moscow (MSK): 15:00 (5 May)</div>
-            <div class="time-zone">🇨🇳 Shanghai (CST): 20:00 (5 May)</div>
-            <div class="time-zone">🗽 New York (EDT): 08:00 (5 May)</div>
-            <div class="time-zone">🏰 London (BST): 13:00 (5 May)</div>
-            <div class="time-zone">🏯 Tokyo (JST): 21:00 (5 May)</div>
-            <div class="time-zone">🌆 Dubai (GST): 16:00 (5 May)</div>
+            <div class="time-zone">🇷🇺 Moscow (MSK): 17:00 (6 May, Tue)</div>
+            <div class="time-zone">🇨🇳 Shanghai (CST): 22:00 (6 May)</div>
+            <div class="time-zone">🗽 New York (EDT): 10:00 (6 May)</div>
+            <div class="time-zone">🏰 London (BST): 15:00 (6 May)</div>
+            <div class="time-zone">🏯 Tokyo (JST): 23:00 (6 May)</div>
+            <div class="time-zone">🌆 Dubai (GST): 18:00 (6 May)</div>
+            <div class="time-zone">🌐 UTC: 14:00 (6 May)</div>
           </div>
           <div class="countdown-info">
             <p>🧠 The Sleepman token will be unleashed soon.</p>
@@ -3514,43 +3515,30 @@ The trader replied instantly:
 
     // Countdown Timer Logic
     function initializeCountdown() {
-        // Set the countdown duration to 58 hours in milliseconds
-        const countdownDuration = 58 * 60 * 60 * 1000;
-        const startTime = new Date().getTime();
-        const endTime = startTime + countdownDuration;
-
+        // 6 May 2025, 17:00 MSK = 14:00 UTC
+        const launchDateUTC = new Date(Date.UTC(2025, 4, 6, 14, 0, 0));
         function updateTimer() {
-            const now = new Date().getTime();
-            const timeLeft = endTime - now;
-
+            const now = new Date();
+            const timeLeft = launchDateUTC.getTime() - now.getTime();
             if (timeLeft <= 0) {
                 document.getElementById('countdown-timer').innerHTML = "Token Launch Time!";
                 return;
             }
-
-            // Calculate hours, minutes, and seconds
             const hours = Math.floor(timeLeft / (1000 * 60 * 60));
             const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-            // Format the time with leading zeros
             const formattedHours = String(hours).padStart(2, '0');
             const formattedMinutes = String(minutes).padStart(2, '0');
             const formattedSeconds = String(seconds).padStart(2, '0');
-
-            // Update the display with glitch effect
             const timerElement = document.getElementById('countdown-timer');
             const newTime = `${formattedHours}h ${formattedMinutes}m ${formattedSeconds}s until token launch`;
-            
             if (timerElement.innerHTML !== newTime) {
                 timerElement.style.animation = 'none';
-                timerElement.offsetHeight; // Trigger reflow
+                timerElement.offsetHeight;
                 timerElement.style.animation = null;
                 timerElement.innerHTML = newTime;
             }
         }
-
-        // Update immediately and then every second
         updateTimer();
         setInterval(updateTimer, 1000);
     }

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>$SLEEPMAN — Enter the Dream</title>
-  <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
-  <script type="module">
+<meta charset="utf-8"/>
+<title>$SLEEPMAN — Enter the Dream</title>
+<link href="https://fonts.googleapis.com/css2?family=VT323&amp;display=swap" rel="stylesheet"/>
+<script type="module">
     async function loadEthers() {
       try {
         const { ethers } = await import('./ethers.js');
@@ -23,9 +24,9 @@
     }
     loadEthers();
   </script>
-  <script src="https://unpkg.com/@thirdweb-dev/sdk@3"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <style>
+<script src="https://unpkg.com/@thirdweb-dev/sdk@3"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
     html, body {
       margin: 0;
       padding: 0;
@@ -2335,36 +2336,31 @@
       opacity: 0.7;
     }
   </style>
-
-  <!-- SVG Filters for distortion -->
-  <svg style="display: none;">
-    <filter id="distortion-filter">
-      <feTurbulence type="turbulence" baseFrequency="0.01 0.01" numOctaves="2" seed="2" />
-      <feDisplacementMap in="SourceGraphic" scale="10" />
-    </filter>
-  </svg>
-
-  <div class="screen-distortion"></div>
-  </head>
+<!-- SVG Filters for distortion -->
+<svg style="display: none;">
+<filter id="distortion-filter">
+<feturbulence basefrequency="0.01 0.01" numoctaves="2" seed="2" type="turbulence"></feturbulence>
+<fedisplacementmap in="SourceGraphic" scale="10"></fedisplacementmap>
+</filter>
+</svg>
+<div class="screen-distortion"></div>
+</head>
 <body>
-  <div class="error-overlay"></div>
-  <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9998;display:none;"></canvas>
-  <!-- Добавляем элементы для эффектов ошибки -->
-  <div class="error-glow"></div>
-  <div class="system-alert">[ALERT] SYSTEM SECURITY FAILURE: SLEEP_ENTITY SCP-Δ777 IS WAKING UP.</div>
-
-  <!-- Добавляем контейнеры для фейерверков -->
-  <div class="firework-container" id="fireworkLeft"></div>
-  <div class="firework-container" id="fireworkRight"></div>
-
-  <!-- Info Button -->
-  <button id="info-button">!</button>
-
-  <!-- Info Modal -->
-  <div id="info-modal" class="modal">
-    <div class="modal-content">
-      <button class="close-modal" onclick="closeInfoModal()">×</button>
-      <div class="info-content">
+<div class="error-overlay"></div>
+<canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:9998;display:none;"></canvas>
+<!-- Добавляем элементы для эффектов ошибки -->
+<div class="error-glow"></div>
+<div class="system-alert">[ALERT] SYSTEM SECURITY FAILURE: SLEEP_ENTITY SCP-Δ777 IS WAKING UP.</div>
+<!-- Добавляем контейнеры для фейерверков -->
+<div class="firework-container" id="fireworkLeft"></div>
+<div class="firework-container" id="fireworkRight"></div>
+<!-- Info Button -->
+<button id="info-button">!</button>
+<!-- Info Modal -->
+<div class="modal" id="info-modal">
+<div class="modal-content">
+<button class="close-modal" onclick="closeInfoModal()">×</button>
+<div class="info-content">
 [INFO FILE .SLPM-00X1]  
 Access granted. Warning: Background interference may affect signal integrity.
 
@@ -2444,103 +2440,96 @@ Or you can stay.
 
 But if you stay — you won't walk away the same.
       </div>
-    </div>
-  </div>
-
-  <!-- Intro Screen -->
-  <div id="introScreen">
-    <div class="intro-text">You are not supposed to be here.</div>
-    <div class="intro-text">But now that you are...</div>
-    <div class="intro-text">the game begins.</div>
-  </div>
-
-  <!-- Main Content -->
-  <div id="mainContent">
-    <!-- Фон -->
-    <img class="background" id="bg" src="sleepman_final_1_3s.gif" alt="Sleepman Background">
-
-    <!-- UI -->
-    <div class="ui" id="mainUI">
-      <div id="connectWallet" class="button" data-text="CONNECT WALLET" data-sound="buzz" onclick="showWalletModal()">CONNECT WALLET</div>
-      <div id="walletAddress" class="button" style="display: none;"></div>
-      <div class="button" data-text="BUY $SLEEPMAN" data-sound="buzz" onclick="showTokenomics()">BUY $SLEEPMAN</div>
-      <div class="button" data-text="CLAIM NFT" data-sound="buzz">CLAIM NFT</div>
-      <div class="button" data-text="JOIN CULT" data-sound="buzz">JOIN CULT</div>
-      <div class="button" data-text="CLAIM AIRDROP" data-sound="buzz" onclick="showAirdropModal()">CLAIM AIRDROP</div>
-      <div class="button" data-text="REFERRAL" data-sound="buzz" id="referral-main-btn" onclick="openMainReferralModal()">REFERRAL</div>
-    </div>
-
-    <!-- Секретная кнопка по лампе -->
-    <div id="secretLampBtn" onclick="activateTerminal()"></div>
-
-    <!-- Терминал -->
-    <div class="terminal-overlay"></div>
-    <div id="terminal">
-      <div class="terminal-content">
-        <div class="terminal-line">[LOG-██/██/██] // SLEEP ENTITY FILE - SCP-Δ777</div>
-        <div class="terminal-line">&nbsp;</div>
-        <div class="terminal-line">Designation: SLEEP_MAN</div>
-        <div class="terminal-line">Status: Semi-dormant</div>
-        <div class="terminal-line">Threat Level: Unclassified</div>
-        <div class="terminal-line">&nbsp;</div>
-        <div class="terminal-line">Fragmented Memory Extract:</div>
-        <div class="terminal-line">>> ...subject exhibits passive resistance to all stimuli...</div>
-        <div class="terminal-line">>> ...first contact recorded at dream depth level 6...</div>
-        <div class="terminal-line">>> ...eyes closed, but aware. always aware...</div>
-        <div class="terminal-line">>> ...he said: "don't wake me... I'm still uploading the dream..."</div>
-        <div class="terminal-line">&nbsp;</div>
-        <div class="terminal-line">Notes:</div>
-        <div class="terminal-line">Subject is believed to exist simultaneously in chain and meta-chain.</div>
-        <div class="terminal-line">Do not engage directly unless clearance Δ is provided.</div>
-        <div class="terminal-line">Await Phase: Dream Protocol.</div>
-      </div>
-      <div class="terminal-input-wrapper">
-        <span class="terminal-prompt">>></span>
-        <input type="text" class="terminal-input" placeholder="Enter command..." spellcheck="false" />
-        <div class="terminal-indicator"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tokenomics Modal -->
-  <div id="tokenomicsModal" class="modal">
-    <div class="modal-content">
-      <button class="close-modal" onclick="closeModal()">×</button>
-      <div class="countdown-container">
-        <div class="countdown-image">
-          <div class="coin-warning">Do NOT click the coin!</div>
-          <img src="Монета с монстром и кровью.png" alt="Sleepman Token" class="token-image">
-        </div>
-        <div class="countdown-content">
-          <h2 class="modal-title countdown-title">⏳ Token Launch Time</h2>
-          <div class="launch-date">6 May 2025</div>
-          <div class="time-zones">
-            <div class="time-zone">🇷🇺 Moscow (MSK): 17:00 (6 May, Tue)</div>
-            <div class="time-zone">🇨🇳 Shanghai (CST): 22:00 (6 May)</div>
-            <div class="time-zone">🗽 New York (EDT): 10:00 (6 May)</div>
-            <div class="time-zone">🏰 London (BST): 15:00 (6 May)</div>
-            <div class="time-zone">🏯 Tokyo (JST): 23:00 (6 May)</div>
-            <div class="time-zone">🌆 Dubai (GST): 18:00 (6 May)</div>
-            <div class="time-zone">🌐 UTC: 14:00 (6 May)</div>
-          </div>
-          <div class="countdown-info">
-            <p>🧠 The Sleepman token will be unleashed soon.</p>
-            <p>📢 All purchase instructions will appear in our official channels:</p>
-            <p>— Telegram: <a href="https://t.me/SleepmanCult" target="_blank" class="glow-link">@SleepmanCult</a></p>
-            <p>— Twitter: <a href="https://twitter.com/SleepmanToken" target="_blank" class="glow-link">@SleepmanToken</a></p>
-            <p>🌀 Token will be available to buy here via Jupiter.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- NFT Claim Modal -->
-  <div id="nft-claim-modal" class="modal">
-    <div class="modal-content">
-      <button class="close-modal" onclick="closeNFTClaim()">×</button>
-      <h2 class="modal-title">NFT Access</h2>
-      <div class="nft-claim-content">
+</div>
+</div>
+<!-- Intro Screen -->
+<div id="introScreen">
+<div class="intro-text">You are not supposed to be here.</div>
+<div class="intro-text">But now that you are...</div>
+<div class="intro-text">the game begins.</div>
+</div>
+<!-- Main Content -->
+<div id="mainContent">
+<!-- Фон -->
+<img alt="Sleepman Background" class="background" id="bg" src="sleepman_final_1_3s.gif"/>
+<!-- UI -->
+<div class="ui" id="mainUI">
+<div class="button" data-sound="buzz" data-text="CONNECT WALLET" id="connectWallet" onclick="showWalletModal()">CONNECT WALLET</div>
+<div class="button" id="walletAddress" style="display: none;"></div>
+<div class="button" data-sound="buzz" data-text="BUY $SLEEPMAN" onclick="showTokenomics()">BUY $SLEEPMAN</div>
+<div class="button" data-sound="buzz" data-text="CLAIM NFT">CLAIM NFT</div>
+<div class="button" data-sound="buzz" data-text="JOIN CULT">JOIN CULT</div>
+<div class="button" data-sound="buzz" data-text="CLAIM AIRDROP" onclick="showAirdropModal()">CLAIM AIRDROP</div>
+<div class="button" data-sound="buzz" data-text="REFERRAL" id="referral-main-btn" onclick="openMainReferralModal()">REFERRAL</div>
+</div>
+<!-- Секретная кнопка по лампе -->
+<div id="secretLampBtn" onclick="activateTerminal()"></div>
+<!-- Терминал -->
+<div class="terminal-overlay"></div>
+<div id="terminal">
+<div class="terminal-content">
+<div class="terminal-line">[LOG-██/██/██] // SLEEP ENTITY FILE - SCP-Δ777</div>
+<div class="terminal-line"> </div>
+<div class="terminal-line">Designation: SLEEP_MAN</div>
+<div class="terminal-line">Status: Semi-dormant</div>
+<div class="terminal-line">Threat Level: Unclassified</div>
+<div class="terminal-line"> </div>
+<div class="terminal-line">Fragmented Memory Extract:</div>
+<div class="terminal-line">&gt;&gt; ...subject exhibits passive resistance to all stimuli...</div>
+<div class="terminal-line">&gt;&gt; ...first contact recorded at dream depth level 6...</div>
+<div class="terminal-line">&gt;&gt; ...eyes closed, but aware. always aware...</div>
+<div class="terminal-line">&gt;&gt; ...he said: "don't wake me... I'm still uploading the dream..."</div>
+<div class="terminal-line"> </div>
+<div class="terminal-line">Notes:</div>
+<div class="terminal-line">Subject is believed to exist simultaneously in chain and meta-chain.</div>
+<div class="terminal-line">Do not engage directly unless clearance Δ is provided.</div>
+<div class="terminal-line">Await Phase: Dream Protocol.</div>
+</div>
+<div class="terminal-input-wrapper">
+<span class="terminal-prompt">&gt;&gt;</span>
+<input class="terminal-input" placeholder="Enter command..." spellcheck="false" type="text"/>
+<div class="terminal-indicator"></div>
+</div>
+</div>
+</div>
+<!-- Tokenomics Modal -->
+<div class="modal" id="tokenomicsModal">
+<div class="modal-content">
+<button class="close-modal" onclick="closeModal()">×</button>
+<div class="countdown-container">
+<div class="countdown-image">
+<div class="coin-warning">Do NOT click the coin!</div>
+<img alt="Sleepman Token" class="token-image" src="Монета с монстром и кровью.png"/>
+</div>
+<div class="countdown-content">
+<h2 class="modal-title countdown-title">⏳ Token Launch Time</h2>
+<div class="launch-date">10 May 2025</div>
+<div class="time-zones">
+<div class="time-zone">🇷🇺 Moscow (MSK): 12:00 (10 May, Sat)</div>
+<div class="time-zone">🇨🇳 Shanghai (CST): 17:00 (10 May)</div>
+<div class="time-zone">🗽 New York (EDT): 05:00 (10 May)</div>
+<div class="time-zone">🏰 London (BST): 10:00 (10 May)</div>
+<div class="time-zone">🏯 Tokyo (JST): 18:00 (10 May)</div>
+<div class="time-zone">🌆 Dubai (GST): 13:00 (10 May)</div>
+<div class="time-zone">🌐 UTC: 09:00 (10 May)</div>
+</div>
+<div class="countdown-info">
+<p>🧠 The Sleepman token will be unleashed soon.</p>
+<p>📢 All purchase instructions will appear in our official channels:</p>
+<p>— Telegram: <a class="glow-link" href="https://t.me/SleepmanCult" target="_blank">@SleepmanCult</a></p>
+<p>— Twitter: <a class="glow-link" href="https://twitter.com/SleepmanToken" target="_blank">@SleepmanToken</a></p>
+<p>🌀 Token will be available to buy here via Jupiter.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- NFT Claim Modal -->
+<div class="modal" id="nft-claim-modal">
+<div class="modal-content">
+<button class="close-modal" onclick="closeNFTClaim()">×</button>
+<h2 class="modal-title">NFT Access</h2>
+<div class="nft-claim-content">
 This is not a collectible.
 
 By claiming this NFT, you enter the first layer of the Sleepman system.
@@ -2557,150 +2546,143 @@ No entry — no lore.
 
 Welcome to the mechanism.
       </div>
-      <a href="https://thirdweb.com/base/0x2785b77adC320846497B894424977028a5CEef0d/nfts" target="_blank" class="nft-claim-button">BUY NFT 1.25$</a>
-    </div>
-  </div>
-
-  <!-- Wallet Selection Modal -->
-  <div id="wallet-select-modal" class="modal">
-    <div class="modal-content">
-      <button class="close-wallet-modal" onclick="closeWalletModal()">×</button>
-      <h2 class="modal-title">Connect Wallet</h2>
-      <div class="disclaimer">
-        <strong>Important Notice:</strong>
+<a class="nft-claim-button" href="https://thirdweb.com/base/0x2785b77adC320846497B894424977028a5CEef0d/nfts" target="_blank">BUY NFT 1.25$</a>
+</div>
+</div>
+<!-- Wallet Selection Modal -->
+<div class="modal" id="wallet-select-modal">
+<div class="modal-content">
+<button class="close-wallet-modal" onclick="closeWalletModal()">×</button>
+<h2 class="modal-title">Connect Wallet</h2>
+<div class="disclaimer">
+<strong>Important Notice:</strong>
         To ensure correct wallet connection, please disable any additional wallet extensions (such as Phantom, TokenPocket, or Rabby) before proceeding.
-        <br><br>
+        <br/><br/>
         Sleepman supports MetaMask only — the NFT operates on the Base network (an Ethereum-compatible chain), and using other wallet extensions may result in connection conflicts or false addresses.
-        <br><br>
+        <br/><br/>
         If MetaMask is installed and no other wallets are active, click "Connect MetaMask" below.
       </div>
-      <button id="connect-metamask" data-text="CONNECT METAMASK" onclick="connectMetaMask()">CONNECT METAMASK</button>
-    </div>
-  </div>
-
-  <!-- Cult Modal -->
-  <div id="cult-modal" class="modal">
-    <div class="modal-content">
-      <button class="close-modal" onclick="closeCultModal()">×</button>
-      <h2 class="modal-title">Join the Cult</h2>
-      <div class="social-buttons">
-        <a href="https://t.me/SleepManCult" target="_blank" class="social-button telegram-button">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.95 1.24-5.5 3.65-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.25.38-.51 1.05-.78 4.12-1.79 6.87-2.97 8.26-3.54 3.93-1.6 4.75-1.87 5.27-1.88.12 0 .37.03.54.17.14.12.18.29.2.45-.01.06-.01.24 0 .38z"/>
-          </svg>
-        </a>
-        <a href="https://x.com/CryptoSleepMan" target="_blank" class="social-button twitter-button">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z"/>
-          </svg>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  <!-- NFT Counter Modal -->
-  <div id="nft-counter">
-    <div class="nft-counter">
-      <span>9</span><span>8</span><span>2</span><span>3</span> / <span>1</span><span>0</span><span>0</span><span>0</span><span>0</span>
-    </div>
-    <div class="rotating-quote"></div>
-  </div>
-
-  <!-- AIRDROP MODAL -->
-  <div id="airdrop-modal" class="modal">
-    <div class="modal-content airdrop-modal-content">
-      <button class="close-modal" onclick="closeAirdropModal()">×</button>
-      <div class="airdrop-title">🌙 Sleepman Cult Airdrop</div>
-      <div class="scroll-container"><div class="airdrop-text">
-        Hey you.<br>
-        Yes, you — the one who hasn't sold your soul to scam tokens and dead-end projects yet.<br><br>
-        $SLEEPMAN is not just another coin.<br>
-        It's the first spark of a new movement.<br><br>
-        <b>What's happening here?</b><br><br>
-        It's simple:<br><br>
-        Built on real community, not fake hype.<br>
-        No smoke, no mirrors. Only real momentum.<br><br>
-        <b>Why does it matter?</b><br><br>
-        The more activity, the more power the cult gathers.<br>
-        You are part of the rise — and you benefit directly.<br><br>
-        Share a post → earn tokens.<br>
-        Create a meme → earn even more.<br>
-        Drop a video → carve your way to the top.<br>
-        No fakery.<br>
-        You're not a marketer.<br>
-        You are a builder of the new reality.<br><br>
-        To make it easier:<br><br>
-        Ready-to-use memes, images, and content are waiting for you in the Telegram Bot.<br>
-        Want to stand out?<br>
-        Create your own art, memes, or videos — and earn 2x more rewards.<br>
-        Your choice.<br>
-        Step by step, we are building a new world.<br><br>
-        <b>Token Allocation:</b><br><br>
-        30% — Liquidity Pool<br>
-        (So everyone can buy and sell freely.)<br>
-        20% — Viral Airdrops<br>
-        (Rewards for the active believers.)<br>
-        20% — Cult Treasury<br>
-        (To reinvest into liquidity and support price growth as the market cap rises.)<br>
-        10% — Team Allocation<br>
-        (To fuel development and innovation.)<br>
-        20% — Marketing & Expansion Fund<br>
-        (For scaling, partnerships, and global exposure.)<br><br>
-        <b>Why now?</b><br><br>
-        The cult is just awakening.<br>
-        Every active member today lays the foundation for the future.<br><br>
-        When everyone else catches up — you'll already be miles ahead.<br><br>
-        You're not just clicking a button.<br>
-        You're stepping into a new reality.<br><br>
-        <b>How to participate:</b><br><br>
-        Click CLAIM AIRDROP.<br>
-        Enter the Telegram Bot.<br>
-        Complete tasks → receive $SLEEPMAN tokens.<br>
-        The more you move the cult forward — the bigger your prize.<br><br>
-        Sleepman is still asleep.<br>
-        But the cult is awakening.<br>
-        With you — or without you.<br>
+<button data-text="CONNECT METAMASK" id="connect-metamask" onclick="connectMetaMask()">CONNECT METAMASK</button>
+</div>
+</div>
+<!-- Cult Modal -->
+<div class="modal" id="cult-modal">
+<div class="modal-content">
+<button class="close-modal" onclick="closeCultModal()">×</button>
+<h2 class="modal-title">Join the Cult</h2>
+<div class="social-buttons">
+<a class="social-button telegram-button" href="https://t.me/SleepManCult" target="_blank">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.95 1.24-5.5 3.65-.52.36-.99.53-1.41.52-.46-.01-1.35-.26-2.01-.48-.81-.27-1.46-.42-1.4-.88.03-.25.38-.51 1.05-.78 4.12-1.79 6.87-2.97 8.26-3.54 3.93-1.6 4.75-1.87 5.27-1.88.12 0 .37.03.54.17.14.12.18.29.2.45-.01.06-.01.24 0 .38z"></path>
+</svg>
+</a>
+<a class="social-button twitter-button" href="https://x.com/CryptoSleepMan" target="_blank">
+<svg viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M23.44 4.83c-.8.37-1.5.38-2.22.02.93-.56.98-.96 1.32-2.02-.88.52-1.86.9-2.9 1.1-.82-.88-2-1.43-3.3-1.43-2.5 0-4.55 2.04-4.55 4.54 0 .36.03.7.1 1.04-3.77-.2-7.12-2-9.36-4.75-.4.67-.6 1.45-.6 2.3 0 1.56.8 2.95 2 3.77-.74-.03-1.44-.23-2.05-.57v.06c0 2.2 1.56 4.03 3.64 4.44-.67.2-1.37.2-2.06.08.58 1.8 2.26 3.12 4.25 3.16C5.78 18.1 3.37 18.74 1 18.46c2 1.3 4.4 2.04 6.97 2.04 8.35 0 12.92-6.92 12.92-12.93 0-.2 0-.4-.02-.6.9-.63 1.96-1.22 2.56-2.14z"></path>
+</svg>
+</a>
+</div>
+</div>
+</div>
+<!-- NFT Counter Modal -->
+<div id="nft-counter">
+<div class="nft-counter">
+<span>9</span><span>8</span><span>2</span><span>3</span> / <span>1</span><span>0</span><span>0</span><span>0</span><span>0</span>
+</div>
+<div class="rotating-quote"></div>
+</div>
+<!-- AIRDROP MODAL -->
+<div class="modal" id="airdrop-modal">
+<div class="modal-content airdrop-modal-content">
+<button class="close-modal" onclick="closeAirdropModal()">×</button>
+<div class="airdrop-title">🌙 Sleepman Cult Airdrop</div>
+<div class="scroll-container"><div class="airdrop-text">
+        Hey you.<br/>
+        Yes, you — the one who hasn't sold your soul to scam tokens and dead-end projects yet.<br/><br/>
+        $SLEEPMAN is not just another coin.<br/>
+        It's the first spark of a new movement.<br/><br/>
+<b>What's happening here?</b><br/><br/>
+        It's simple:<br/><br/>
+        Built on real community, not fake hype.<br/>
+        No smoke, no mirrors. Only real momentum.<br/><br/>
+<b>Why does it matter?</b><br/><br/>
+        The more activity, the more power the cult gathers.<br/>
+        You are part of the rise — and you benefit directly.<br/><br/>
+        Share a post → earn tokens.<br/>
+        Create a meme → earn even more.<br/>
+        Drop a video → carve your way to the top.<br/>
+        No fakery.<br/>
+        You're not a marketer.<br/>
+        You are a builder of the new reality.<br/><br/>
+        To make it easier:<br/><br/>
+        Ready-to-use memes, images, and content are waiting for you in the Telegram Bot.<br/>
+        Want to stand out?<br/>
+        Create your own art, memes, or videos — and earn 2x more rewards.<br/>
+        Your choice.<br/>
+        Step by step, we are building a new world.<br/><br/>
+<b>Token Allocation:</b><br/><br/>
+        30% — Liquidity Pool<br/>
+        (So everyone can buy and sell freely.)<br/>
+        20% — Viral Airdrops<br/>
+        (Rewards for the active believers.)<br/>
+        20% — Cult Treasury<br/>
+        (To reinvest into liquidity and support price growth as the market cap rises.)<br/>
+        10% — Team Allocation<br/>
+        (To fuel development and innovation.)<br/>
+        20% — Marketing &amp; Expansion Fund<br/>
+        (For scaling, partnerships, and global exposure.)<br/><br/>
+<b>Why now?</b><br/><br/>
+        The cult is just awakening.<br/>
+        Every active member today lays the foundation for the future.<br/><br/>
+        When everyone else catches up — you'll already be miles ahead.<br/><br/>
+        You're not just clicking a button.<br/>
+        You're stepping into a new reality.<br/><br/>
+<b>How to participate:</b><br/><br/>
+        Click CLAIM AIRDROP.<br/>
+        Enter the Telegram Bot.<br/>
+        Complete tasks → receive $SLEEPMAN tokens.<br/>
+        The more you move the cult forward — the bigger your prize.<br/><br/>
+        Sleepman is still asleep.<br/>
+        But the cult is awakening.<br/>
+        With you — or without you.<br/>
         Decide.
       </div></div>
-      <a href="https://t.me/SleepManAirdrop" target="_blank" class="airdrop-link">Go to Telegram Bot</a>
-    </div>
-  </div>
-
-  <!-- Add blood overlay container -->
-  <div id="blood-overlay" class="blood-overlay">
-    <div class="blood-stream top-left"></div>
-    <div class="blood-stream top-right"></div>
-    <div class="blood-stream left"></div>
-    <div class="blood-stream right"></div>
-  </div>
-
-  <!-- Добавить модальное окно для рефералов в конец <body> -->
-  <div id="main-referral-modal" class="modal">
-    <div class="modal-content referral-modal-content">
-      <button class="close-modal" onclick="closeMainReferralModal()">×</button>
-      <div class="referral-headline">
-        Bring a friend — and get 175,000 tokens.<br>
-        Your friend gets 100,000 tokens instantly, and you'll earn 15% of their airdrop progress forever.<br><br>
-        Be the one who spreads the signal.<br>
-        This cult will grow like mushrooms in the dark.<br>
+<a class="airdrop-link" href="https://t.me/SleepManAirdrop" target="_blank">Go to Telegram Bot</a>
+</div>
+</div>
+<!-- Add blood overlay container -->
+<div class="blood-overlay" id="blood-overlay">
+<div class="blood-stream top-left"></div>
+<div class="blood-stream top-right"></div>
+<div class="blood-stream left"></div>
+<div class="blood-stream right"></div>
+</div>
+<!-- Добавить модальное окно для рефералов в конец <body> -->
+<div class="modal" id="main-referral-modal">
+<div class="modal-content referral-modal-content">
+<button class="close-modal" onclick="closeMainReferralModal()">×</button>
+<div class="referral-headline">
+        Bring a friend — and get 175,000 tokens.<br/>
+        Your friend gets 100,000 tokens instantly, and you'll earn 15% of their airdrop progress forever.<br/><br/>
+        Be the one who spreads the signal.<br/>
+        This cult will grow like mushrooms in the dark.<br/>
         You'll be among the first when the world wakes up.
       </div>
-      <div class="referral-blocks">
-        <div class="referral-own-block">
-          <h3>Your Referral Code</h3>
-          <div id="main-referral-code" class="referral-code-box">—</div>
-        </div>
-        <div class="referral-enter-block">
-          <h3>Enter a Referral Code</h3>
-          <input id="main-referral-input" class="referral-input" type="text" maxlength="5" placeholder="Enter 5-digit code" disabled>
-          <button id="main-referral-submit" class="referral-submit-btn" disabled>Submit</button>
-          <div id="main-referral-msg" class="referral-enter-msg"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
+<div class="referral-blocks">
+<div class="referral-own-block">
+<h3>Your Referral Code</h3>
+<div class="referral-code-box" id="main-referral-code">—</div>
+</div>
+<div class="referral-enter-block">
+<h3>Enter a Referral Code</h3>
+<input class="referral-input" disabled="" id="main-referral-input" maxlength="5" placeholder="Enter 5-digit code" type="text"/>
+<button class="referral-submit-btn" disabled="" id="main-referral-submit">Submit</button>
+<div class="referral-enter-msg" id="main-referral-msg"></div>
+</div>
+</div>
+</div>
+</div>
+<script>
     // Check if intro has been shown before
     const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
 
